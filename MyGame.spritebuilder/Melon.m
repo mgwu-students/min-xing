@@ -16,10 +16,14 @@
     
     if (self) {
         self.isActive = NO;
-        self.isLabeled = NO;
+//        self.isLabeled = NO;
     }
     return self;
 }
+
+int(^updateMelonLabel)(int label) = ^int(int label) {
+    return label;
+};
 
 - (void)setIsActive:(BOOL)newState
 {
@@ -27,6 +31,5 @@
     self.visible = _isActive;
 
 }
-
 
 @end

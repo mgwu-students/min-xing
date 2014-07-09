@@ -8,6 +8,10 @@
 
 #import "CCSprite.h"
 
+typedef void(^updateMelonLabel)(int label);
+
 @interface Grid : CCSprite
+
+@property (nonatomic, copy) updateMelonLabel updateLabel;
 
 @end

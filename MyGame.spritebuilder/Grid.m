@@ -16,6 +16,7 @@ static const int GRID_COLUMNS = 6;
     NSMutableArray *_gridArray;
     float _cellWidth;
     float _cellHeight;
+    int _melonLabel;
 }
 
 - (void)onEnter
@@ -26,12 +27,15 @@ static const int GRID_COLUMNS = 6;
     
     // Accept touches on the grid.
     self.userInteractionEnabled = YES;
+    
+    // Set random starting number label for first melon.
+    _melonLabel = arc4random_uniform(GRID_COLUMNS) + 1; // Random number between 1 and GRID_COLUMNS.
+    self.updateLabel(_melonLabel);
 }
 
 - (void)setupGrid
 {
-    // Divide the grid's size by the number of col/rows to figure out
-    // the right width and height of each cell
+    // Divide grid size by total cols/rows to figure out the width and height of each cell.
     _cellWidth = self.contentSize.width / GRID_COLUMNS;
     _cellHeight = self.contentSize.height / GRID_ROWS;
     
@@ -71,32 +75,32 @@ static const int GRID_COLUMNS = 6;
     
     thisMelon.isActive = YES;
     
-    thisMelon.numLabel = 5; // TESTING ONLY
-    thisMelon.isLabeled = YES; // TESTING ONLY
-    
     // Update neighbor counts.
     [self countRow:thisMelon.rowPos andCol:thisMelon.colPos NeighborsOfMelon:thisMelon];
     int numVerticalNeighbors = thisMelon.verticalNeighborEndRow - thisMelon.verticalNeighborStartRow + 1;
     int numHorizNeighbors = thisMelon.horizNeighborEndCol - thisMelon.horizNeighborStartCol + 1;
     
-//    CCLOG(@"Num of vertical neighbors: %d", numVerticalNeighbors);
-//    CCLOG(@"Num of horizontal neighbors: %d", numHorizNeighbors);
-    
     // Remove all vertical neighbors.
-    if (thisMelon.numLabel == numVerticalNeighbors) {
-        for (int i = thisMelon.verticalNeighborStartRow; i <= thisMelon.verticalNeighborEndRow; i++) {
+    if (_melonLabel == numVerticalNeighbors)
+    {
+        for (int i = thisMelon.verticalNeighborStartRow; i <= thisMelon.verticalNeighborEndRow; i++)
+        {
             Melon *neighborToRemove = _gridArray[i][thisMelon.colPos];
             neighborToRemove.isActive = NO;
         }
     }
     // Remove all horizontal neighbors.
-    if (thisMelon.numLabel == numHorizNeighbors) {
-        for (int j = thisMelon.horizNeighborStartCol; j <= thisMelon.horizNeighborEndCol; j++) {
+    if (_melonLabel == numHorizNeighbors)
+    {
+        for (int j = thisMelon.horizNeighborStartCol; j <= thisMelon.horizNeighborEndCol; j++)
+        {
             Melon *neighborToRemove = _gridArray[thisMelon.rowPos][j];
-            CCLOG(@"Removing melon at pos: %d %d", thisMelon.rowPos, j);
             neighborToRemove.isActive = NO;
         }
     }
+    
+    _melonLabel = arc4random_uniform(GRID_COLUMNS) + 1; // Get a random number for the next melon.
+    self.updateLabel(_melonLabel);
 }
 
 - (Melon *)melonForTouchPosition:(CGPoint)touchPosition
@@ -157,7 +161,8 @@ static const int GRID_COLUMNS = 6;
     }
     
     // Count the active melons above the current melon.
-    for (int up = row - 1; up >= 0 ; up--) {
+    for (int up = row - 1; up >= 0 ; up--)
+    {
         Melon *neighborMelon = _gridArray[up][col];
         if (neighborMelon.isActive) {
             currentMelon.verticalNeighborStartRow--;
@@ -171,7 +176,7 @@ static const int GRID_COLUMNS = 6;
 // Removes a melon at the specificed position.
 - (void)removeNeighborAtX:(int)xPos Y:(int)yPos
 {
-    Melon *melonToBeRemoved =  _gridArray[xPos][yPos];
+    Melon *melonToBeRemoved = _gridArray[xPos][yPos];
     melonToBeRemoved.isActive = NO;
 }
 

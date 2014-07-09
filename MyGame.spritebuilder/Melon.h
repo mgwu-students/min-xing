@@ -13,11 +13,11 @@
 // Whether this melon is visible on the board.
 @property (nonatomic, assign) BOOL isActive;
 
-// Whether this melon has a number label/ can possibly act as a bomb.
-@property (nonatomic, assign) BOOL isLabeled;
-
-// The number on the label.
-@property (nonatomic, assign) NSInteger numLabel;
+//// Whether this melon has a number label/ can possibly act as a bomb.
+//@property (nonatomic, assign) BOOL isLabeled;
+//
+//// The number on the label.
+//@property (nonatomic, assign) NSInteger numLabel;
 
 // Current column of the melon.
 @property (nonatomic, assign) NSInteger colPos;
