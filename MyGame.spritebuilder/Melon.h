@@ -13,29 +13,26 @@
 // Whether this melon is visible on the board.
 @property (nonatomic, assign) BOOL isActive;
 
-//// Whether this melon has a number label/ can possibly act as a bomb.
-//@property (nonatomic, assign) BOOL isLabeled;
-//
-//// The number on the label.
-//@property (nonatomic, assign) NSInteger numLabel;
+// The number on the label.
+@property (nonatomic, assign) int winterMelonNumLabel; // 0 if not a winter melon.
 
 // Current column of the melon.
-@property (nonatomic, assign) NSInteger colPos;
+@property (nonatomic, assign) int colPos;
 
 // Current row of the melon.
-@property (nonatomic, assign) NSInteger rowPos;
+@property (nonatomic, assign) int rowPos;
 
 // Stores the column where the row of horizontal neighbors starts.
-@property (nonatomic, assign) NSInteger horizNeighborStartCol;
+@property (nonatomic, assign) int horizNeighborStartCol;
 
 // Stores the row where the column of vertical neighbors starts.
-@property (nonatomic, assign) NSInteger verticalNeighborStartRow;
+@property (nonatomic, assign) int verticalNeighborStartRow;
 
 // Stores the column where the row of horizontal neighbors ends.
-@property (nonatomic, assign) NSInteger horizNeighborEndCol;
+@property (nonatomic, assign) int horizNeighborEndCol;
 
 // Stores the row where the column of vertical neighbors ends
-@property (nonatomic, assign) NSInteger verticalNeighborEndRow;
+@property (nonatomic, assign) int verticalNeighborEndRow;
 
 - (id)initMelons;
 

@@ -16,7 +16,6 @@
     
     if (self) {
         self.isActive = NO;
-//        self.isLabeled = NO;
     }
     return self;
 }

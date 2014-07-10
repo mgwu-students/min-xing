@@ -71,8 +71,8 @@
 						<string>Position</string>
 						<key>value</key>
 						<array>
-							<real>203</real>
-							<real>216</real>
+							<real>199</real>
+							<real>222</real>
 							<integer>0</integer>
 							<integer>0</integer>
 							<integer>0</integer>
@@ -127,6 +127,8 @@
 						</array>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -160,8 +162,8 @@
 						<string>Position</string>
 						<key>value</key>
 						<array>
-							<real>165.00003051757812</real>
-							<real>293</real>
+							<real>164.00003051757812</real>
+							<real>214</real>
 							<integer>0</integer>
 							<integer>0</integer>
 							<integer>0</integer>
@@ -174,8 +176,8 @@
 						<string>ScaleLock</string>
 						<key>value</key>
 						<array>
-							<real>1</real>
-							<real>1</real>
+							<real>3.1235711574554443</real>
+							<real>3.3397133350372314</real>
 							<false/>
 							<integer>0</integer>
 						</array>
@@ -223,7 +225,7 @@
 						<key>value</key>
 						<array>
 							<real>248</real>
-							<real>379</real>
+							<real>388</real>
 							<integer>0</integer>
 							<integer>0</integer>
 							<integer>0</integer>
@@ -247,8 +249,8 @@
 						<string>ScaleLock</string>
 						<key>value</key>
 						<array>
-							<real>3</real>
-							<real>2.750861644744873</real>
+							<real>4.0001859664916992</real>
+							<real>3.9295814037322998</real>
 							<false/>
 							<integer>0</integer>
 						</array>
@@ -311,8 +313,8 @@
 						<string>Position</string>
 						<key>value</key>
 						<array>
-							<real>249</real>
-							<real>378</real>
+							<real>250</real>
+							<real>389</real>
 							<integer>0</integer>
 							<integer>0</integer>
 							<integer>0</integer>
@@ -336,8 +338,8 @@
 						<string>ScaleLock</string>
 						<key>value</key>
 						<array>
-							<real>1</real>
-							<real>1</real>
+							<real>1.7503664493560791</real>
+							<real>1.3635063171386719</real>
 							<false/>
 							<integer>0</integer>
 						</array>
@@ -485,8 +487,6 @@
 						</array>
 					</dict>
 				</array>
-				<key>selected</key>
-				<true/>
 			</dict>
 		</array>
 		<key>customClass</key>

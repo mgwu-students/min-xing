@@ -25,7 +25,6 @@ static const int GRID_COLUMNS = 6;
     
     [self setupGrid];
     
-    // Accept touches on the grid.
     self.userInteractionEnabled = YES;
     
     // Set random starting number label for first melon.
@@ -60,65 +59,45 @@ static const int GRID_COLUMNS = 6;
             
             x += _cellWidth;
         }
-        
         y += _cellHeight;
     }
 }
 
-
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
-    // Get the x, y coordinates of the touch.
+    // Get the x, y coordinates of the touch and the Melon at that location.
     CGPoint touchLocation = [touch locationInNode:self];
-    // Get the Melon at that location.
     Melon *thisMelon = [self melonForTouchPosition:touchLocation];
     
     thisMelon.isActive = YES;
     
     // Update neighbor counts.
     [self countRow:thisMelon.rowPos andCol:thisMelon.colPos NeighborsOfMelon:thisMelon];
-    int numVerticalNeighbors = thisMelon.verticalNeighborEndRow - thisMelon.verticalNeighborStartRow + 1;
-    int numHorizNeighbors = thisMelon.horizNeighborEndCol - thisMelon.horizNeighborStartCol + 1;
+    // Remove neighbors if necessary.
+    [self checkToRemoveNeighborsOfMelon:thisMelon];
     
-    // Remove all vertical neighbors.
-    if (_melonLabel == numVerticalNeighbors)
-    {
-        for (int i = thisMelon.verticalNeighborStartRow; i <= thisMelon.verticalNeighborEndRow; i++)
-        {
-            Melon *neighborToRemove = _gridArray[i][thisMelon.colPos];
-            neighborToRemove.isActive = NO;
-        }
-    }
-    // Remove all horizontal neighbors.
-    if (_melonLabel == numHorizNeighbors)
-    {
-        for (int j = thisMelon.horizNeighborStartCol; j <= thisMelon.horizNeighborEndCol; j++)
-        {
-            Melon *neighborToRemove = _gridArray[thisMelon.rowPos][j];
-            neighborToRemove.isActive = NO;
-        }
-    }
-    
-    _melonLabel = arc4random_uniform(GRID_COLUMNS) + 1; // Get a random number for the next melon.
+    // Get a random number for the next melon.
+    _melonLabel = arc4random_uniform(GRID_COLUMNS) + 1;
     self.updateLabel(_melonLabel);
 }
 
+// Gets the row and column that was touched and returns the melon inside the cell.
 - (Melon *)melonForTouchPosition:(CGPoint)touchPosition
 {
-    // Get the row and column that was touched, return the Melon inside the cell.
     int row = touchPosition.y / _cellHeight;
     int column = touchPosition.x / _cellWidth;
+    
     Melon *touchedMelon =_gridArray[row][column];
     touchedMelon.rowPos = row;
     touchedMelon.colPos = column;
+    
     return touchedMelon;
 }
 
-
+// Updates the number of horizontal and vertical neighbors of a melon.
 - (void)countRow:(int)row andCol: (int)col NeighborsOfMelon: (Melon*)currentMelon
 {
-    
-    // Initialize.
+    // Initialize positions.
     currentMelon.verticalNeighborStartRow = currentMelon.rowPos;
     currentMelon.verticalNeighborEndRow = currentMelon.rowPos;
     currentMelon.horizNeighborStartCol = currentMelon.colPos;
@@ -169,6 +148,31 @@ static const int GRID_COLUMNS = 6;
         }
         else {
             break;
+        }
+    }
+}
+
+// Check if the melon's label equals the number of vertical/horizontal neighbors. If so,
+// remove that column/row.
+- (void)checkToRemoveNeighborsOfMelon: (Melon *)currentMelon
+{
+    int numVerticalNeighbors = currentMelon.verticalNeighborEndRow - currentMelon.verticalNeighborStartRow + 1;
+    int numHorizNeighbors = currentMelon.horizNeighborEndCol - currentMelon.horizNeighborStartCol + 1;
+
+    // Remove all vertical neighbors.
+    if (_melonLabel == numVerticalNeighbors)
+    {
+        for (int i = currentMelon.verticalNeighborStartRow; i <= currentMelon.verticalNeighborEndRow; i++)
+        {
+            [self removeNeighborAtX:i Y:currentMelon.colPos];
+        }
+    }
+    // Remove all horizontal neighbors.
+    if (_melonLabel == numHorizNeighbors)
+    {
+        for (int j = currentMelon.horizNeighborStartCol; j <= currentMelon.horizNeighborEndCol; j++)
+        {
+            [self removeNeighborAtX:currentMelon.rowPos Y:j];
         }
     }
 }
