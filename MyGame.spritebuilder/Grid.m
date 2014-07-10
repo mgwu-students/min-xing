@@ -9,14 +9,17 @@
 #import "Grid.h"
 #import "Melon.h"
 
-static const int GRID_ROWS = 6;
-static const int GRID_COLUMNS = 6;
+static const int GRID_ROWS = 5;
+static const int GRID_COLUMNS = 5;
+static const int INITIAL_OBSTACLE_CHANCE= 0.12;
+static const int MIDGAME_OBSTACLE_CHANCE = 0.24;
 
 @implementation Grid {
     NSMutableArray *_gridArray;
     float _cellWidth;
     float _cellHeight;
     int _melonLabel;
+    float _chanceToGetObstacle;
 }
 
 - (void)onEnter
@@ -30,6 +33,8 @@ static const int GRID_COLUMNS = 6;
     // Set random starting number label for first melon.
     _melonLabel = arc4random_uniform(GRID_COLUMNS) + 1; // Random number between 1 and GRID_COLUMNS.
     self.updateLabel(_melonLabel);
+    
+    _chanceToGetObstacle = INITIAL_OBSTACLE_CHANCE;
 }
 
 - (void)setupGrid
@@ -50,7 +55,7 @@ static const int GRID_COLUMNS = 6;
         x = 0;
         
         for (int j = 0; j < GRID_COLUMNS; j++) {
-            Melon *melon = [[Melon alloc] initMelons];
+            Melon *melon = [[Melon alloc] initMelon];
             melon.anchorPoint = ccp(0, 0);
             melon.position = ccp (x, y);
             [self addChild: melon];

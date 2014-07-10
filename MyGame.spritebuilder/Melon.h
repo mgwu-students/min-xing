@@ -13,8 +13,11 @@
 // Whether this melon is visible on the board.
 @property (nonatomic, assign) BOOL isActive;
 
-// The number on the label.
-@property (nonatomic, assign) int winterMelonNumLabel; // 0 if not a winter melon.
+// Whether this melon is a cluster explosion melon.
+@property (nonatomic, assign) int isExplosiveMelon;
+
+// Whether this melon is an obstacle.
+@property (nonatomic, assign) BOOL isObstacleMelon;
 
 // Current column of the melon.
 @property (nonatomic, assign) int colPos;
@@ -34,6 +37,8 @@
 // Stores the row where the column of vertical neighbors ends
 @property (nonatomic, assign) int verticalNeighborEndRow;
 
-- (id)initMelons;
+- (id)initMelon;
+- (id)initExplosiveMelon;
+- (id)initObstacleMelon;
 
 @end

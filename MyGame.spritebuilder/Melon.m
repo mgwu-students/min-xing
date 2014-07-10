@@ -10,17 +10,42 @@
 
 @implementation Melon
 
-- (instancetype)initMelons {
-    
+- (instancetype)initMelon
+{
     self = [super initWithImageNamed:@"MyGameAssets/melon_temp.png"];
     
     if (self) {
         self.isActive = NO;
+        self.isObstacleMelon = NO;
+        self.isExplosiveMelon = NO;
     }
     return self;
 }
 
-int(^updateMelonLabel)(int label) = ^int(int label) {
+- (instancetype)initExplosiveMelon
+{
+    self = [super initWithImageNamed:@"MyGameAssets/bomb_temp.png"];
+    
+    if (self) {
+        self.isExplosiveMelon = YES;
+        self.isObstacleMelon = NO;
+    }
+    return self;
+}
+
+- (instancetype)initObstacleMelon
+{
+    self = [super initWithImageNamed:@"MyGameAssets/obstacle_temp.png"];
+    
+    if (self) {
+        self.isObstacleMelon = YES;
+        self.isExplosiveMelon = NO;
+    }
+    return self;
+}
+
+int(^updateMelonLabel)(int label) = ^int(int label)
+{
     return label;
 };
 
@@ -28,7 +53,6 @@ int(^updateMelonLabel)(int label) = ^int(int label) {
 {
     _isActive = newState;
     self.visible = _isActive;
-
 }
 
 @end

@@ -17,23 +17,6 @@
 - (id)init
 {
     self = [super init];
-    
-    if (self) {
-//        int (^makeSum)(float A,float B) = ^int(float A,float B) {
-//            return (int)(A + B);
-//        };
-//        
-//        int ans = makeSum(5,8);
-//        
-//        NSLog(@"answer is %d",ans);
-//        
-//        void (^printHello)() = ^{
-//            NSLog(@"Hello");
-//        };
-//        
-//        printHello();
-    }
-    
     return self;
 }
 

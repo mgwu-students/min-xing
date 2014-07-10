@@ -127,8 +127,6 @@
 						</array>
 					</dict>
 				</array>
-				<key>selected</key>
-				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -162,8 +160,8 @@
 						<string>Position</string>
 						<key>value</key>
 						<array>
-							<real>164.00003051757812</real>
-							<real>214</real>
+							<real>160.00003051757812</real>
+							<real>211</real>
 							<integer>0</integer>
 							<integer>0</integer>
 							<integer>0</integer>
@@ -176,8 +174,8 @@
 						<string>ScaleLock</string>
 						<key>value</key>
 						<array>
-							<real>3.1235711574554443</real>
-							<real>3.3397133350372314</real>
+							<real>3.3905520439147949</real>
+							<real>3.4316320419311523</real>
 							<false/>
 							<integer>0</integer>
 						</array>
@@ -191,6 +189,8 @@
 						<string>Grid.ccb</string>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
