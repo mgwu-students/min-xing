@@ -9,8 +9,14 @@
 #import "Grid.h"
 #import "Melon.h"
 
+// Grid size.
 static const int GRID_ROWS = 5;
 static const int GRID_COLUMNS = 5;
+// Melon types.
+static const int REGULAR_MELON = 0;
+static const int OBSTACLE_MELON = 1;
+static const int EXPLOSIVE_MELON = 2;
+// Chance to get an obstacle melon.
 static const int INITIAL_OBSTACLE_CHANCE= 0.12;
 static const int MIDGAME_OBSTACLE_CHANCE = 0.24;
 
@@ -26,7 +32,7 @@ static const int MIDGAME_OBSTACLE_CHANCE = 0.24;
 {
     [super onEnter];
     
-    [self setupGrid];
+//    [self setupGrid];
     
     self.userInteractionEnabled = YES;
     
@@ -35,44 +41,77 @@ static const int MIDGAME_OBSTACLE_CHANCE = 0.24;
     self.updateLabel(_melonLabel);
     
     _chanceToGetObstacle = INITIAL_OBSTACLE_CHANCE;
-}
-
-- (void)setupGrid
-{
+    
     // Divide grid size by total cols/rows to figure out the width and height of each cell.
     _cellWidth = self.contentSize.width / GRID_COLUMNS;
     _cellHeight = self.contentSize.height / GRID_ROWS;
-    
-    float x = 0;
-    float y = 0;
-    
-    // Initialize the array as a blank NSMutableArray.
-    _gridArray = [NSMutableArray array];
-    
-    // Initialize melons.
-    for (int i = 0; i < GRID_ROWS; i++) {
-        _gridArray[i] = [NSMutableArray array];
-        x = 0;
-        
-        for (int j = 0; j < GRID_COLUMNS; j++) {
-            Melon *melon = [[Melon alloc] initMelon];
-            melon.anchorPoint = ccp(0, 0);
-            melon.position = ccp (x, y);
-            [self addChild: melon];
-            
-            _gridArray[i][j] = melon;
-            
-            x += _cellWidth;
-        }
-        y += _cellHeight;
-    }
 }
 
+//- (void)setupGrid
+//{
+//    // Divide grid size by total cols/rows to figure out the width and height of each cell.
+//    _cellWidth = self.contentSize.width / GRID_COLUMNS;
+//    _cellHeight = self.contentSize.height / GRID_ROWS;
+//    
+//    float x = 0;
+//    float y = 0;
+//    
+//    // Initialize the array as a blank NSMutableArray.
+//    _gridArray = [NSMutableArray array];
+//    
+//    // Initialize melons.
+//    for (int i = 0; i < GRID_ROWS; i++) {
+//        _gridArray[i] = [NSMutableArray array];
+//        x = 0;
+//        
+//        for (int j = 0; j < GRID_COLUMNS; j++) {
+//            Melon *melon = [[Melon alloc] initMelon];
+//            melon.anchorPoint = ccp(0, 0);
+//            melon.position = ccp (x, y);
+//            [self addChild: melon];
+//            
+//            _gridArray[i][j] = melon;
+//            
+//            x += _cellWidth;
+//        }
+//        y += _cellHeight;
+//    }
+//}
+
+// Make a melon of type melonType at the specified position in the array.
+- (Melon *)makeMelon:(int)melonType atRow:(int)row andCol:(int)col
+{
+    Melon *melon;
+    switch (melonType) {
+        case REGULAR_MELON:
+            melon = [[Melon alloc] initMelon];
+            break;
+        case OBSTACLE_MELON:
+            melon = [[Melon alloc] initObstacleMelon];
+            break;
+        case EXPLOSIVE_MELON:
+            melon = [[Melon alloc] initExplosiveMelon];
+            break;
+        default:
+            break;
+    }
+    melon.anchorPoint = ccp(0, 0);
+    melon.position = ccp (row * _cellWidth, col * _cellHeight);
+    [self addChild: melon];
+    _gridArray[row][col] = melon;
+    
+    return melon;
+}
+
+// A melon appears when the user touches the screen.
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
-    // Get the x, y coordinates of the touch and the Melon at that location.
+    // Get the x, y coordinates of the touch and make a Melon at that location.
     CGPoint touchLocation = [touch locationInNode:self];
-    Melon *thisMelon = [self melonForTouchPosition:touchLocation];
+    Melon *thisMelon = [self makeMelon: REGULAR_MELON atRow:touchLocation.y / _cellHeight
+                                andCol:touchLocation.x / _cellWidth];
+    
+//    Melon *thisMelon = [self melonForTouchPosition:touchLocation];
     
     thisMelon.isActive = YES;
     
@@ -100,7 +139,7 @@ static const int MIDGAME_OBSTACLE_CHANCE = 0.24;
 }
 
 // Updates the number of horizontal and vertical neighbors of a melon.
-- (void)countRow:(int)row andCol: (int)col NeighborsOfMelon: (Melon*)currentMelon
+- (void)countRow:(int)row andCol:(int)col NeighborsOfMelon: (Melon*)currentMelon
 {
     // Initialize positions.
     currentMelon.verticalNeighborStartRow = currentMelon.rowPos;
