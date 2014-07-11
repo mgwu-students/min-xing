@@ -15,7 +15,7 @@
     self = [super initWithImageNamed:@"MyGameAssets/melon_temp.png"];
     
     if (self) {
-        self.isActive = NO;
+        self.isActive = YES; // TESTING ONLY
         self.isObstacleMelon = NO;
         self.isExplosiveMelon = NO;
     }
@@ -44,15 +44,11 @@
     return self;
 }
 
-int(^updateMelonLabel)(int label) = ^int(int label)
-{
-    return label;
-};
-
 - (void)setIsActive:(BOOL)newState
 {
     _isActive = newState;
     self.visible = _isActive;
+    
 }
 
 @end

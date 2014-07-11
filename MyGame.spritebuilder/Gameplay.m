@@ -12,6 +12,7 @@
 @implementation Gameplay {
   Grid *_grid;
   CCLabelTTF *_numLabel;
+  CCNode *_obstacleIcon;
 }
 
 - (id)init
@@ -24,6 +25,7 @@
     _grid.updateLabel = ^(int label){
         _numLabel.string = [NSString stringWithFormat:@"%d", label];
     };
+    
 }
 
 @end

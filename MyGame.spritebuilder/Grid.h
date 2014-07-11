@@ -9,9 +9,11 @@
 #import "CCSprite.h"
 
 typedef void(^updateMelonLabel)(int label);
+typedef void(^setIconVisible) (int icon);
 
 @interface Grid : CCSprite
 
 @property (nonatomic, copy) updateMelonLabel updateLabel;
+@property (nonatomic, copy) setIconVisible updateIcon;
 
 @end

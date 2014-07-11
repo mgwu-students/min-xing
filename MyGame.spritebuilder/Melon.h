@@ -10,20 +10,13 @@
 
 @interface Melon : CCSprite
 
-// Whether this melon is visible on the board.
 @property (nonatomic, assign) BOOL isActive;
 
 // Whether this melon is a cluster explosion melon.
-@property (nonatomic, assign) int isExplosiveMelon;
+@property (nonatomic, assign) BOOL isExplosiveMelon;
 
 // Whether this melon is an obstacle.
 @property (nonatomic, assign) BOOL isObstacleMelon;
-
-// Current column of the melon.
-@property (nonatomic, assign) int colPos;
-
-// Current row of the melon.
-@property (nonatomic, assign) int rowPos;
 
 // Stores the column where the row of horizontal neighbors starts.
 @property (nonatomic, assign) int horizNeighborStartCol;
