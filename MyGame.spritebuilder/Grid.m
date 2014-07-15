@@ -27,7 +27,7 @@ static const int GRID_COLUMNS = 5;
 // Chance to get a bomb melon.
 static const int BOMB_CHANCE = 0.0;
 // Chance to get a wintermelon.
-static const int INITIAL_WINTERMELON_CHANCE = 0.12;
+static const int INITIAL_WINTERMELON_CHANCE = 0.22;
 // # of times a wintermelon should be cleared before removing it from the board.
 static const int NUM_OF_HITS_BEFORE_BREAK = 2;
 
@@ -37,7 +37,8 @@ static const int NUM_OF_HITS_BEFORE_BREAK = 2;
 
 // TODO: Fix - can't intialize the variable to the value of the constant.
 //    _chanceToGetWintermelon = INITIAL_WINTERMELON_CHANCE + BOMB_CHANCE;
-    _chanceToGetWintermelon = 0.12;
+    _chanceToGetWintermelon = 0.32;
+    _chanceToGetBomb = 0.1;
     
     [self setupGrid];
     [self updateMelonLabel];
@@ -66,48 +67,51 @@ static const int NUM_OF_HITS_BEFORE_BREAK = 2;
 {
     // Get the x, y coordinates of the touch and make a Melon at that location.
     CGPoint touchLocation = [touch locationInNode:self];
-    int melonRow = touchLocation.y / _cellHeight;
-    int melonCol = touchLocation.x / _cellWidth;
+    int currentRow = touchLocation.y / _cellHeight;
+    int currentCol = touchLocation.x / _cellWidth;
  
     // Prevent duplicate touches.
-    if (_gridArray[melonRow][melonCol] != [NSNull null]) {
+    if (_gridArray[currentRow][currentCol] != [NSNull null]) {
         return;
     }
     
     Melon *thisMelon;
     
-    if (_chance <= BOMB_CHANCE) {
-        //
+    if (_chance <= _chanceToGetBomb) {
+        [self explodeMelonsAdjacentToRow:currentRow andCol:currentCol];
     }
     else if (_chance <= _chanceToGetWintermelon) {
-        thisMelon= [[Melon alloc] initWinterMelon];
-        [self positionMelon:thisMelon atRow:melonRow andCol:melonCol];
+        thisMelon = [[Melon alloc] initWinterMelon];
+        [self positionMelon:thisMelon atRow:currentRow andCol:currentCol];
     }
     else {
         // Regular green melon.
-         thisMelon= [[Melon alloc] initMelon];
-        [self positionMelon:thisMelon atRow:melonRow andCol:melonCol];
+         thisMelon = [[Melon alloc] initMelon];
+        [self positionMelon:thisMelon atRow:currentRow andCol:currentCol];
         
         // Count row and column neighbors, and remove neighbors if necessary.
-        [self countRow:melonRow andCol:melonCol NeighborsOfMelon:thisMelon];
-        [self checkToRemoveNeighborsOfMelon:thisMelon atRow:melonRow andCol:melonCol];
+        [self countRow:currentRow andCol:currentCol NeighborsOfMelon:thisMelon];
+        [self checkToRemoveNeighborsOfMelon:thisMelon atRow:currentRow andCol:currentCol];
     }
     
     [self updateMelonLabel];
 }
 
-// Updates the melon's number label.
-// TODO: Bomb
-- (void) updateMelonLabel
+// Remove the melons surounding the bomb
+- (void)explodeMelonsAdjacentToRow:(int)row andCol:(int)col
 {
-    _chance = drand48(); // Random float between 0 and 1.
-    
-    if (_chance <= _chanceToGetWintermelon) {
-        self.updateLabel(0);
-    }
-    else {
-        _melonLabel = arc4random_uniform(GRID_COLUMNS) + 1; // Random int btw 1 & GRID_COLUMNS
-        self.updateLabel(_melonLabel);
+    for (int i = row - 1; i <= row + 1; i++) {
+        if (i < 0 || i >= GRID_ROWS) {
+            return;
+        }
+        for (int j = col - 1; j <= col + 1; j++) {
+            if (j < 0 || j >= GRID_COLUMNS) {
+                break;
+            }
+            if (_gridArray[i][j] != [NSNull null]) {
+                [self removeNeighborAtX:i Y:j];
+            }
+        }
     }
 }
 
@@ -118,6 +122,24 @@ static const int NUM_OF_HITS_BEFORE_BREAK = 2;
     melon.position = ccp (col * _cellWidth, row * _cellHeight);
     [self addChild: melon];
     _gridArray[row][col] = melon;
+}
+
+// Updates the melon's number label.
+// TODO: Updae Icon
+- (void) updateMelonLabel
+{
+    _chance = drand48(); // Random float between 0 and 1.
+    
+    if (_chance <= _chanceToGetBomb) {
+        self.updateLabel(99); // TESTING ONLY
+    }
+    else if (_chance <= _chanceToGetWintermelon) {
+        self.updateLabel(0); // TESTING ONLY
+    }
+    else {
+        _melonLabel = arc4random_uniform(GRID_COLUMNS) + 1; // Random int btw 1 & GRID_COLUMNS
+        self.updateLabel(_melonLabel);
+    }
 }
 
 // Updates the number of horizontal and vertical neighbors of a melon.
@@ -151,6 +173,17 @@ static const int NUM_OF_HITS_BEFORE_BREAK = 2;
         }
     }
     
+    // Count the active melons above the current melon.
+    for (int up = row - 1; up >= 0 ; up--)
+    {
+        if (_gridArray[up][col] != [NSNull null]) {
+            currentMelon.verticalNeighborStartRow--;
+        }
+        else {
+            break;
+        }
+    }
+    
     // Count the active melons below the current melon.
     for (int down = row + 1; down < [_gridArray[row] count]; down++)
     {
@@ -162,16 +195,7 @@ static const int NUM_OF_HITS_BEFORE_BREAK = 2;
         }
     }
     
-    // Count the active melons above the current melon.
-    for (int up = row - 1; up >= 0 ; up--)
-    {
-        if (_gridArray[up][col] != [NSNull null]) {
-            currentMelon.verticalNeighborStartRow--;
-        }
-        else {
-            break;
-        }
-    }
+
 }
 
 // Check if the melon's label equals the number of vertical/horizontal neighbors. If so,

@@ -9,7 +9,7 @@
 #import "CCSprite.h"
 
 typedef void(^updateMelonLabel)(int label);
-typedef void(^setIconVisible) (int icon);
+//typedef void(^setIconVisible) (int icon);
 typedef NS_ENUM(NSInteger, IconType) {
     IconTypeMelon,
     IconTypeBomb,
@@ -19,7 +19,7 @@ typedef NS_ENUM(NSInteger, IconType) {
 @interface Grid : CCSprite
 
 @property (nonatomic, copy) updateMelonLabel updateLabel;
-@property (nonatomic, copy) setIconVisible updateIcon;
+//@property (nonatomic, copy) setIconVisible updateIcon;
 @property (nonatomic, assign) int obstacle;
 @property (nonatomic, assign) int bomb;
 

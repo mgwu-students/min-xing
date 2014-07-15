@@ -12,8 +12,8 @@
 @implementation Gameplay {
     Grid *_grid;
     CCLabelTTF *_numLabel;
-    CCSprite *_winterMelonIcon;
-    CCSprite *_bombIcon;
+//    CCSprite *_winterMelonIcon;
+//    CCSprite *_bombIcon;
 }
 
 - (id)init
@@ -31,20 +31,20 @@
         }
     };
     
-    _grid.updateIcon = ^(int iconType) {
-        switch (iconType) {
-            case IconTypeBomb:
-                _winterMelonIcon.visible = YES;
-                _bombIcon.visible = NO;
-            case IconTypeObstacle:
-                _bombIcon.visible = YES;
-                _winterMelonIcon.visible = NO;
-            default:
-                _winterMelonIcon.visible = NO;
-                _bombIcon.visible = NO;
-                break;
-        }
-    };
+//    _grid.updateIcon = ^(int iconType) {
+//        switch (iconType) {
+//            case IconTypeBomb:
+//                _winterMelonIcon.visible = YES;
+//                _bombIcon.visible = NO;
+//            case IconTypeObstacle:
+//                _bombIcon.visible = YES;
+//                _winterMelonIcon.visible = NO;
+//            default:
+//                _winterMelonIcon.visible = NO;
+//                _bombIcon.visible = NO;
+//                break;
+//        }
+//    };
 }
 
 @end
