@@ -68,6 +68,12 @@ static const int NUM_OF_HITS_BEFORE_BREAK = 2;
     CGPoint touchLocation = [touch locationInNode:self];
     int melonRow = touchLocation.y / _cellHeight;
     int melonCol = touchLocation.x / _cellWidth;
+ 
+    // Prevent duplicate touches.
+    if (_gridArray[melonRow][melonCol] != [NSNull null]) {
+        return;
+    }
+    
     Melon *thisMelon;
     
     if (_chance <= BOMB_CHANCE) {
@@ -216,7 +222,6 @@ static const int NUM_OF_HITS_BEFORE_BREAK = 2;
 {
     winterMelon.numOfHits++;
 
-    CCLOG(@"num hits: %d", winterMelon.numOfHits);
     // Display different images depending on how many times it's been hit.
     switch (winterMelon.numOfHits)
     {
