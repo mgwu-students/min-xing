@@ -8,15 +8,14 @@
 
 #import "CCSprite.h"
 
+
 @interface Melon : CCSprite
 
-@property (nonatomic, assign) BOOL isActive;
+// Whether this melon is a winter melon.
+@property (nonatomic, assign) BOOL isWinterMelon;
 
-// Whether this melon is a cluster explosion melon.
-@property (nonatomic, assign) BOOL isExplosiveMelon;
-
-// Whether this melon is an obstacle.
-@property (nonatomic, assign) BOOL isObstacleMelon;
+// For winter melons only: how many times it has been hit (attempt to clear).
+@property (nonatomic, assign) int numOfHits;
 
 // Stores the column where the row of horizontal neighbors starts.
 @property (nonatomic, assign) int horizNeighborStartCol;
@@ -27,11 +26,13 @@
 // Stores the column where the row of horizontal neighbors ends.
 @property (nonatomic, assign) int horizNeighborEndCol;
 
-// Stores the row where the column of vertical neighbors ends
+// Stores the row where the column of vertical neighbors ends.
 @property (nonatomic, assign) int verticalNeighborEndRow;
 
 - (id)initMelon;
-- (id)initExplosiveMelon;
-- (id)initObstacleMelon;
+- (id)initWinterMelonWithImageString:(NSString*)imgString;
+- (id)initWinterMelon;
+- (id)initWinterMelonFirstHit;
+- (id)initWinterMelonSecondHit;
 
 @end

@@ -10,45 +10,46 @@
 
 @implementation Melon
 
+static NSString *wintermelon = @"MyGameAssets/wintermelon_temp.png";
+static NSString *wintermelonFirstHit = @"MyGameAssets/wintermelonFirstHit_temp.png";
+static NSString *wintermelonSecondHit = @"MyGameAssets/wintermelonSecondHit_temp.png";
+
 - (instancetype)initMelon
 {
     self = [super initWithImageNamed:@"MyGameAssets/melon_temp.png"];
     
     if (self) {
-        self.isActive = YES; // TESTING ONLY
-        self.isObstacleMelon = NO;
-        self.isExplosiveMelon = NO;
+        self.isWinterMelon = NO;
     }
+
     return self;
 }
 
-- (instancetype)initExplosiveMelon
+- (instancetype)initWinterMelonWithImageString:(NSString*)imgString
 {
-    self = [super initWithImageNamed:@"MyGameAssets/bomb_temp.png"];
+    self = [super initWithImageNamed:imgString];
     
     if (self) {
-        self.isExplosiveMelon = YES;
-        self.isObstacleMelon = NO;
+        self.isWinterMelon = YES;
+        self.numOfHits = 0;
     }
+    
     return self;
 }
 
-- (instancetype)initObstacleMelon
+- (instancetype)initWinterMelon
 {
-    self = [super initWithImageNamed:@"MyGameAssets/obstacle_temp.png"];
-    
-    if (self) {
-        self.isObstacleMelon = YES;
-        self.isExplosiveMelon = NO;
-    }
-    return self;
+    return [self initWinterMelonWithImageString:wintermelon];
 }
 
-- (void)setIsActive:(BOOL)newState
+- (instancetype)initWinterMelonFirstHit
 {
-    _isActive = newState;
-    self.visible = _isActive;
-    
+    return [self initWinterMelonWithImageString:wintermelonFirstHit];
+}
+
+- (instancetype)initWinterMelonSecondHit
+{
+    return [self initWinterMelonWithImageString:wintermelonSecondHit];
 }
 
 @end

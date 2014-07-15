@@ -10,10 +10,17 @@
 
 typedef void(^updateMelonLabel)(int label);
 typedef void(^setIconVisible) (int icon);
+typedef NS_ENUM(NSInteger, IconType) {
+    IconTypeMelon,
+    IconTypeBomb,
+    IconTypeObstacle
+};
 
 @interface Grid : CCSprite
 
 @property (nonatomic, copy) updateMelonLabel updateLabel;
 @property (nonatomic, copy) setIconVisible updateIcon;
+@property (nonatomic, assign) int obstacle;
+@property (nonatomic, assign) int bomb;
 
 @end
