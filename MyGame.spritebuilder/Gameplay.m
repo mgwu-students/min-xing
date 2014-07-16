@@ -22,7 +22,8 @@
     return self;
 }
 
-- (void)didLoadFromCCB {
+- (void)didLoadFromCCB
+{
     __weak Gameplay *weakSelf = self;
     _grid.updateLabel = ^(int label){
         if (weakSelf) {
@@ -45,6 +46,11 @@
 //                break;
 //        }
 //    };
+}
+
+- (void)restart
+{
+     [[CCDirector sharedDirector] replaceScene:[CCBReader loadAsScene:@"Gameplay"]];
 }
 
 @end

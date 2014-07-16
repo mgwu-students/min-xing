@@ -10,6 +10,17 @@
 #import "Melon.h"
 #import "Bomb.h"
 
+// Grid size.
+static const int GRID_ROWS = 5;
+static const int GRID_COLUMNS = 5;
+
+// # of times a wintermelon should be cleared before removing it from the board.
+static const int NUM_OF_HITS_BEFORE_BREAK = 2;
+// Chance to get a bomb melon.
+static const float BOMB_CHANCE = 0.1;
+// Chance to get a wintermelon.
+static const float INITIAL_WINTERMELON_CHANCE = 0.22;
+
 @implementation Grid {
     NSMutableArray *_gridArray;
     float _cellWidth;
@@ -20,27 +31,16 @@
     float _chance;
 }
 
-// Grid size.
-static const int GRID_ROWS = 5;
-static const int GRID_COLUMNS = 5;
-
-// Chance to get a bomb melon.
-static const int BOMB_CHANCE = 0.0;
-// Chance to get a wintermelon.
-static const int INITIAL_WINTERMELON_CHANCE = 0.22;
-// # of times a wintermelon should be cleared before removing it from the board.
-static const int NUM_OF_HITS_BEFORE_BREAK = 2;
 
 - (void)onEnter
 {
     [super onEnter];
-
-// TODO: Fix - can't intialize the variable to the value of the constant.
-//    _chanceToGetWintermelon = INITIAL_WINTERMELON_CHANCE + BOMB_CHANCE;
-    _chanceToGetWintermelon = 0.32;
-    _chanceToGetBomb = 0.1;
     
     [self setupGrid];
+    
+    _chanceToGetWintermelon = INITIAL_WINTERMELON_CHANCE + BOMB_CHANCE;
+    _chanceToGetBomb = BOMB_CHANCE;
+    
     [self updateMelonLabel];
     
     self.userInteractionEnabled = YES;
@@ -101,13 +101,16 @@ static const int NUM_OF_HITS_BEFORE_BREAK = 2;
 - (void)explodeMelonsAdjacentToRow:(int)row andCol:(int)col
 {
     for (int i = row - 1; i <= row + 1; i++) {
+        // Boundary check.
         if (i < 0 || i >= GRID_ROWS) {
             return;
         }
         for (int j = col - 1; j <= col + 1; j++) {
+            // Boundary check.
             if (j < 0 || j >= GRID_COLUMNS) {
                 break;
             }
+            // Remove melon.
             if (_gridArray[i][j] != [NSNull null]) {
                 [self removeNeighborAtX:i Y:j];
             }
@@ -194,8 +197,6 @@ static const int NUM_OF_HITS_BEFORE_BREAK = 2;
             break;
         }
     }
-    
-
 }
 
 // Check if the melon's label equals the number of vertical/horizontal neighbors. If so,
@@ -236,7 +237,7 @@ static const int NUM_OF_HITS_BEFORE_BREAK = 2;
     }
     else {
         // Completely remove melon from board.
-        [melonToBeRemoved removeFromParent];
+        [self melonRemoved:melonToBeRemoved];
         _gridArray[xPos][yPos] = [NSNull null];
     }
 }
@@ -265,6 +266,23 @@ static const int NUM_OF_HITS_BEFORE_BREAK = 2;
         default:
             break;
     }
+}
+
+
+- (void)melonRemoved:(Melon *)melon
+{
+    // Load particle effect.
+    CCParticleSystem *explosion = (CCParticleSystem *)[CCBReader load:@"MelonExplosion"];
+    // Clean up particle effect.
+    explosion.autoRemoveOnFinish = YES;
+    // Place the particle effect at the melon's center.
+    explosion.position = ccp(melon.position.x + melon.contentSizeInPoints.width / 2, melon.position.y +
+                             melon.contentSizeInPoints.height / 2);
+    // Add the particle effect to the same node the seal is on.
+    [melon.parent addChild:explosion];
+    
+    // Remove the destroyed melon.
+    [melon removeFromParent];
 }
 
 @end
