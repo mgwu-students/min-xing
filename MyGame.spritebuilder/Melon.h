@@ -17,16 +17,16 @@
 // For winter melons only: how many times it has been hit (attempt to clear).
 @property (nonatomic, assign) int numOfHits;
 
-// Stores the column where the row of horizontal neighbors starts.
+// The melon's current row and column.
+@property (nonatomic, assign) int row;
+@property (nonatomic, assign) int col;
+
+// Stores the column where the row of horizontal neighbors starts/ends.
 @property (nonatomic, assign) int horizNeighborStartCol;
-
-// Stores the row where the column of vertical neighbors starts.
-@property (nonatomic, assign) int verticalNeighborStartRow;
-
-// Stores the column where the row of horizontal neighbors ends.
 @property (nonatomic, assign) int horizNeighborEndCol;
 
-// Stores the row where the column of vertical neighbors ends.
+// Stores the row where the column of vertical neighbors starts/ends.
+@property (nonatomic, assign) int verticalNeighborStartRow;
 @property (nonatomic, assign) int verticalNeighborEndRow;
 
 - (id)initMelon;

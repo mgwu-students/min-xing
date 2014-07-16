@@ -10,13 +10,15 @@
 
 @implementation Melon
 
-static NSString *wintermelon = @"MyGameAssets/wintermelon_temp.png";
-static NSString *wintermelonFirstHit = @"MyGameAssets/wintermelonFirstHit_temp.png";
-static NSString *wintermelonSecondHit = @"MyGameAssets/wintermelonSecondHit_temp.png";
+static NSString *regularMelon = @"MyGameAssets/melon_temp.png";
+static NSString *winterMelon = @"MyGameAssets/wintermelon_temp.png";
+static NSString *winterMelonFirstHit = @"MyGameAssets/wintermelonFirstHit_temp.png";
+static NSString *winterMelonSecondHit = @"MyGameAssets/wintermelonSecondHit_temp.png";
 
+// Initializes a regular green melon.
 - (instancetype)initMelon
 {
-    self = [super initWithImageNamed:@"MyGameAssets/melon_temp.png"];
+    self = [super initWithImageNamed:regularMelon];
     
     if (self) {
         self.isWinterMelon = NO;
@@ -25,6 +27,7 @@ static NSString *wintermelonSecondHit = @"MyGameAssets/wintermelonSecondHit_temp
     return self;
 }
 
+// Initializes a blue winter melon.
 - (instancetype)initWinterMelonWithImageString:(NSString*)imgString
 {
     self = [super initWithImageNamed:imgString];
@@ -37,19 +40,20 @@ static NSString *wintermelonSecondHit = @"MyGameAssets/wintermelonSecondHit_temp
     return self;
 }
 
+// Different images for different states of a winter melon.
 - (instancetype)initWinterMelon
 {
-    return [self initWinterMelonWithImageString:wintermelon];
+    return [self initWinterMelonWithImageString:winterMelon];
 }
 
 - (instancetype)initWinterMelonFirstHit
 {
-    return [self initWinterMelonWithImageString:wintermelonFirstHit];
+    return [self initWinterMelonWithImageString:winterMelonFirstHit];
 }
 
 - (instancetype)initWinterMelonSecondHit
 {
-    return [self initWinterMelonWithImageString:wintermelonSecondHit];
+    return [self initWinterMelonWithImageString:winterMelonSecondHit];
 }
 
 @end
