@@ -11,12 +11,13 @@ static NSString *regularMelon = @"MyGameAssets/melon_temp.png";
 static NSString *winterMelon = @"MyGameAssets/wintermelon_temp.png";
 static NSString *winterMelonFirstHit = @"MyGameAssets/wintermelonFirstHit_temp.png";
 static NSString *winterMelonSecondHit = @"MyGameAssets/wintermelonSecondHit_temp.png";
+static NSString *bomb = @"MyGameAssets/bomb_temp.png";
 
 @implementation Melon {
     CCSprite *_melonSprite;
 }
 
-- (void)changeMelon:(int)melonType
+- (void)makeMelon:(int)melonType
 {
     switch (melonType)
     {
@@ -32,6 +33,9 @@ static NSString *winterMelonSecondHit = @"MyGameAssets/wintermelonSecondHit_temp
         case MelonTypeWinterSecondHit:
             _melonSprite.spriteFrame = [CCSpriteFrame frameWithImageNamed:winterMelonSecondHit];
             break;
+        case MelonTypeBomb:
+            _melonSprite.spriteFrame = [CCSpriteFrame frameWithImageNamed:bomb];
+            break;
         default:
             break;
     }
@@ -41,7 +45,7 @@ static NSString *winterMelonSecondHit = @"MyGameAssets/wintermelonSecondHit_temp
 - (void)setType:(MelonType)type
 {
     _type = type;
-    [self changeMelon:type];
+    [self makeMelon:type];
 }
 
 // Makes the melon wobble.

@@ -78,30 +78,24 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         return;
     }
     
+    // Determine what type of melon it is and change type accordingly.
     if (_chance <= _chanceToGetBomb) {
-        CCLOG(@"BOMB");
+        currentMelon.type = MelonTypeBomb;
+    }
+    else if (_chance <= _chanceToGetWintermelon) {
+        currentMelon.type = MelonTypeWinter;
     }
     else {
-        if (_chance <= _chanceToGetWintermelon) {
-            CCLOG(@"Making winter melon.");
-            // Changes the sprite frame to a winter melon.
-            currentMelon.type = MelonTypeWinter;
-        }
-        else {
-            // Only does this for regular green melon.
-            // Count row and column neighbors.
-            currentMelon.type = MelonTypeRegular;
-        }
-        
-        // Puts melon on board.
-        [self positionMelon:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
-        [self addChild: currentMelon];
-        
-        // Makes clearable melon wobble.
+        currentMelon.type = MelonTypeRegular;
+            
+        // Makes clearable neighbor melon wobble.
         [self countNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
         [self wobble:YES orRemoveNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
-
     }
+        
+    // Puts melon on board.
+    [self positionMelon:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
+    [self addChild: currentMelon];
 }
 
 // Melon moves with touch.
@@ -113,12 +107,17 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     //Follows finger movements.
     CGPoint currentLocation = [touch locationInNode:self];
     currentMelon.position = currentLocation;
-    
-    // Dynamically makes clearable melon wobble.
     [self updateRowAndCol:currentLocation];
-    [self countNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
-    [self wobble:YES orRemoveNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
     
+    // Only run this when the current melon doesn't overlap another melon (i.e. current grid is clear).
+    if (_gridArray[currentMelon.row][currentMelon.col] == [NSNull null] &&
+        currentMelon.type != MelonTypeWinter)
+    {
+        // Makes clearable neighbor melon wobble.
+        [self countNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
+        [self wobble:YES orRemoveNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
+    }
+
     // TODO: Highlight passing grid.
 }
 
@@ -130,25 +129,28 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
  
     // Prevent putting multiple objects at the same location.
     if (_gridArray[currentMelon.row][currentMelon.col] != [NSNull null]) {
+        [currentMelon removeFromParent];
         return;
     }
     
-    // Special effect for bombs.
-    if (_chance <= _chanceToGetBomb) {
+    CCLOG(@"HERE");
+    
+    // Add melon.
+    [self positionMelon:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
+    _gridArray[currentMelon.row][currentMelon.col] = currentMelon;
+
+    // Check to remove neighbors for bombs and regular green melons.
+    if (currentMelon.type == MelonTypeBomb) {
         // Remove surrounding melons.
         [self explodeMelonsAdjacentToRow:currentMelon.row andCol:currentMelon.col];
-    }
-    else {
-        // Add melon.
-        [self positionMelon:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
-        _gridArray[currentMelon.row][currentMelon.col] = currentMelon;
         
-        // Only do this for regular green melon.
-        if (currentMelon.type == MelonTypeRegular) {
-            // Remove row and column neighbors if necessary.
-            [self countNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
-            [self wobble:NO orRemoveNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
-        }
+        // Remove the bomb with special bomb particle effect.
+        [self removeMelonAtX:currentMelon.row Y:currentMelon.col isBomb:YES];
+    }
+    else if (currentMelon.type == MelonTypeRegular) {
+        // Remove row and column neighbors if necessary.
+        [self countNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
+        [self wobble:NO orRemoveNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
     }
 
     [self updateMelonLabel];
@@ -197,10 +199,9 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
             if (i < 0 || i >= GRID_ROWS || j < 0 || j >= GRID_COLUMNS) {
                 break;
             }
-            // Remove melon.
+            // Remove neighbor melon.
             if (_gridArray[i][j] != [NSNull null]) {
-                
-                [self removeMelonAtX:i Y:j];
+                [self removeMelonAtX:i Y:j isBomb:NO];
             }
         }
     }
@@ -275,11 +276,10 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
             if (wobbly && _gridArray[i][col] != [NSNull null]) {
                 // Wobble the melon and its clearable neighbors.
                 [melon wobble];
-                Melon *neighborMelon = _gridArray[i][col];
-                [neighborMelon wobble];
+                [_gridArray[i][col] wobble];
             }
             else {
-                [self removeMelonAtX:i Y:col];
+                [self removeMelonAtX:i Y:col isBomb:NO];
             }
         }
     }
@@ -290,11 +290,10 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
             if (wobbly && _gridArray[row][j] != [NSNull null]) {
                 // Wobble the melon and its clearable neighbors.
                 [melon wobble];
-                Melon *neighborMelon = _gridArray[row][j];
-                [neighborMelon wobble];
+                [_gridArray[row][j] wobble];
             }
             else {
-                [self removeMelonAtX:row Y:j];
+                [self removeMelonAtX:row Y:j isBomb:NO];
             }
         }
     }
@@ -302,7 +301,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 
 
 // Attempts to remove a melon at the specificed position.
-- (void)removeMelonAtX:(int)xPos Y:(int)yPos
+- (void)removeMelonAtX:(int)xPos Y:(int)yPos isBomb:(BOOL)isBomb
 {
     if (_gridArray[xPos][yPos] == [NSNull null]) {
         return;
@@ -311,7 +310,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     Melon *melonToRemove = _gridArray[xPos][yPos];
     
     // Winter melons only get removed after a certain number of hits.
-    if (melonToRemove.type != MelonTypeRegular && melonToRemove.numOfHits < NUM_OF_HITS_BEFORE_BREAK)
+    if (melonToRemove.type == MelonTypeWinter || melonToRemove.type == MelonTypeWinterFirstHit)
     {
         melonToRemove.numOfHits++;
         // Every time a winter melon is hit, replace the old picture with a new one.
@@ -320,7 +319,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     else
     {
         // Completely remove melon from board.
-        [self melonRemoved:melonToRemove];
+        [self melonRemoved:melonToRemove isBomb:isBomb];
         _gridArray[xPos][yPos] = [NSNull null];
     }
 }
@@ -344,16 +343,22 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 }
 
 // Removes the melon with particle effects.
-- (void)melonRemoved:(Melon *)melon
+- (void)melonRemoved:(Melon *)melon isBomb:(BOOL)isBomb
 {
+    CCParticleSystem *explosion;
+    
     // Load and clean up particle effect.
-    CCParticleSystem *explosion = (CCParticleSystem *)[CCBReader load:@"MelonExplosion"];
+    if (isBomb) {
+        explosion = (CCParticleSystem *)[CCBReader load:@"BombExplosion"];
+    }
+    else {
+        explosion = (CCParticleSystem *)[CCBReader load:@"MelonExplosion"];
+    }
     explosion.autoRemoveOnFinish = YES;
     
     // Place the particle effect at the melon's center.
     explosion.position = ccp(melon.position.x + melon.contentSizeInPoints.width / 2, melon.position.y +
                              melon.contentSizeInPoints.height / 2);
-//    explosion.position = melon.position;
     
     // Add the particle effect to the same node the melon is on and remove the destroyed melon.
     [melon.parent addChild:explosion];

@@ -13,7 +13,8 @@ typedef NS_ENUM(NSInteger, MelonType) {
     MelonTypeRegular,
     MelonTypeWinter,
     MelonTypeWinterFirstHit,
-    MelonTypeWinterSecondHit
+    MelonTypeWinterSecondHit,
+    MelonTypeBomb
 };
 
 @interface Melon : CCNode
@@ -36,7 +37,7 @@ typedef NS_ENUM(NSInteger, MelonType) {
 // Type of melon.
 @property (nonatomic, assign) MelonType type;
 
-- (void)changeMelon:(int)melonType;
+- (void)makeMelon:(int)melonType;
 - (void)wobble;
 
 @end
