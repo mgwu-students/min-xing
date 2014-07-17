@@ -50,4 +50,11 @@ static NSString *winterMelonSecondHit = @"MyGameAssets/wintermelonSecondHit_temp
     [self.animationManager runAnimationsForSequenceNamed:@"wobbleTimeline"];
 }
 
+// Stops melon from wobbling.
+// Makes the melon wobble.
+- (void)stopWobble
+{
+    [self.animationManager runAnimationsForSequenceNamed:@"defaultTimeline"];
+}
+
 @end
