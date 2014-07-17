@@ -6,13 +6,17 @@
 //  Copyright (c) 2014 Apportable. All rights reserved.
 //
 
-#import "CCSprite.h"
+#import "CCNode.h"
 
+// Types of melon.
+typedef NS_ENUM(NSInteger, MelonType) {
+    MelonTypeRegular,
+    MelonTypeWinter,
+    MelonTypeWinterFirstHit,
+    MelonTypeWinterSecondHit
+};
 
-@interface Melon : CCSprite
-
-// Whether this melon is a winter melon.
-@property (nonatomic, assign) BOOL isWinterMelon;
+@interface Melon : CCNode
 
 // For winter melons only: how many times it has been hit (attempt to clear).
 @property (nonatomic, assign) int numOfHits;
@@ -29,10 +33,10 @@
 @property (nonatomic, assign) int verticalNeighborStartRow;
 @property (nonatomic, assign) int verticalNeighborEndRow;
 
-- (id)initMelon;
-- (id)initWinterMelonWithImageString:(NSString*)imgString;
-- (id)initWinterMelon;
-- (id)initWinterMelonFirstHit;
-- (id)initWinterMelonSecondHit;
+// Type of melon.
+@property (nonatomic, assign) MelonType type;
+
+- (void)changeMelon:(int)melonType;
+- (void)wobble;
 
 @end

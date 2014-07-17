@@ -10,6 +10,7 @@
 
 typedef void(^updateMelonLabel)(int label);
 //typedef void(^setIconVisible) (int icon);
+
 typedef NS_ENUM(NSInteger, IconType) {
     IconTypeMelon,
     IconTypeBomb,

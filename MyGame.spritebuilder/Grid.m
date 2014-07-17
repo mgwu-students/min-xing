@@ -14,10 +14,6 @@
 static const int GRID_ROWS = 5;
 static const int GRID_COLUMNS = 5;
 
-// Anchor points.
-static const CGPoint CENTER = {0.5, 0.5};
-static const CGPoint CORNER = {0, 0};
-
 // # of times a wintermelon should be cleared before removing it from the board.
 static const int NUM_OF_HITS_BEFORE_BREAK = 2;
 // Chance to get a bomb melon.
@@ -44,10 +40,12 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     
     [self setupGrid];
     
-    _chanceToGetWintermelon = INITIAL_WINTERMELON_CHANCE + BOMB_CHANCE;
-    _chanceToGetBomb = BOMB_CHANCE;
-    
     [self updateMelonLabel];
+    
+    currentMelon = (Melon *)[CCBReader load:@"Melon"];
+    
+     _chanceToGetBomb = BOMB_CHANCE;
+    _chanceToGetWintermelon = _chanceToGetBomb + INITIAL_WINTERMELON_CHANCE;
     
     self.userInteractionEnabled = YES;
 }
@@ -76,22 +74,30 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     int currentRow = beginLocation.y / _cellHeight;
     int currentCol = beginLocation.x / _cellWidth;
 
+    currentMelon = (Melon *)[CCBReader load:@"Melon"];
+    
     // Prevent duplicate touches.
     if (_gridArray[currentRow][currentCol] != [NSNull null]) {
         return;
     }
-
+    
     if (_chance <= _chanceToGetBomb) {
         CCLOG(@"BOMB");
     }
-    else if (_chance <= _chanceToGetWintermelon) {
-        currentMelon = [[Melon alloc] initWinterMelon];
-        [self positionMelon:currentMelon atRow:currentRow andCol:currentCol];
-        [self addChild: currentMelon];
-    }
     else {
-        // Regular green melon.
-        currentMelon = [[Melon alloc] initMelon];
+        if (_chance <= _chanceToGetWintermelon) {
+            CCLOG(@"Making winter melon.");
+            // Changes the sprite frame to a winter melon.
+            currentMelon.type = MelonTypeWinter;
+        }
+        else {
+            // Only do this for regular green melon.
+            // Count row and column neighbors.
+            currentMelon.type = MelonTypeRegular;
+            [self countNeighborsOf:currentMelon atRow:currentRow andCol:currentCol];
+        }
+        
+        // Put melon on board.
         [self positionMelon:currentMelon atRow:currentRow andCol:currentCol];
         [self addChild: currentMelon];
     }
@@ -100,9 +106,13 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 // Melon moves with touch.
 - (void)touchMoved:(UITouch *)touch withEvent:(UIEvent *)event
 {
-    currentMelon.anchorPoint = CENTER;
+    // Centers the melon.
+    currentMelon.anchorPoint = ccp(0.5, 0.5);
+    
+    //Follow finger movements.
     CGPoint currentLocation = [touch locationInNode:self];
     currentMelon.position = currentLocation;
+    
     // TODO: Highlight passing grid.
 }
 
@@ -119,24 +129,21 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         return;
     }
     
+    // Special effect for bombs.
     if (_chance <= _chanceToGetBomb) {
         // Remove surrounding melons.
         [self explodeMelonsAdjacentToRow:currentRow andCol:currentCol];
     }
-    else if (_chance <= _chanceToGetWintermelon) {
-        // Add a winter melon.
-        [self positionMelon:currentMelon atRow:currentRow andCol:currentCol];
-        _gridArray[currentRow][currentCol] = currentMelon;
-    }
     else {
-        // Add a regular green melon.
+        // Add melon.
         [self positionMelon:currentMelon atRow:currentRow andCol:currentCol];
         _gridArray[currentRow][currentCol] = currentMelon;
         
-        // Count row and column neighbors.
-        [self countNeighborsOf:currentMelon atRow:currentRow andCol:currentCol];
-        // Remove row and column neighbors if necessary.
-        [self checkToRemoveNeighborsOf:currentMelon atRow:currentRow andCol:currentCol];
+        // Only do this for regular green melon.
+        if (currentMelon.type == MelonTypeRegular) {
+            // Remove row and column neighbors if necessary.
+            [self checkToRemoveNeighborsOf:currentMelon atRow:currentRow andCol:currentCol];
+        }
     }
 
     [self updateMelonLabel];
@@ -152,7 +159,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 // Put a melon on the board at the specified position on the board..
 - (void)positionMelon:(Melon *)melon atRow:(int)row andCol:(int)col
 {
-    melon.anchorPoint = CORNER;
+    melon.anchorPoint = ccp(0, 0);
     melon.position = ccp (col * _cellWidth, row * _cellHeight);
 }
 
@@ -169,7 +176,8 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         self.updateLabel(0); // TESTING ONLY
     }
     else {
-        _melonLabel = arc4random_uniform(GRID_COLUMNS) + 1; // Random int btw 1 & GRID_COLUMNS
+        // Generate random int btw 1 & GRID_COLUMNS
+        _melonLabel = arc4random_uniform(GRID_COLUMNS) + 1;
         self.updateLabel(_melonLabel);
     }
 }
@@ -179,13 +187,9 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 - (void)explodeMelonsAdjacentToRow:(int)row andCol:(int)col
 {
     for (int i = row - 1; i <= row + 1; i++) {
-        // Boundary check.
-        if (i < 0 || i >= GRID_ROWS) {
-            return;
-        }
         for (int j = col - 1; j <= col + 1; j++) {
             // Boundary check.
-            if (j < 0 || j >= GRID_COLUMNS) {
+            if (i < 0 || i >= GRID_ROWS || j < 0 || j >= GRID_COLUMNS) {
                 break;
             }
             // Remove melon.
@@ -210,6 +214,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     for (int right = col + 1; right < [_gridArray count]; right++)
     {
         if (_gridArray[row][right] != [NSNull null]) {
+//            [melon wobble];
             melon.horizNeighborEndCol++;
         }
         else {
@@ -221,6 +226,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     for (int left = col - 1; left >= 0; left--)
     {
         if (_gridArray[row][left] != [NSNull null]) {
+//            [melon wobble];
             melon.horizNeighborStartCol--;
         }
         else {
@@ -232,6 +238,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     for (int up = row - 1; up >= 0 ; up--)
     {
         if (_gridArray[up][col] != [NSNull null]) {
+//            [melon wobble];
             melon.verticalNeighborStartRow--;
         }
         else {
@@ -243,6 +250,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     for (int down = row + 1; down < [_gridArray[row] count]; down++)
     {
         if (_gridArray[down][col] != [NSNull null]) {
+//            [melon wobble];
             melon.verticalNeighborEndRow++;
         }
         else {
@@ -250,7 +258,6 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         }
     }
 }
-
 
 // Check if the melon's label equals the number of vertical/horizontal neighbors. If so,
 // remove that column/row.
@@ -286,11 +293,10 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     Melon *melonToRemove = _gridArray[xPos][yPos];
     
     // Winter melons only get removed after a certain number of hits.
-    if (melonToRemove.isWinterMelon && melonToRemove.numOfHits < NUM_OF_HITS_BEFORE_BREAK)
+    if (melonToRemove.type != MelonTypeRegular && melonToRemove.numOfHits < NUM_OF_HITS_BEFORE_BREAK)
     {
         // Every time a winter melon is hit, replace the old picture with a new one.
-        int currentHits = melonToRemove.numOfHits + 1;
-        [self winterMelonHitTimes:currentHits atRow:xPos andCol:yPos andReplace:melonToRemove];
+        [self winterMelon:melonToRemove hitTimes:melonToRemove.numOfHits + 1];
     }
     else
     {
@@ -300,33 +306,22 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     }
 }
 
-// Handles winter melon hits.
-- (void)winterMelonHitTimes:(int)times atRow:(int)row andCol:(int)col andReplace:(Melon*)oldMelon
+// Changes winter melon sprite frame upon getting hit.
+- (void)winterMelon:(Melon *)melon hitTimes:(int)times
 {
-    // Remove original winter melon picture.
-    [oldMelon removeFromParent];
-    
-    // Make a new picture of the melon that got hit.
-    Melon *winterMelonOnHit;
+    // Change the sprite frame of the melon that got hit.
     switch (times) {
         case 1: {
-            winterMelonOnHit =[[Melon alloc]initWinterMelonFirstHit];
+            melon.type =  MelonTypeWinterFirstHit;
             break;
         }
         case 2: {
-            winterMelonOnHit =[[Melon alloc]initWinterMelonSecondHit];
+            melon.type = MelonTypeWinterSecondHit;
             break;
         }
         default:
             break;
     }
-    // Put new melon picture on board.
-    [self positionMelon:winterMelonOnHit atRow:row andCol:col];
-    [self addChild:winterMelonOnHit];
-    _gridArray[row][col] = winterMelonOnHit;
-    
-    // Set new melon's number of times hit.
-    winterMelonOnHit.numOfHits = times;
 }
 
 // Removes the melon with particle effects.
@@ -339,6 +334,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     // Place the particle effect at the melon's center.
     explosion.position = ccp(melon.position.x + melon.contentSizeInPoints.width / 2, melon.position.y +
                              melon.contentSizeInPoints.height / 2);
+//    explosion.position = melon.position;
     
     // Add the particle effect to the same node the melon is on and remove the destroyed melon.
     [melon.parent addChild:explosion];
