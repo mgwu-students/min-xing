@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		280A677A1974699E00435D20 /* Bomb.m in Sources */ = {isa = PBXBuildFile; fileRef = 280A67791974699E00435D20 /* Bomb.m */; };
 		2858DD73196B113800550ABB /* Gameplay.m in Sources */ = {isa = PBXBuildFile; fileRef = 2858DD72196B113800550ABB /* Gameplay.m */; };
 		2858DD78196B175200550ABB /* Grid.m in Sources */ = {isa = PBXBuildFile; fileRef = 2858DD77196B175200550ABB /* Grid.m */; };
 		2858DD7B196B177500550ABB /* Melon.m in Sources */ = {isa = PBXBuildFile; fileRef = 2858DD7A196B177500550ABB /* Melon.m */; };
@@ -59,8 +58,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		280A67781974699E00435D20 /* Bomb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bomb.h; sourceTree = "<group>"; };
-		280A67791974699E00435D20 /* Bomb.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Bomb.m; sourceTree = "<group>"; };
 		2858DD71196B113800550ABB /* Gameplay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Gameplay.h; sourceTree = "<group>"; };
 		2858DD72196B113800550ABB /* Gameplay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Gameplay.m; sourceTree = "<group>"; };
 		2858DD76196B175200550ABB /* Grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Grid.h; sourceTree = "<group>"; };
@@ -142,8 +139,6 @@
 				2858DD77196B175200550ABB /* Grid.m */,
 				2858DD79196B177500550ABB /* Melon.h */,
 				2858DD7A196B177500550ABB /* Melon.m */,
-				280A67781974699E00435D20 /* Bomb.h */,
-				280A67791974699E00435D20 /* Bomb.m */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -360,7 +355,6 @@
 				2858DD73196B113800550ABB /* Gameplay.m in Sources */,
 				2858DD7B196B177500550ABB /* Melon.m in Sources */,
 				2858DD78196B175200550ABB /* Grid.m in Sources */,
-				280A677A1974699E00435D20 /* Bomb.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

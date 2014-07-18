@@ -31,21 +31,6 @@
             strongSelf->_numLabel.string = [NSString stringWithFormat:@"%d", label];
         }
     };
-    
-//    _grid.updateIcon = ^(int iconType) {
-//        switch (iconType) {
-//            case IconTypeBomb:
-//                _winterMelonIcon.visible = YES;
-//                _bombIcon.visible = NO;
-//            case IconTypeObstacle:
-//                _bombIcon.visible = YES;
-//                _winterMelonIcon.visible = NO;
-//            default:
-//                _winterMelonIcon.visible = NO;
-//                _bombIcon.visible = NO;
-//                break;
-//        }
-//    };
 }
 
 - (void)restart

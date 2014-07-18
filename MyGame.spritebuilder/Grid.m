@@ -8,17 +8,14 @@
 
 #import "Grid.h"
 #import "Melon.h"
-#import "Bomb.h"
 
 // Grid size.
 static const int GRID_ROWS = 5;
 static const int GRID_COLUMNS = 5;
 
-// # of times a wintermelon should be cleared before removing it from the board.
-static const int NUM_OF_HITS_BEFORE_BREAK = 2;
 // Chance to get a bomb melon.
 static const float BOMB_CHANCE = 0.07;
-// Chance to get a wintermelon.
+// Chance to get a winter melon.
 static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 
 
@@ -132,8 +129,6 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         [currentMelon removeFromParent];
         return;
     }
-    
-    CCLOG(@"HERE");
     
     // Add melon.
     [self positionMelon:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
@@ -283,10 +278,11 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
             }
         }
     }
-    // Remove all horizontal neighbors.
+    // Removes all horizontal neighbors.
     if (_melonLabel == numHorizNeighbors)
     {
-        for (int j = melon.horizNeighborStartCol; j <= melon.horizNeighborEndCol; j++) {
+        for (int j = melon.horizNeighborStartCol; j <= melon.horizNeighborEndCol; j++)
+        {
             if (wobbly && _gridArray[row][j] != [NSNull null]) {
                 // Wobble the melon and its clearable neighbors.
                 [melon wobble];
@@ -300,7 +296,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 }
 
 
-// Attempts to remove a melon at the specificed position.
+// Attempts to clear a melon at the specificed position.
 - (void)removeMelonAtX:(int)xPos Y:(int)yPos isBomb:(BOOL)isBomb
 {
     if (_gridArray[xPos][yPos] == [NSNull null]) {
@@ -310,14 +306,11 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     Melon *melonToRemove = _gridArray[xPos][yPos];
     
     // Winter melons only get removed after a certain number of hits.
-    if (melonToRemove.type == MelonTypeWinter || melonToRemove.type == MelonTypeWinterFirstHit)
-    {
-        melonToRemove.numOfHits++;
-        // Every time a winter melon is hit, replace the old picture with a new one.
+    if (melonToRemove.type == MelonTypeWinter || melonToRemove.type == MelonTypeWinterFirstHit) {
+        melonToRemove.numOfHits++; // Got hit.
         [self winterMelon:melonToRemove hitTimes:melonToRemove.numOfHits];
     }
-    else
-    {
+    else {
         // Completely remove melon from board.
         [self melonRemoved:melonToRemove isBomb:isBomb];
         _gridArray[xPos][yPos] = [NSNull null];
@@ -327,7 +320,6 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 // Changes winter melon sprite frame upon getting hit.
 - (void)winterMelon:(Melon *)melon hitTimes:(int)times
 {
-    // Change the sprite frame of the melon that got hit.
     switch (times) {
         case 1: {
             melon.type =  MelonTypeWinterFirstHit;
@@ -347,13 +339,14 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 {
     CCParticleSystem *explosion;
     
-    // Load and clean up particle effect.
+    // Different particle effects for melon and bomb.
     if (isBomb) {
         explosion = (CCParticleSystem *)[CCBReader load:@"BombExplosion"];
     }
     else {
         explosion = (CCParticleSystem *)[CCBReader load:@"MelonExplosion"];
     }
+    // Clean up particle effect.
     explosion.autoRemoveOnFinish = YES;
     
     // Place the particle effect at the melon's center.
