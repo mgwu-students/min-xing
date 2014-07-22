@@ -49,23 +49,6 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
     [self makeMelon:type];
 }
 
-// Changes winter melon sprite frame upon getting hit.
-- (void)winterMelonGotHit
-{
-    switch (self.numOfHits) {
-        case 1: {
-            self.type =  MelonTypeWinterFirstHit;
-            break;
-        }
-        case 2: {
-            self.type = MelonTypeWinterSecondHit;
-            break;
-        }
-        default:
-            break;
-    }
-}
-
 // Makes the melon wobble.
 - (void)wobble
 {
@@ -81,27 +64,40 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
 // Removes the melon with particle effects.
 - (void)explode
 {
-    CCParticleSystem *explosion;
-    
-    // Different particle effects for melon and bomb.
-    if (self.type == MelonTypeBomb) {
-        explosion = (CCParticleSystem *)[CCBReader load:@"BombExplosion"];
+    // Remove winter melons on third hit.
+    if (self.type == MelonTypeWinter)
+    {
+        self.type = MelonTypeWinterFirstHit;
     }
-    else {
-        explosion = (CCParticleSystem *)[CCBReader load:@"MelonExplosion"];
+    else if (self.type == MelonTypeWinterFirstHit)
+    {
+        self.type = MelonTypeWinterSecondHit;
     }
-    // Clean up particle effect.
-    explosion.autoRemoveOnFinish = YES;
-    
-    // Place the particle effect at the melon's center.
-    explosion.position = ccp(self.position.x + self.contentSizeInPoints.width / 2, self.position.y +
-                             self.contentSizeInPoints.height / 2);
-    
-    // Add the particle effect to the same node the melon is on and remove the destroyed melon.
-    [self.parent addChild:explosion];
-    
-    // Removes the melon.
-    [self removeFromParent];
+    else
+    // Remove melon with explosion effects.
+    {
+        CCParticleSystem *explosion;
+        
+        // Different particle effects for melon and bomb.
+        if (self.type == MelonTypeBomb) {
+            explosion = (CCParticleSystem *)[CCBReader load:@"BombExplosion"];
+        }
+        else {
+            explosion = (CCParticleSystem *)[CCBReader load:@"MelonExplosion"];
+        }
+        // Clean up particle effect.
+        explosion.autoRemoveOnFinish = YES;
+        
+        // Place the particle effect at the melon's center.
+        explosion.position = ccp(self.position.x + self.contentSizeInPoints.width / 2, self.position.y +
+                                 self.contentSizeInPoints.height / 2);
+        
+        // Add the particle effect to the same node the melon is on and remove the destroyed melon.
+        [self.parent addChild:explosion];
+        
+        // Removes the melon.
+//        [self removeFromParent]; 
+    }
 }
 
 @end

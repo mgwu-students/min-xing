@@ -11,7 +11,7 @@
 #import "Melon.h"
 
 // Chance to get a bomb melon.
-static const float BOMB_CHANCE = 0.05;
+static const float BOMB_CHANCE = 0.00;
 // Chance to get a winter melon.
 static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 
@@ -89,8 +89,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     [self updateMelonRowAndCol:[touch locationInNode:_grid]];
     
     // Only wobble melons when the current melon doesn't overlap another melon.
-    if ([_grid isNullAtRow:_melon.row andCol:_melon.col] && _melon.type == MelonTypeRegular)
-    {
+    if ([_grid isNullAtRow:_melon.row andCol:_melon.col] && _melon.type == MelonTypeRegular) {
         // Makes clearable neighbor melon wobble.
         [self countMelonNeighbors];
         [self wobbleOrRemoveNeighbors:NO];
@@ -177,7 +176,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     // Count the active melons to the right of the current melon.
     for (int right = _melon.col + 1; right < _grid.numCols; right++)
     {
-        if ([_grid isNullAtRow:_melon.row andCol:_melon.col] == NO) {
+        if ([_grid isNullAtRow:_melon.row andCol:right] == NO) {
             _melon.horizNeighborEndCol++;
         }
         else {
@@ -188,7 +187,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     // Count the active melons to the left of the current melon.
     for (int left = _melon.col - 1; left >= 0; left--)
     {
-        if ([_grid isNullAtRow:_melon.row andCol:_melon.col] == NO) {
+        if ([_grid isNullAtRow:_melon.row andCol:left] == NO) {
             _melon.horizNeighborStartCol--;
         }
         else {
@@ -197,9 +196,9 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     }
     
     // Count the active melons above the current melon.
-    for (int up = _melon.row - 1; up >= 0 ; up--)
+    for (int down = _melon.row - 1; down >= 0 ; down--)
     {
-        if ([_grid isNullAtRow:_melon.row andCol:_melon.col] == NO) {
+        if ([_grid isNullAtRow:down andCol:_melon.col] == NO) {
             _melon.verticalNeighborStartRow--;
         }
         else {
@@ -208,9 +207,9 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     }
     
     // Count the active melons below the current melon.
-    for (int down = _melon.row + 1; down < _grid.numRows; down++)
+    for (int up = _melon.row + 1; up < _grid.numRows; up++)
     {
-        if ([_grid isNullAtRow:_melon.row andCol:_melon.col] == NO) {
+        if ([_grid isNullAtRow:up andCol:_melon.col] == NO) {
             _melon.verticalNeighborEndRow++;
         }
         else {
@@ -221,58 +220,45 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 
 // Check if the melon's label equals the number of vertical/horizontal neighbors. If so,
 // remove that column/row.
-- (void)wobbleOrRemoveNeighbors:(BOOL)remove
+- (void)wobbleOrRemoveNeighbors:(BOOL)removeNeighbor
 {
     int numVerticalNeighbors = _melon.verticalNeighborEndRow - _melon.verticalNeighborStartRow + 1;
     int numHorizNeighbors = _melon.horizNeighborEndCol - _melon.horizNeighborStartCol + 1;
     
     // Remove all vertical neighbors.
-    if (_melonLabel == numVerticalNeighbors)
-    {
-        for (int i = _melon.verticalNeighborStartRow; i <= _melon.verticalNeighborEndRow; i++)
-        {
-            if ([_grid isNullAtRow:i andCol:_melon.col] == NO)
-            {
-                Melon *neighbor = [_grid getObjectAtRow:i andCol:_melon.col];
-
-                if (remove)
-                {
-                    // Remove the neighbor.
-                    [_grid removeObjectAtX:i Y:_melon.col];
-                    [neighbor explode];
-                }
-                else
-                {
-                    // Wobble the neighbor and the current melon.
-                    Melon *neighbor = [_grid getObjectAtRow:i andCol:_melon.col];
-                    [neighbor wobble];
-                    [_melon wobble];
-                }
-            }
+    if (_melonLabel == numVerticalNeighbors) {
+        for (int i = _melon.verticalNeighborStartRow; i <= _melon.verticalNeighborEndRow; i++) {
+            [self helperWobbleOrRemove:removeNeighbor NeighborsAtRow:i andCol:_melon.col];
         }
     }
     // Removes all horizontal neighbors.
-    if (_melonLabel == numHorizNeighbors)
-    {
-        for (int j = _melon.horizNeighborStartCol; j <= _melon.horizNeighborEndCol; j++)
-        {
-            if ( [_grid isNullAtRow:_melon.row andCol:j] == NO)
-            {
-                Melon *neighbor = [_grid getObjectAtRow:_melon.row andCol:j];
+    if (_melonLabel == numHorizNeighbors) {
+        for (int j = _melon.horizNeighborStartCol; j <= _melon.horizNeighborEndCol; j++) {
+            [self helperWobbleOrRemove:removeNeighbor NeighborsAtRow:_melon.row andCol:j];
+        }
+    }
+}
 
-                if (remove)
-                {
-                    // Remove the neighbor.
-                    [_grid removeObjectAtX:_melon.row Y:j];
-                    [neighbor explode];
-                }
-                else
-                {
-                    // Wobble the neighbor and the current melon.
-                    [neighbor wobble];
-                    [_melon wobble];
-                }
+// Helper method to remove or wobble neighbor.
+- (void) helperWobbleOrRemove:(BOOL)remove NeighborsAtRow:(int)row andCol:(int)col
+{
+    if ( [_grid isNullAtRow:row andCol:col] == NO) {
+        Melon *neighbor = [_grid getObjectAtRow:row andCol:col];
+        
+        if (remove) {
+            // Remove reference unless it's a winter melon.
+            if (neighbor.type == MelonTypeWinter || neighbor.type == MelonTypeWinterFirstHit) {
+                // Attempt to explode the neighbor (change pic if winter melon).
+                [neighbor explode];
             }
+            else {
+                [_grid removeObjectAtX:row Y:col];
+            }
+        }
+        else {
+            // Wobble the neighbor and the current melon.
+            [neighbor wobble];
+            [_melon wobble];
         }
     }
 }

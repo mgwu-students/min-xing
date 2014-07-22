@@ -45,10 +45,10 @@ static const int GRID_COLUMNS = 5;
 // Checks if a specified position on the grid is [NSNull null].
 - (BOOL)isNullAtRow:(int)row andCol:(int)col
 {
-    if (_gridArray[row][col] == [NSNull null]) {
-        return YES;
+    if (_gridArray[row][col] != [NSNull null]) {
+        return NO;
     }
-    return NO;
+    return YES;
 }
 
 // Position an object at the specified position on the board.
@@ -76,7 +76,7 @@ static const int GRID_COLUMNS = 5;
     if (_gridArray[xPos][yPos] == [NSNull null]) {
         return;
     }
-    
+    [_gridArray[xPos][yPos] removeFromParent];
     _gridArray[xPos][yPos] = [NSNull null];
 }
 
