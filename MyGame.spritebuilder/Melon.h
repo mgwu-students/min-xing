@@ -39,5 +39,7 @@ typedef NS_ENUM(NSInteger, MelonType) {
 
 - (void)makeMelon:(int)melonType;
 - (void)wobble;
+- (void)stopWobble;
+- (void)explode;
 
 @end

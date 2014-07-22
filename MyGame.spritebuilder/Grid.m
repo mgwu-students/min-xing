@@ -7,186 +7,81 @@
 //
 
 #import "Grid.h"
-#import "Melon.h"
 
-// Grid size.
 static const int GRID_ROWS = 5;
 static const int GRID_COLUMNS = 5;
 
-// Chance to get a bomb melon.
-static const float BOMB_CHANCE = 0.07;
-// Chance to get a winter melon.
-static const float INITIAL_WINTERMELON_CHANCE = 0.22;
-
-
 @implementation Grid {
     NSMutableArray *_gridArray;
-    float _cellWidth;
-    float _cellHeight;
-    int _melonLabel; // Current melon number label.
-    float _chanceToGetWintermelon;
-    float _chanceToGetBomb;
-    float _chance;
-    Melon *currentMelon;
 }
-
 
 - (void)onEnter
 {
     [super onEnter];
     
     [self setupGrid];
-    
-    [self updateMelonLabel];
-    
-    currentMelon = (Melon *)[CCBReader load:@"Melon"];
-    
-     _chanceToGetBomb = BOMB_CHANCE;
-    _chanceToGetWintermelon = _chanceToGetBomb + INITIAL_WINTERMELON_CHANCE;
-    
-    self.userInteractionEnabled = YES;
 }
 
+// Sets up a 2D grid.
 - (void)setupGrid
 {
-    _cellWidth = self.contentSize.width / GRID_COLUMNS;
-    _cellHeight = self.contentSize.height / GRID_ROWS;
-
+    self.numCols = GRID_COLUMNS;
+    self.numRows = GRID_ROWS;
+    
+    self.cellWidth = self.contentSize.width / GRID_COLUMNS;
+    self.cellHeight = self.contentSize.height / GRID_ROWS;
+    
     // Initializes the grid and uses NSNull objects as placeholders.
     _gridArray = [NSMutableArray array];
     for (int i = 0; i < GRID_ROWS; i++) {
         _gridArray[i] = [NSMutableArray array];
         
         for (int j = 0; j < GRID_COLUMNS; j++) {
-            _gridArray[i][j] = [NSNull null]; // placeholder
+            _gridArray[i][j] = [NSNull null];
         }
     }
 }
 
-// Melon appears on touch.
-- (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
+// Checks if a specified position on the grid is [NSNull null].
+- (BOOL)isNullAtRow:(int)row andCol:(int)col
 {
-    // Makes a melon and update its location.
-    currentMelon = (Melon *)[CCBReader load:@"Melon"];
-    [self updateRowAndCol:[touch locationInNode:self]];
-    
-    // Prevents duplicate touches.
-    if (_gridArray[currentMelon.row][currentMelon.col] != [NSNull null]) {
+    if (_gridArray[row][col] == [NSNull null]) {
+        return YES;
+    }
+    return NO;
+}
+
+// Position an object at the specified position on the board.
+- (void)positionNode:(CCNode *)node atRow:(int)row andCol:(int)col
+{
+    node.anchorPoint = ccp(0, 0);
+    node.position = ccp (col * _cellWidth, row * _cellHeight);
+}
+
+// Adds an object to the board.
+- (void)addObject:(id)object toRow:(int)row andCol:(int)col
+{
+    _gridArray[row][col] = object;
+}
+
+// Returns the object stored at the specified position.
+- (id)getObjectAtRow:(int)row andCol:(int)col
+{
+    return _gridArray[row][col];
+}
+
+// Removes reference to the object stored at the specified position.
+- (void)removeObjectAtX:(int)xPos Y:(int)yPos
+{
+    if (_gridArray[xPos][yPos] == [NSNull null]) {
         return;
     }
     
-    // Determine what type of melon it is and change type accordingly.
-    if (_chance <= _chanceToGetBomb) {
-        currentMelon.type = MelonTypeBomb;
-    }
-    else if (_chance <= _chanceToGetWintermelon) {
-        currentMelon.type = MelonTypeWinter;
-    }
-    else {
-        currentMelon.type = MelonTypeRegular;
-            
-        // Makes clearable neighbor melon wobble.
-        [self countNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
-        [self wobble:YES orRemoveNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
-    }
-        
-    // Puts melon on board.
-    [self positionMelon:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
-    [self addChild: currentMelon];
+    _gridArray[xPos][yPos] = [NSNull null];
 }
 
-// Melon moves with touch.
-- (void)touchMoved:(UITouch *)touch withEvent:(UIEvent *)event
-{
-    // Centers the melon.
-    currentMelon.anchorPoint = ccp(0.5, 0.5);
-    
-    //Follows finger movements.
-    CGPoint currentLocation = [touch locationInNode:self];
-    currentMelon.position = currentLocation;
-    [self updateRowAndCol:currentLocation];
-    
-    // Only run this when the current melon doesn't overlap another melon (i.e. current grid is clear).
-    if (_gridArray[currentMelon.row][currentMelon.col] == [NSNull null] &&
-        currentMelon.type != MelonTypeWinter)
-    {
-        // Makes clearable neighbor melon wobble.
-        [self countNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
-        [self wobble:YES orRemoveNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
-    }
-
-    // TODO: Highlight passing grid.
-}
-
-// Melon gets added to the grid on release.
-- (void)touchEnded:(UITouch *)touch withEvent:(UIEvent *)event
-{
-    // Updates melon location.
-    [self updateRowAndCol:[touch locationInNode:self]];
- 
-    // Prevent putting multiple objects at the same location.
-    if (_gridArray[currentMelon.row][currentMelon.col] != [NSNull null]) {
-        [currentMelon removeFromParent];
-        return;
-    }
-    
-    // Add melon.
-    [self positionMelon:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
-    _gridArray[currentMelon.row][currentMelon.col] = currentMelon;
-
-    // Check to remove neighbors for bombs and regular green melons.
-    if (currentMelon.type == MelonTypeBomb) {
-        // Remove surrounding melons.
-        [self explodeMelonsAdjacentToRow:currentMelon.row andCol:currentMelon.col];
-        
-        // Remove the bomb with special bomb particle effect.
-        [self removeMelonAtX:currentMelon.row Y:currentMelon.col isBomb:YES];
-    }
-    else if (currentMelon.type == MelonTypeRegular) {
-        // Remove row and column neighbors if necessary.
-        [self countNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
-        [self wobble:NO orRemoveNeighborsOf:currentMelon atRow:currentMelon.row andCol:currentMelon.col];
-    }
-
-    [self updateMelonLabel];
-}
-
-// Updates the current melon's row and column.
-- (void)updateRowAndCol:(CGPoint)location
-{
-    currentMelon.row = location.y / _cellHeight;
-    currentMelon.col = location.x / _cellWidth;
-}
-
-// Put a melon on the board at the specified position on the board.
-- (void)positionMelon:(Melon *)melon atRow:(int)row andCol:(int)col
-{
-    melon.anchorPoint = ccp(0, 0);
-    melon.position = ccp (col * _cellWidth, row * _cellHeight);
-}
-
-// Updates the melon's number label.
-// TODO: Updae Icon
-- (void) updateMelonLabel
-{
-    _chance = drand48(); // Random float between 0 and 1.
-    
-    if (_chance <= _chanceToGetBomb) {
-        self.updateLabel(99); // TESTING ONLY
-    }
-    else if (_chance <= _chanceToGetWintermelon) {
-        self.updateLabel(0); // TESTING ONLY
-    }
-    else {
-        // Generate random int btw 2 & GRID_COLUMNS
-        _melonLabel = arc4random_uniform(GRID_COLUMNS - 1) + 2;
-        self.updateLabel(_melonLabel);
-    }
-}
-
-
-// Remove the melons surounding the bomb.
-- (void)explodeMelonsAdjacentToRow:(int)row andCol:(int)col
+// Remove the neighbor objects surounding the current object.
+- (void)removeNeighborsAroundObjectAtRow:(int)row andCol:(int)col
 {
     for (int i = row - 1; i <= row + 1; i++) {
         for (int j = col - 1; j <= col + 1; j++) {
@@ -194,168 +89,12 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
             if (i < 0 || i >= GRID_ROWS || j < 0 || j >= GRID_COLUMNS) {
                 break;
             }
-            // Remove neighbor melon.
+            // Remove neighbor object.
             if (_gridArray[i][j] != [NSNull null]) {
-                [self removeMelonAtX:i Y:j isBomb:NO];
+                [self removeObjectAtX:i Y:j];
             }
         }
     }
-}
-
-
-// Updates the number of horizontal and vertical neighbors of a melon.
-- (void)countNeighborsOf:(Melon*)melon atRow:(int)row andCol:(int)col
-{
-    // Initialize positions.
-    melon.verticalNeighborStartRow = row;
-    melon.verticalNeighborEndRow = row;
-    melon.horizNeighborStartCol = col;
-    melon.horizNeighborEndCol = col;
-    
-    // Count the active melons to the right of the current melon.
-    for (int right = col + 1; right < [_gridArray count]; right++)
-    {
-        if (_gridArray[row][right] != [NSNull null]) {
-            melon.horizNeighborEndCol++;
-        }
-        else {
-            break; // Only count contiguous melons.
-        }
-    }
-    
-    // Count the active melons to the left of the current melon.
-    for (int left = col - 1; left >= 0; left--)
-    {
-        if (_gridArray[row][left] != [NSNull null]) {
-            melon.horizNeighborStartCol--;
-        }
-        else {
-            break;
-        }
-    }
-    
-    // Count the active melons above the current melon.
-    for (int up = row - 1; up >= 0 ; up--)
-    {
-        if (_gridArray[up][col] != [NSNull null]) {
-            melon.verticalNeighborStartRow--;
-        }
-        else {
-            break;
-        }
-    }
-    
-    // Count the active melons below the current melon.
-    for (int down = row + 1; down < [_gridArray[row] count]; down++)
-    {
-        if (_gridArray[down][col] != [NSNull null]) {
-            melon.verticalNeighborEndRow++;
-        }
-        else {
-            break;
-        }
-    }
-}
-
-// Check if the melon's label equals the number of vertical/horizontal neighbors. If so,
-// remove that column/row.
-- (void)wobble:(BOOL)wobbly orRemoveNeighborsOf:(Melon *)melon atRow:(int)row andCol:(int)col
-{
-    int numVerticalNeighbors = melon.verticalNeighborEndRow - melon.verticalNeighborStartRow + 1;
-    int numHorizNeighbors = melon.horizNeighborEndCol - melon.horizNeighborStartCol + 1;
-
-    // Remove all vertical neighbors.
-    if (_melonLabel == numVerticalNeighbors)
-    {
-        for (int i = melon.verticalNeighborStartRow; i <= melon.verticalNeighborEndRow; i++) {
-            if (wobbly && _gridArray[i][col] != [NSNull null]) {
-                // Wobble the melon and its clearable neighbors.
-                [melon wobble];
-                [_gridArray[i][col] wobble];
-            }
-            else {
-                [self removeMelonAtX:i Y:col isBomb:NO];
-            }
-        }
-    }
-    // Removes all horizontal neighbors.
-    if (_melonLabel == numHorizNeighbors)
-    {
-        for (int j = melon.horizNeighborStartCol; j <= melon.horizNeighborEndCol; j++)
-        {
-            if (wobbly && _gridArray[row][j] != [NSNull null]) {
-                // Wobble the melon and its clearable neighbors.
-                [melon wobble];
-                [_gridArray[row][j] wobble];
-            }
-            else {
-                [self removeMelonAtX:row Y:j isBomb:NO];
-            }
-        }
-    }
-}
-
-
-// Attempts to clear a melon at the specificed position.
-- (void)removeMelonAtX:(int)xPos Y:(int)yPos isBomb:(BOOL)isBomb
-{
-    if (_gridArray[xPos][yPos] == [NSNull null]) {
-        return;
-    }
-    
-    Melon *melonToRemove = _gridArray[xPos][yPos];
-    
-    // Winter melons only get removed after a certain number of hits.
-    if (melonToRemove.type == MelonTypeWinter || melonToRemove.type == MelonTypeWinterFirstHit) {
-        melonToRemove.numOfHits++; // Got hit.
-        [self winterMelon:melonToRemove hitTimes:melonToRemove.numOfHits];
-    }
-    else {
-        // Completely remove melon from board.
-        [self melonRemoved:melonToRemove isBomb:isBomb];
-        _gridArray[xPos][yPos] = [NSNull null];
-    }
-}
-
-// Changes winter melon sprite frame upon getting hit.
-- (void)winterMelon:(Melon *)melon hitTimes:(int)times
-{
-    switch (times) {
-        case 1: {
-            melon.type =  MelonTypeWinterFirstHit;
-            break;
-        }
-        case 2: {
-            melon.type = MelonTypeWinterSecondHit;
-            break;
-        }
-        default:
-            break;
-    }
-}
-
-// Removes the melon with particle effects.
-- (void)melonRemoved:(Melon *)melon isBomb:(BOOL)isBomb
-{
-    CCParticleSystem *explosion;
-    
-    // Different particle effects for melon and bomb.
-    if (isBomb) {
-        explosion = (CCParticleSystem *)[CCBReader load:@"BombExplosion"];
-    }
-    else {
-        explosion = (CCParticleSystem *)[CCBReader load:@"MelonExplosion"];
-    }
-    // Clean up particle effect.
-    explosion.autoRemoveOnFinish = YES;
-    
-    // Place the particle effect at the melon's center.
-    explosion.position = ccp(melon.position.x + melon.contentSizeInPoints.width / 2, melon.position.y +
-                             melon.contentSizeInPoints.height / 2);
-    
-    // Add the particle effect to the same node the melon is on and remove the destroyed melon.
-    [melon.parent addChild:explosion];
-    [melon removeFromParent];
 }
 
 @end
