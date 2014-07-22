@@ -19,6 +19,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     Grid *_grid;
     Melon *_melon;
     CCLabelTTF *_numLabel;
+    CGRect _gridBox;
     int _melonLabel; // Current melon number label.
     float _chanceToGetWintermelon;
     float _chanceToGetBomb;
@@ -40,6 +41,8 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     
     _melon = (Melon *)[CCBReader load:@"Melon"];
     
+    _gridBox= _grid.boundingBox;
+    
     [self updateMelonLabel]; // First melon label.
     
     self.userInteractionEnabled = YES;
@@ -48,10 +51,21 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 // Melon appears on touch.
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
-    // Makes a melon and update its location.
+    // Current touch location.
+    CGPoint touchLocation = [touch locationInNode:self];
+    
+    // If touch point is outside the grid, don't do anything.
+    if (CGRectContainsPoint(_gridBox, touchLocation) == NO) {
+        return;
+    }
+    
+    // Convert to grid coordinates.
+    touchLocation = [touch locationInNode:_grid];
+    
+    // Makes a new melon.
     _melon = (Melon *)[CCBReader load:@"Melon"];
-    CGPoint touchLocation = [touch locationInNode:_grid];
-
+    
+    // Updatets the melon's location.
     [self updateMelonRowAndCol:touchLocation];
  
     // Prevents duplicate touches.
@@ -82,11 +96,22 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 // Melon moves with touch.
 - (void)touchMoved:(UITouch *)touch withEvent:(UIEvent *)event
 {
+    // Current touch location.
+    CGPoint touchLocation = [touch locationInNode:self];
+    
+    // If touch point is outside the grid, don't do anything.
+    if (CGRectContainsPoint(_gridBox, touchLocation) == NO) {
+        return;
+    }
+    
+    // Convert to grid coordinates.
+    touchLocation = [touch locationInNode:_grid];
+    
     // Centers the melon.
     _melon.anchorPoint = ccp(0.5, 0.5);
     
     //Follows finger movements.
-    [self updateMelonRowAndCol:[touch locationInNode:_grid]];
+    [self updateMelonRowAndCol:touchLocation];
     [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
     
     // Only wobble melons when the current melon doesn't overlap another melon.
@@ -100,8 +125,19 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 // Melon gets added to the grid on release.
 - (void)touchEnded:(UITouch *)touch withEvent:(UIEvent *)event
 {
+    // Current touch location.
+    CGPoint touchLocation = [touch locationInNode:self];
+    
+    // If touch point is outside the grid, don't do anything.
+    if (CGRectContainsPoint(_gridBox, touchLocation) == NO) {
+        return;
+    }
+    
+    // Convert to grid coordinates.
+    touchLocation = [touch locationInNode:_grid];
+    
     // Updates melon location.
-    [self updateMelonRowAndCol:[touch locationInNode:_grid]];
+    [self updateMelonRowAndCol:touchLocation];
     
     // Prevent putting multiple objects at the same location.
     if ([_grid isNullAtRow:_melon.row andCol:_melon.col] == NO) {
@@ -126,12 +162,6 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     else if (_melon.type == MelonTypeRegular) {
         // Remove row and column neighbors if necessary.
         [self countMelonNeighbors];
-        
-//        CCLOG(@"horizontal neighbor start col %d", _melon.horizNeighborStartCol);
-//        CCLOG(@"horizontal neighbor end col %d", _melon.horizNeighborEndCol);
-//        CCLOG(@"vertical neighbor start row %d", _melon.verticalNeighborStartRow);
-//        CCLOG(@"vertical neighbor end row %d", _melon.verticalNeighborEndRow);
-        
         [self wobbleOrRemoveNeighbors:YES];
     }
     
@@ -159,8 +189,6 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 {
     _melon.row = location.y / _grid.cellHeight;
     _melon.col = location.x / _grid.cellWidth;
-    
-//    CCLOG(@"melon row, col %d  %d", _melon.row, _melon.col);
 }
 
 // Updates the number of horizontal and vertical neighbors of a melon.
@@ -245,7 +273,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         Melon *neighbor = [_grid getObjectAtRow:row andCol:col];
         
         if (remove) {
-            // Attempt to explode the neighbor and possibly change frame for winter melon.
+            // Loads explosion effects and possible winter melon frame changes.
             [neighbor explode];
             // Remove this melon completely.
             if (neighbor.type == MelonTypeRegular || neighbor.type == MelonTypeWinterSecondHit) {
