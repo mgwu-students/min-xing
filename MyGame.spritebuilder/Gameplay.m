@@ -11,7 +11,7 @@
 #import "Melon.h"
 
 // Chance to get a bomb melon.
-static const float BOMB_CHANCE = 0.00;
+static const float BOMB_CHANCE = 0.05;
 // Chance to get a winter melon.
 static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 
@@ -79,24 +79,24 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     [_grid addChild: _melon];
 }
 
-// Melon moves with touch.
-- (void)touchMoved:(UITouch *)touch withEvent:(UIEvent *)event
-{
-    // Centers the melon.
-    _melon.anchorPoint = ccp(0.5, 0.5);
-    
-    //Follows finger movements.
-    [self updateMelonRowAndCol:[touch locationInNode:_grid]];
-    
-    // Only wobble melons when the current melon doesn't overlap another melon.
-    if ([_grid isNullAtRow:_melon.row andCol:_melon.col] && _melon.type == MelonTypeRegular) {
-        // Makes clearable neighbor melon wobble.
-        [self countMelonNeighbors];
-        [self wobbleOrRemoveNeighbors:NO];
-    }
-    
-    // TODO: Highlight passing grid.
-}
+//// Melon moves with touch.
+//- (void)touchMoved:(UITouch *)touch withEvent:(UIEvent *)event
+//{
+//    // Centers the melon.
+//    _melon.anchorPoint = ccp(0.5, 0.5);
+//    
+//    //Follows finger movements.
+//    [self updateMelonRowAndCol:[touch locationInNode:_grid]];
+//    
+//    // Only wobble melons when the current melon doesn't overlap another melon.
+//    if ([_grid isNullAtRow:_melon.row andCol:_melon.col] && _melon.type == MelonTypeRegular) {
+//        // Makes clearable neighbor melon wobble.
+//        [self countMelonNeighbors];
+//        [self wobbleOrRemoveNeighbors:NO];
+//    }
+//    
+//    // TODO: Highlight passing grid.
+//}
 
 // Melon gets added to the grid on release.
 - (void)touchEnded:(UITouch *)touch withEvent:(UIEvent *)event
@@ -117,12 +117,12 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     
     // Check to remove neighbors for bombs and regular green melons.
     if (_melon.type == MelonTypeBomb) {
+        // Remove the bomb.
+        [_melon explode];
+        [_grid removeObjectAtX:_melon.row Y:_melon.col];
+        
         // Remove surrounding melons.
         [_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
-        
-        // Remove the bomb.
-        [_grid removeObjectAtX:_melon.row Y:_melon.col];
-        [_melon explode];
     }
     else if (_melon.type == MelonTypeRegular) {
         // Remove row and column neighbors if necessary.
