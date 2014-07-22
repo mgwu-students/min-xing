@@ -79,24 +79,23 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     [_grid addChild: _melon];
 }
 
-//// Melon moves with touch.
-//- (void)touchMoved:(UITouch *)touch withEvent:(UIEvent *)event
-//{
-//    // Centers the melon.
-//    _melon.anchorPoint = ccp(0.5, 0.5);
-//    
-//    //Follows finger movements.
-//    [self updateMelonRowAndCol:[touch locationInNode:_grid]];
-//    
-//    // Only wobble melons when the current melon doesn't overlap another melon.
-//    if ([_grid isNullAtRow:_melon.row andCol:_melon.col] && _melon.type == MelonTypeRegular) {
-//        // Makes clearable neighbor melon wobble.
-//        [self countMelonNeighbors];
-//        [self wobbleOrRemoveNeighbors:NO];
-//    }
-//    
-//    // TODO: Highlight passing grid.
-//}
+// Melon moves with touch.
+- (void)touchMoved:(UITouch *)touch withEvent:(UIEvent *)event
+{
+    // Centers the melon.
+    _melon.anchorPoint = ccp(0.5, 0.5);
+    
+    //Follows finger movements.
+    [self updateMelonRowAndCol:[touch locationInNode:_grid]];
+    [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
+    
+    // Only wobble melons when the current melon doesn't overlap another melon.
+    if ([_grid isNullAtRow:_melon.row andCol:_melon.col] && _melon.type == MelonTypeRegular) {
+        // Makes clearable neighbor melon wobble.
+        [self countMelonNeighbors];
+        [self wobbleOrRemoveNeighbors:NO];
+    }
+}
 
 // Melon gets added to the grid on release.
 - (void)touchEnded:(UITouch *)touch withEvent:(UIEvent *)event
@@ -128,10 +127,10 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         // Remove row and column neighbors if necessary.
         [self countMelonNeighbors];
         
-        CCLOG(@"horizontal neighbor start col %d", _melon.horizNeighborStartCol);
-        CCLOG(@"horizontal neighbor end col %d", _melon.horizNeighborEndCol);
-        CCLOG(@"vertical neighbor start row %d", _melon.verticalNeighborStartRow);
-        CCLOG(@"vertical neighbor end row %d", _melon.verticalNeighborEndRow);
+//        CCLOG(@"horizontal neighbor start col %d", _melon.horizNeighborStartCol);
+//        CCLOG(@"horizontal neighbor end col %d", _melon.horizNeighborEndCol);
+//        CCLOG(@"vertical neighbor start row %d", _melon.verticalNeighborStartRow);
+//        CCLOG(@"vertical neighbor end row %d", _melon.verticalNeighborEndRow);
         
         [self wobbleOrRemoveNeighbors:YES];
     }
@@ -161,7 +160,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     _melon.row = location.y / _grid.cellHeight;
     _melon.col = location.x / _grid.cellWidth;
     
-    CCLOG(@"melon row, col %d  %d", _melon.row, _melon.col);
+//    CCLOG(@"melon row, col %d  %d", _melon.row, _melon.col);
 }
 
 // Updates the number of horizontal and vertical neighbors of a melon.
