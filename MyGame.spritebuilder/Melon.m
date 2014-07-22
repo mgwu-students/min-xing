@@ -83,7 +83,8 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
             explosion = (CCParticleSystem *)[CCBReader load:@"BombExplosion"];
         }
         else {
-            explosion = (CCParticleSystem *)[CCBReader load:@"MelonExplosion"];
+            explosion = (CCParticleSystem *)[CCBReader load:@"BombExplosion"];
+            CCLOG(@"Loaded melon explosion");
         }
         // Clean up particle effect.
         explosion.autoRemoveOnFinish = YES;
@@ -94,9 +95,6 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
         
         // Add the particle effect to the same node the melon is on and remove the destroyed melon.
         [self.parent addChild:explosion];
-        
-        // Removes the melon.
-//        [self removeFromParent]; 
     }
 }
 

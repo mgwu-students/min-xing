@@ -245,12 +245,10 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         Melon *neighbor = [_grid getObjectAtRow:row andCol:col];
         
         if (remove) {
-            // Remove reference unless it's a winter melon.
-            if (neighbor.type == MelonTypeWinter || neighbor.type == MelonTypeWinterFirstHit) {
-                // Attempt to explode the neighbor (change pic if winter melon).
-                [neighbor explode];
-            }
-            else {
+            // Attempt to explode the neighbor and possibly change frame for winter melon.
+            [neighbor explode];
+            // Remove this melon completely.
+            if (neighbor.type == MelonTypeRegular || neighbor.type == MelonTypeWinterSecondHit) {
                 [_grid removeObjectAtX:row Y:col];
             }
         }
