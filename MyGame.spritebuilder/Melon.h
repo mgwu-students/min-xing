@@ -14,6 +14,7 @@ typedef NS_ENUM(NSInteger, MelonType) {
     MelonTypeWinter,
     MelonTypeWinterFirstHit,
     MelonTypeWinterSecondHit,
+    MelonTypeWinterThirdHit,
     MelonTypeBomb
 };
 

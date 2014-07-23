@@ -36,14 +36,18 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 
 - (void)didLoadFromCCB
 {
+    // Initialize chances to get bomb and winter melons.
     _chanceToGetBomb = BOMB_CHANCE;
     _chanceToGetWintermelon = _chanceToGetBomb + INITIAL_WINTERMELON_CHANCE;
     
+    // Loads melon.
     _melon = (Melon *)[CCBReader load:@"Melon"];
     
+    // Grid's bounding box.
     _gridBox= _grid.boundingBox;
     
-    [self updateMelonLabel]; // First melon label.
+    // First melon label.
+//    [self updateMelonLabel];
     
     self.userInteractionEnabled = YES;
 }
@@ -83,13 +87,15 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     else {
         _melon.type = MelonTypeRegular;
         
-        // Makes clearable neighbor melon wobble.
+        // Updates the current melon's neighbor positions.
         [self countMelonNeighbors];
+        // Makes clearable neighbors wobble (without removing them).
         [self wobbleOrRemoveNeighbors:NO];
     }
     
-    // Puts melon on board.
+    // Positions the melon.
     [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
+    // Adds the melon to the grid.
     [_grid addChild: _melon];
 }
 
@@ -110,14 +116,17 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     // Centers the melon.
     _melon.anchorPoint = ccp(0.5, 0.5);
     
-    //Follows finger movements.
+    // Updates the melon's current location.
     [self updateMelonRowAndCol:touchLocation];
+    
+    // Position melon to follow finger movements.
     [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
     
-    // Only wobble melons when the current melon doesn't overlap another melon.
+    // Only wobble melons when the current (regular) melon doesn't overlap another melon.
     if ([_grid isNullAtRow:_melon.row andCol:_melon.col] && _melon.type == MelonTypeRegular) {
-        // Makes clearable neighbor melon wobble.
+        // Updates the current melon's neighbor positions.
         [self countMelonNeighbors];
+        // Makes clearable neighbors wobble (without removing them).
         [self wobbleOrRemoveNeighbors:NO];
     }
 }
@@ -133,55 +142,68 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         return;
     }
     
-    // Convert to grid coordinates.
+    // Converts to grid coordinates.
     touchLocation = [touch locationInNode:_grid];
     
     // Updates melon location.
     [self updateMelonRowAndCol:touchLocation];
     
-    // Prevent putting multiple objects at the same location.
+    // Prevents putting multiple melons at the same location.
     if ([_grid isNullAtRow:_melon.row andCol:_melon.col] == NO) {
         // Remove the current melon if it's not properly placed.
         [_melon removeFromParent];
         return;
     }
     
-    // Add melon.
+    // Position melon on board.
     [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
+    // Adds melon to the grid.
     [_grid addObject:_melon toRow:_melon.row andCol:_melon.col];
     
-    // Check to remove neighbors for bombs and regular green melons.
+    // Check to remove neighbors for bomb and regular melon.
     if (_melon.type == MelonTypeBomb) {
-        // Remove the bomb.
+        // Removes the bomb.
         [_melon explode];
         [_grid removeObjectAtX:_melon.row Y:_melon.col];
         
-        // Remove surrounding melons.
+        // Removes surrounding melons.
         [_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
     }
     else if (_melon.type == MelonTypeRegular) {
-        // Remove row and column neighbors if necessary.
+        // Updates the current melon's neighbor positions.
         [self countMelonNeighbors];
+        // Removes the melon's neighbors on mouse release.
         [self wobbleOrRemoveNeighbors:YES];
     }
     
-    [self updateMelonLabel];
+    [self updateMelonLabelAndIcon];
 }
 
-- (void) updateMelonLabel
+- (void) updateMelonLabelAndIcon
 {
-    _chance = drand48(); // Random float between 0 and 1.
+    // Reloads melon.
+    _melon = (Melon *)[CCBReader load:@"Melon"];
+
+    // Random float between 0 and 1.
+    _chance = drand48();
     
     if (_chance <= _chanceToGetBomb) {
-        _numLabel.string = [NSString stringWithFormat:@"%d", 99];
+        _numLabel.string = [NSString stringWithFormat:@" "];
+        _melon.type = MelonTypeBomb;
     }
     else if (_chance <= _chanceToGetWintermelon) {
-        _numLabel.string = [NSString stringWithFormat:@"%d", 0];
+        _numLabel.string = [NSString stringWithFormat:@" "];
+        _melon.type = MelonTypeWinter;
     }
     else {
-        _melonLabel = arc4random_uniform(_grid.numCols) + 1; // Random int btw 1 & GRID_COLUMNS
+        // Random int btw 1 & GRID_COLUMNS.
+        _melonLabel = arc4random_uniform(_grid.numCols) + 1;
         _numLabel.string = [NSString stringWithFormat:@"%d", _melonLabel];
+        _melon.type = MelonTypeRegular;
     }
+    
+    _melon.position = _numLabel.position;
+    [self addChild:_melon];
 }
 
 // Updates the melon's row and column.
@@ -200,7 +222,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     _melon.horizNeighborStartCol = _melon.col;
     _melon.horizNeighborEndCol = _melon.col;
     
-    // Count the active melons to the right of the current melon.
+    // Count the number of melons to the right of the current melon.
     for (int right = _melon.col + 1; right < _grid.numCols; right++)
     {
         if ([_grid isNullAtRow:_melon.row andCol:right] == NO) {
@@ -211,7 +233,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         }
     }
     
-    // Count the active melons to the left of the current melon.
+    // Count the number of melons to the left of the current melon.
     for (int left = _melon.col - 1; left >= 0; left--)
     {
         if ([_grid isNullAtRow:_melon.row andCol:left] == NO) {
@@ -222,7 +244,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         }
     }
     
-    // Count the active melons above the current melon.
+    // Count the number of melons above the current melon.
     for (int down = _melon.row - 1; down >= 0 ; down--)
     {
         if ([_grid isNullAtRow:down andCol:_melon.col] == NO) {
@@ -233,7 +255,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         }
     }
     
-    // Count the active melons below the current melon.
+    // Count the number of melons below the current melon.
     for (int up = _melon.row + 1; up < _grid.numRows; up++)
     {
         if ([_grid isNullAtRow:up andCol:_melon.col] == NO) {
@@ -276,7 +298,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
             // Loads explosion effects and possible winter melon frame changes.
             [neighbor explode];
             // Remove this melon completely.
-            if (neighbor.type == MelonTypeRegular || neighbor.type == MelonTypeWinterSecondHit) {
+            if (neighbor.type == MelonTypeRegular || neighbor.type == MelonTypeWinterThirdHit) {
                 [_grid removeObjectAtX:row Y:col];
             }
         }

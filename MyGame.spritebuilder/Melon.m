@@ -65,13 +65,14 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
 - (void)explode
 {
     // Remove winter melons on third hit.
-    if (self.type == MelonTypeWinter)
-    {
+    if (self.type == MelonTypeWinter) {
         self.type = MelonTypeWinterFirstHit;
     }
-    else if (self.type == MelonTypeWinterFirstHit)
-    {
+    else if (self.type == MelonTypeWinterFirstHit) {
         self.type = MelonTypeWinterSecondHit;
+    }
+    else if (self.type == MelonTypeWinterSecondHit) {
+        self.type = MelonTypeWinterThirdHit;
     }
     else
     // Remove melon with explosion effects.
