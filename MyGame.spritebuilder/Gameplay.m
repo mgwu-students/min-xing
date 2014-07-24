@@ -40,14 +40,11 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     _chanceToGetBomb = BOMB_CHANCE;
     _chanceToGetWintermelon = _chanceToGetBomb + INITIAL_WINTERMELON_CHANCE;
     
-    // Loads melon.
-    _melon = (Melon *)[CCBReader load:@"Melon"];
-    
     // Grid's bounding box.
     _gridBox= _grid.boundingBox;
     
     // First melon label.
-//    [self updateMelonLabel];
+    [self updateMelonLabelAndIcon];
     
     self.userInteractionEnabled = YES;
 }
