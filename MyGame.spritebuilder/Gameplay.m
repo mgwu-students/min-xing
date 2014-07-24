@@ -66,6 +66,8 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     // Makes a new melon.
     _melon = (Melon *)[CCBReader load:@"Melon"];
     
+    CCLOG(@"HERE");
+    
     // Updatets the melon's location.
     [self updateMelonRowAndCol:touchLocation];
  
@@ -185,20 +187,21 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     _chance = drand48();
     
     if (_chance <= _chanceToGetBomb) {
-        _numLabel.string = [NSString stringWithFormat:@" "];
         _melon.type = MelonTypeBomb;
+        _numLabel.string = [NSString stringWithFormat:@" "];
     }
     else if (_chance <= _chanceToGetWintermelon) {
-        _numLabel.string = [NSString stringWithFormat:@" "];
         _melon.type = MelonTypeWinter;
+        _numLabel.string = [NSString stringWithFormat:@" "];
     }
     else {
         // Random int btw 1 & GRID_COLUMNS.
+        _melon.type = MelonTypeRegular;
         _melonLabel = arc4random_uniform(_grid.numCols) + 1;
         _numLabel.string = [NSString stringWithFormat:@"%d", _melonLabel];
-        _melon.type = MelonTypeRegular;
     }
     
+    _melon.scale = _grid.cellHeight;
     _melon.position = _numLabel.position;
     [self addChild:_melon];
 }

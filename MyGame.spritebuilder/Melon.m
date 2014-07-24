@@ -8,8 +8,8 @@
 
 #import "Melon.h"
 
-static NSString *regularMelon = @"MyGameAssets/melon_temp.png";
-static NSString *winterMelon = @"MyGameAssets/wintermelon_temp.png";
+static NSString *regularMelon = @"MyGameAssets/watermelon_temp.png";
+static NSString *winterMelon = @"MyGameAssets/wintermelon.png";
 static NSString *winterMelonFirstHit = @"MyGameAssets/wintermelonFirstHit_temp.png";
 static NSString *winterMelonSecondHit = @"MyGameAssets/wintermelonSecondHit_temp.png";
 static NSString *bomb = @"MyGameAssets/bomb_temp.png";
@@ -42,11 +42,17 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
     }
 }
 
-// Overriding setter method.
+// Overriding setter.
 - (void)setType:(MelonType)type
 {
     _type = type;
     [self makeMelon:type];
+}
+
+// Overriding scale.
+- (void)setScale:(float)tileSize
+{
+    _melonSprite.scale =  tileSize / _melonSprite.contentSizeInPoints.height;
 }
 
 // Makes the melon wobble.

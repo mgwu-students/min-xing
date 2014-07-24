@@ -174,8 +174,8 @@
 						<string>ScaleLock</string>
 						<key>value</key>
 						<array>
-							<real>1</real>
-							<real>1</real>
+							<real>2.2161686420440674</real>
+							<real>2.1385476589202881</real>
 							<false/>
 							<integer>0</integer>
 						</array>
@@ -198,7 +198,7 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>MyGameAssets/wintermelon_temp.png</string>
+							<string>MyGameAssets/wintermelon.png</string>
 						</array>
 					</dict>
 					<dict>
@@ -215,6 +215,8 @@
 						</array>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 				<key>seqExpanded</key>
 				<true/>
 			</dict>
