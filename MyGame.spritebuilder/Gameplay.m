@@ -24,8 +24,6 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     float _chanceToGetWintermelon;
     float _chanceToGetBomb;
     float _chance;
-    float _gridHeightOffset;
-    float _gridWidthOffset;
 }
 
 - (id)init
@@ -201,9 +199,15 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         _numLabel.string = [NSString stringWithFormat:@"%d", _melonLabel];
     }
     
+    [_numLabel setVisible:YES];
+    
     _melon.scale = _grid.cellHeight;
     _melon.position = _numLabel.position;
-    [self addChild:_melon];
+    
+    // Position the number on top of the melon.
+    [_numLabel removeFromParent];
+    [self addChild:_melon z:0];
+    [self addChild:_numLabel z:1];
 }
 
 // Updates the melon's row and column.
