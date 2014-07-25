@@ -105,8 +105,10 @@ static const float MARGIN = 1.0;
 }
 
 // Remove the neighbor objects surounding the current object.
-- (void)removeNeighborsAroundObjectAtRow:(int)row andCol:(int)col
+- (int)removeNeighborsAroundObjectAtRow:(int)row andCol:(int)col
 {
+    int totalRemoved = 0;
+    
     for (int i = row - 1; i <= row + 1; i++)
     {
         for (int j = col - 1; j <= col + 1; j++)
@@ -118,9 +120,11 @@ static const float MARGIN = 1.0;
             // Remove neighbor object.
             if (_gridArray[i][j] != [NSNull null]) {
                 [self removeObjectAtX:i Y:j];
+                totalRemoved++;
             }
         }
     }
+    return totalRemoved;
 }
 
 @end

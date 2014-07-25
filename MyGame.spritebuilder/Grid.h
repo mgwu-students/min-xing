@@ -20,6 +20,6 @@
 - (void)addObject:(id)object toRow:(int)row andCol:(int)col;
 - (id)getObjectAtRow:(int)row andCol:(int)col;
 - (void)removeObjectAtX:(int)xPos Y:(int)yPos;
-- (void)removeNeighborsAroundObjectAtRow:(int)row andCol:(int)col;
+- (int)removeNeighborsAroundObjectAtRow:(int)row andCol:(int)col;
 
 @end

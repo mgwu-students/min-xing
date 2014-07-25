@@ -19,8 +19,10 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     Grid *_grid;
     Melon *_melon;
     CCLabelTTF *_numLabel;
+    CCLabelTTF *_scoreLabel;
     CGRect _gridBox;
     int _melonLabel; // Current melon number label.
+    int _score;
     float _chanceToGetWintermelon;
     float _chanceToGetBomb;
     float _chance;
@@ -40,6 +42,9 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     
     // Grid's bounding box.
     _gridBox= _grid.boundingBox;
+    
+    // Initialize score.
+    _score = 0;
     
     // First melon label.
     [self updateMelonLabelAndIcon];
@@ -163,8 +168,9 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         [_melon explode];
         [_grid removeObjectAtX:_melon.row Y:_melon.col];
         
-        // Removes surrounding melons.
-        [_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
+        // Removes surrounding melons and accumulates the score.
+        int numNeighborRemoved =[_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
+        [self updateScore:numNeighborRemoved];
     }
     else if (_melon.type == MelonTypeRegular) {
         // Updates the current melon's neighbor positions.
@@ -299,6 +305,9 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         Melon *neighbor = [_grid getObjectAtRow:row andCol:col];
         
         if (remove) {
+            // Accumulates score.
+            [self updateScore:1];
+
             // Loads explosion effects and possible winter melon frame changes.
             [neighbor explode];
             // Remove this melon completely.
@@ -312,6 +321,14 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
             [_melon wobble];
         }
     }
+}
+
+// Updates total score.
+- (void)updateScore:(int)add
+{
+    _score += add;
+    _scoreLabel.string = [NSString stringWithFormat: @"%d", _score];
+
 }
 
 // Reloads the scene.
