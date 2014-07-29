@@ -206,13 +206,14 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         _melon.type = MelonTypeRegular;
         _melonLabel = arc4random_uniform(_grid.numCols) + 1;
         CCLOG(@"_grid.numCols %d", _grid.numCols);
-        _numLabel.string = [NSString stringWithFormat:@"%d", _melonLabel];
+        _numLabel.string = [NSString stringWithFormat:@" %d", _melonLabel];
     }
     
     // Position the melon icon.
+    [_numLabel.parent addChild:_melon];
     _melon.anchorPoint = ccp(0.5, 0.5);
     _melon.scale = _grid.cellHeight * _grid.scaleY;
-    _melon.position = _numLabel.position;
+    _melon.positionInPoints = _numLabel.positionInPoints;
     
     // Position the number on top of the melon icon.
     _numLabel.zOrder = 1;
