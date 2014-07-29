@@ -40,16 +40,21 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     _chanceToGetBomb = BOMB_CHANCE;
     _chanceToGetWintermelon = _chanceToGetBomb + INITIAL_WINTERMELON_CHANCE;
     
-    // Grid's bounding box.
-    _gridBox= _grid.boundingBox;
-    
     // Initialize score.
     _score = 0;
     
+    self.userInteractionEnabled = YES;
+}
+
+- (void)onEnter
+{
+    [super onEnter];
+    
+    // Grid's bounding box.
+    _gridBox = _grid.boundingBox;
+    
     // First melon label.
     [self updateMelonLabelAndIcon];
-    
-    self.userInteractionEnabled = YES;
 }
 
 // Melon appears on touch.
@@ -68,8 +73,6 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     
     // Makes a new melon.
     _melon = (Melon *)[CCBReader load:@"Melon"];
-    
-    CCLOG(@"HERE");
     
     // Updatets the melon's location.
     [self updateMelonRowAndCol:touchLocation];
@@ -202,18 +205,17 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         // Random int btw 1 & GRID_COLUMNS.
         _melon.type = MelonTypeRegular;
         _melonLabel = arc4random_uniform(_grid.numCols) + 1;
+        CCLOG(@"_grid.numCols %d", _grid.numCols);
         _numLabel.string = [NSString stringWithFormat:@"%d", _melonLabel];
     }
     
-    [_numLabel setVisible:YES];
-    
-    _melon.scale = _grid.cellHeight;
+    // Position the melon icon.
+    _melon.anchorPoint = ccp(0.5, 0.5);
+    _melon.scale = _grid.cellHeight * _grid.scaleY;
     _melon.position = _numLabel.position;
     
-    // Position the number on top of the melon.
-    [_numLabel removeFromParent];
-    [self addChild:_melon z:0];
-    [self addChild:_numLabel z:1];
+    // Position the number on top of the melon icon.
+    _numLabel.zOrder = 1;
 }
 
 // Updates the melon's row and column.

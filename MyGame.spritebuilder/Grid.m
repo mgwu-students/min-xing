@@ -75,9 +75,10 @@ static const float MARGIN = 1.0;
 // Position an object at the specified position on the board.
 - (void)positionNode:(CCNode *)node atRow:(int)row andCol:(int)col
 {
-    node.position = ccp (col * self.cellWidth, row * self.cellHeight);
+    node.position = ccp (col * (self.cellWidth + MARGIN), row * (self.cellHeight + MARGIN));
+    
     // See Melon class for overriding scale setter.
-    node.scale = self.cellHeight;
+    node.scale = self.cellHeight - MARGIN;
     
     node.anchorPoint = ccp(0, 0);
 }
