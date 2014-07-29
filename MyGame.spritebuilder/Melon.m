@@ -91,7 +91,6 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
         }
         else {
             explosion = (CCParticleSystem *)[CCBReader load:@"BombExplosion"];
-            CCLOG(@"Loaded melon explosion");
         }
         // Clean up particle effect.
         explosion.autoRemoveOnFinish = YES;

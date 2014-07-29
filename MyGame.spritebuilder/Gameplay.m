@@ -11,9 +11,13 @@
 #import "Melon.h"
 
 // Chance to get a bomb melon.
-static const float BOMB_CHANCE = 0.05;
+static const float BOMB_CHANCE = 0.01;
 // Chance to get a winter melon.
 static const float INITIAL_WINTERMELON_CHANCE = 0.22;
+// Difficulty rate cap.
+static const float WINTERMELON_CHANCE_CAP = 0.3;
+// The chance to get winter melon increases at this rate per point scored.
+static const float WINTERMELON_CHANCE_INCREASE_RATE = 0.01;
 
 @implementation Gameplay {
     Grid *_grid;
@@ -27,6 +31,8 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     float _chanceToGetBomb;
     float _chance;
 }
+
+#pragma mark Initialize
 
 - (id)init
 {
@@ -56,6 +62,8 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     // First melon label.
     [self updateMelonLabelAndIcon];
 }
+
+#pragma mark Touch Handling
 
 // Melon appears on touch.
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
@@ -173,7 +181,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         
         // Removes surrounding melons and accumulates the score.
         int numNeighborRemoved =[_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
-        [self updateScore:numNeighborRemoved];
+        [self updateScoreAndDifficulty:numNeighborRemoved];
     }
     else if (_melon.type == MelonTypeRegular) {
         // Updates the current melon's neighbor positions.
@@ -184,6 +192,8 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     
     [self updateMelonLabelAndIcon];
 }
+
+#pragma mark Updates
 
 - (void) updateMelonLabelAndIcon
 {
@@ -205,7 +215,6 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         // Random int btw 1 & GRID_COLUMNS.
         _melon.type = MelonTypeRegular;
         _melonLabel = arc4random_uniform(_grid.numCols) + 1;
-        CCLOG(@"_grid.numCols %d", _grid.numCols);
         _numLabel.string = [NSString stringWithFormat:@" %d", _melonLabel];
     }
     
@@ -224,7 +233,26 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
 {
     _melon.row = location.y / _grid.cellHeight;
     _melon.col = location.x / _grid.cellWidth;
+    CCLOG(@"row: %d", _melon.row);
+    CCLOG(@"col: %d", _melon.col);
 }
+
+// Updates total score.
+- (void)updateScoreAndDifficulty:(int)addScore
+{
+    // Updates score.
+    _score += addScore;
+    _scoreLabel.string = [NSString stringWithFormat: @"%d", _score];
+    
+    // Updates difficulty level.
+    if (_chanceToGetWintermelon  < WINTERMELON_CHANCE_CAP) {
+        _chanceToGetWintermelon += _chanceToGetWintermelon * WINTERMELON_CHANCE_INCREASE_RATE;
+        
+        CCLOG(@"Chance to get wintermelon: %f", _chanceToGetWintermelon);
+    }
+}
+
+#pragma mark Neighbor Handling
 
 // Updates the number of horizontal and vertical neighbors of a melon.
 - (void)countMelonNeighbors
@@ -257,22 +285,22 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         }
     }
     
-    // Count the number of melons above the current melon.
-    for (int down = _melon.row - 1; down >= 0 ; down--)
+    // Count the number of melons below the current melon.
+    for (int up = _melon.row + 1; up < _grid.numRows; up++)
     {
-        if ([_grid isNullAtRow:down andCol:_melon.col] == NO) {
-            _melon.verticalNeighborStartRow--;
+        if ([_grid isNullAtRow:up andCol:_melon.col] == NO) {
+            _melon.verticalNeighborEndRow++;
         }
         else {
             break;
         }
     }
     
-    // Count the number of melons below the current melon.
-    for (int up = _melon.row + 1; up < _grid.numRows; up++)
+    // Count the number of melons above the current melon.
+    for (int down = _melon.row - 1; down >= 0 ; down--)
     {
-        if ([_grid isNullAtRow:up andCol:_melon.col] == NO) {
-            _melon.verticalNeighborEndRow++;
+        if ([_grid isNullAtRow:down andCol:_melon.col] == NO) {
+            _melon.verticalNeighborStartRow--;
         }
         else {
             break;
@@ -309,7 +337,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
         
         if (remove) {
             // Accumulates score.
-            [self updateScore:1];
+            [self updateScoreAndDifficulty:1];
 
             // Loads explosion effects and possible winter melon frame changes.
             [neighbor explode];
@@ -326,13 +354,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.22;
     }
 }
 
-// Updates total score.
-- (void)updateScore:(int)add
-{
-    _score += add;
-    _scoreLabel.string = [NSString stringWithFormat: @"%d", _score];
-
-}
+#pragma mark Reload
 
 // Reloads the scene.
 - (void)restart
