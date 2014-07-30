@@ -64,9 +64,9 @@ static const float MARGIN = 1.0;
 }
 
 // Checks if a specified position on the grid is [NSNull null].
-- (BOOL)isNullAtRow:(int)row andCol:(int)col
+- (BOOL)hasObjectAtRow:(int)row andCol:(int)col
 {
-    if (_gridArray[row][col] != [NSNull null]) {
+    if (_gridArray[row][col] == [NSNull null]) {
         return NO;
     }
     return YES;
