@@ -19,9 +19,9 @@ static const float BOMB_CHANCE_CAP = 0.05;
 // The chance to get winter melon increases at this rate per point scored.
 static const float WINTERMELON_CHANCE_INCREASE_RATE = 0.01;
 // Chance to get a winter melon.
-static const float INITIAL_WINTERMELON_CHANCE = 0.12 + INITIAL_BOMB_CHANCE;
+static const float INITIAL_WINTERMELON_CHANCE = 0.18 + INITIAL_BOMB_CHANCE;
 // Highest chance to get a winter melon.
-static const float WINTERMELON_CHANCE_CAP = 0.25 + BOMB_CHANCE_CAP;
+static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 
 @implementation Gameplay
 {
@@ -99,18 +99,19 @@ static const float WINTERMELON_CHANCE_CAP = 0.25 + BOMB_CHANCE_CAP;
     if (_chance <= _chanceToGetBomb) {
         _melon.type = MelonTypeBomb;
     }
-    else if (_chance <= _chanceToGetWintermelon) {
-        _melon.type = MelonTypeWinter;
-    }
     else {
-        _melon.type = MelonTypeRegular;
-        
+        if (_chance <= _chanceToGetWintermelon) {
+            _melon.type = MelonTypeWinter;
+        }
+        else {
+            _melon.type = MelonTypeRegular;
+        }
         // Updates the current melon's neighbor positions.
         [self countMelonNeighbors];
         // Makes clearable neighbors wobble (without removing them).
         [self wobbleOrRemoveNeighbors:NO];
     }
-    
+
     // Positions the melon.
     [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
     // Adds the melon to the grid.
@@ -141,7 +142,7 @@ static const float WINTERMELON_CHANCE_CAP = 0.25 + BOMB_CHANCE_CAP;
     [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
     
     // Only wobble melons when the current (regular) melon doesn't overlap another melon.
-    if ([_grid hasObjectAtRow:_melon.row andCol:_melon.col] == NO && _melon.type == MelonTypeRegular) {
+    if ([_grid hasObjectAtRow:_melon.row andCol:_melon.col] == NO) {
         // Updates the current melon's neighbor positions.
         [self countMelonNeighbors];
         // Makes clearable neighbors wobble (without removing them).
@@ -188,7 +189,7 @@ static const float WINTERMELON_CHANCE_CAP = 0.25 + BOMB_CHANCE_CAP;
         int numNeighborRemoved =[_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
         [self updateScoreAndDifficulty:numNeighborRemoved];
     }
-    else if (_melon.type == MelonTypeRegular) {
+    else {
         // Updates the current melon's neighbor positions.
         [self countMelonNeighbors];
         
@@ -202,6 +203,8 @@ static const float WINTERMELON_CHANCE_CAP = 0.25 + BOMB_CHANCE_CAP;
     }
     
     [self updateMelonLabelAndIcon];
+    
+    [self printoutBoardState];
 }
 
 #pragma mark - Updates
@@ -218,13 +221,15 @@ static const float WINTERMELON_CHANCE_CAP = 0.25 + BOMB_CHANCE_CAP;
         _melon.type = MelonTypeBomb;
         _numLabel.string = [NSString stringWithFormat:@" "];
     }
-    else if (_chance <= _chanceToGetWintermelon) {
-        _melon.type = MelonTypeWinter;
-        _numLabel.string = [NSString stringWithFormat:@" "];
-    }
     else {
+        if (_chance <= _chanceToGetWintermelon) {
+            _melon.type = MelonTypeWinter;
+        }
+        else {
+            _melon.type = MelonTypeRegular;
+        }
+        
         // Random int btw 1 & GRID_COLUMNS.
-        _melon.type = MelonTypeRegular;
         _melonLabel = arc4random_uniform(_grid.numCols) + 1;
         _numLabel.string = [NSString stringWithFormat:@" %d", _melonLabel];
     }
@@ -256,13 +261,13 @@ static const float WINTERMELON_CHANCE_CAP = 0.25 + BOMB_CHANCE_CAP;
     // Updates chance to get bomb.
     if (_chanceToGetBomb < BOMB_CHANCE_CAP) {
         _chanceToGetBomb += _chanceToGetBomb * BOMB_CHANCE_INCREASE_RATE;
-        CCLOG(@"Chance to get bomb: %f", _chanceToGetBomb);
+//        CCLOG(@"Chance to get bomb: %f", _chanceToGetBomb);
     }
     
     // Updates chance to get winte rmelon.
     if (_chanceToGetWintermelon < WINTERMELON_CHANCE_CAP) {
         _chanceToGetWintermelon += _chanceToGetWintermelon * WINTERMELON_CHANCE_INCREASE_RATE;
-        CCLOG(@"Chance to get wintermelon: %f", _chanceToGetWintermelon);
+//        CCLOG(@"Chance to get wintermelon: %f", _chanceToGetWintermelon);
     }
 }
 
@@ -374,6 +379,18 @@ static const float WINTERMELON_CHANCE_CAP = 0.25 + BOMB_CHANCE_CAP;
 - (void)restart
 {
      [[CCDirector sharedDirector] replaceScene:[CCBReader loadAsScene:@"Gameplay"]];
+}
+
+#pragma mark - Debugging
+
+- (void)printoutBoardState
+{
+    for (int row = 0; row < _grid.numRows; row++) {
+        CCLOG(@"\n");
+        for (int col = 0 ; col <_grid.numCols; col++) {
+            CCLOG(@"%d ", [_grid getObjectAtRow:row andCol:col] != [NSNull null]);
+        }
+    }
 }
 
 @end
