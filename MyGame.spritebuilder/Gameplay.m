@@ -13,15 +13,15 @@
 // The chance to get bomb increases at this rate per point scored.
 static const float BOMB_CHANCE_INCREASE_RATE = 0.001;
 // Chance to get a bomb melon.
-static const float INITIAL_BOMB_CHANCE = 0.00001;
+static const float INITIAL_BOMB_CHANCE = 0.0001;
 // Highest chance to get a bomb.
 static const float BOMB_CHANCE_CAP = 0.05;
 // The chance to get winter melon increases at this rate per point scored.
 static const float WINTERMELON_CHANCE_INCREASE_RATE = 0.01;
 // Chance to get a winter melon.
-static const float INITIAL_WINTERMELON_CHANCE = 0.22 + INITIAL_BOMB_CHANCE;
+static const float INITIAL_WINTERMELON_CHANCE = 0.12 + INITIAL_BOMB_CHANCE;
 // Highest chance to get a winter melon.
-static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
+static const float WINTERMELON_CHANCE_CAP = 0.25 + BOMB_CHANCE_CAP;
 
 @implementation Gameplay
 {
@@ -181,7 +181,7 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     // Check to remove neighbors for bomb and regular melon.
     if (_melon.type == MelonTypeBomb) {
         // Removes the bomb.
-        [_melon explode];
+        [_melon explodeOrChangeFrame];
         [_grid removeObjectAtX:_melon.row Y:_melon.col];
         
         // Removes surrounding melons and accumulates the score.
@@ -191,6 +191,12 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     else if (_melon.type == MelonTypeRegular) {
         // Updates the current melon's neighbor positions.
         [self countMelonNeighbors];
+        
+        CCLOG(@"horizontal neighbor start col: %d", _melon.horizNeighborStartCol);
+        CCLOG(@"horizontal neighbor end col: %d", _melon.horizNeighborEndCol);
+        CCLOG(@"vertical neighbor start row: %d", _melon.verticalNeighborStartRow);
+        CCLOG(@"vertical neighbor end row: %d", _melon.verticalNeighborEndRow);
+        
         // Removes the melon's neighbors on mouse release.
         [self wobbleOrRemoveNeighbors:YES];
     }
@@ -340,7 +346,7 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 // Helper method to remove or wobble neighbor.
 - (void) helperWobbleOrRemove:(BOOL)remove NeighborsAtRow:(int)row andCol:(int)col
 {
-    if ( [_grid hasObjectAtRow:row andCol:col]) {
+    if ([_grid hasObjectAtRow:row andCol:col]) {
         Melon *neighbor = [_grid getObjectAtRow:row andCol:col];
         
         if (remove) {
@@ -348,7 +354,8 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
             [self updateScoreAndDifficulty:1];
 
             // Loads explosion effects and possible winter melon frame changes.
-            [neighbor explode];
+            [neighbor explodeOrChangeFrame];
+            
             // Remove this melon completely.
             if (neighbor.type == MelonTypeRegular || neighbor.type == MelonTypeWinterThirdHit) {
                 [_grid removeObjectAtX:row Y:col];

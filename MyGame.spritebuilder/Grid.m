@@ -17,6 +17,8 @@ static const float MARGIN = 1.0;
     NSMutableArray *_gridArray;
 }
 
+#pragma mark - Initialize
+
 - (void)onEnter
 {
     [super onEnter];
@@ -63,6 +65,8 @@ static const float MARGIN = 1.0;
     }
 }
 
+#pragma mark - Object Checking/Positioning
+
 // Checks if a specified position on the grid is [NSNull null].
 - (BOOL)hasObjectAtRow:(int)row andCol:(int)col
 {
@@ -70,6 +74,12 @@ static const float MARGIN = 1.0;
         return NO;
     }
     return YES;
+}
+
+// Returns the object stored at the specified position.
+- (id)getObjectAtRow:(int)row andCol:(int)col
+{
+    return _gridArray[row][col];
 }
 
 // Position an object at the specified position on the board.
@@ -83,26 +93,23 @@ static const float MARGIN = 1.0;
     node.anchorPoint = ccp(0, 0);
 }
 
+
+#pragma mark - Object Adding/Deleting
+
 // Adds an object to the board.
 - (void)addObject:(id)object toRow:(int)row andCol:(int)col
 {
     _gridArray[row][col] = object;
 }
 
-// Returns the object stored at the specified position.
-- (id)getObjectAtRow:(int)row andCol:(int)col
-{
-    return _gridArray[row][col];
-}
 
 // Removes reference to the object stored at the specified position.
 - (void)removeObjectAtX:(int)xPos Y:(int)yPos
 {
-    if (_gridArray[xPos][yPos] == [NSNull null]) {
-        return;
+    if (_gridArray[xPos][yPos] != [NSNull null]) {
+        [_gridArray[xPos][yPos] removeFromParent];
+        _gridArray[xPos][yPos] = [NSNull null];
     }
-    [_gridArray[xPos][yPos] removeFromParent];
-    _gridArray[xPos][yPos] = [NSNull null];
 }
 
 // Remove the neighbor objects surounding the current object.

@@ -68,7 +68,7 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
 }
 
 // Removes the melon with particle effects.
-- (void)explode
+- (void)explodeOrChangeFrame
 {
     // Remove winter melons on third hit.
     if (self.type == MelonTypeWinter) {
