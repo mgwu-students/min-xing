@@ -61,36 +61,36 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
     [self.animationManager runAnimationsForSequenceNamed:@"wobbleTimeline"];
 }
 
-// Stops melon from wobbling.
-- (void)stopWobble
-{
-    [self.animationManager runAnimationsForSequenceNamed:@"defaultTimeline"];
-}
-
 // Removes the melon with particle effects.
 - (void)explodeOrChangeFrame
 {
-    // Remove winter melons on third hit.
-    if (self.type == MelonTypeWinter) {
+    // Change frame for winter melons (unless it's the third hit).
+    if (self.type == MelonTypeWinter)
+    {
         self.type = MelonTypeWinterFirstHit;
     }
-    else if (self.type == MelonTypeWinterFirstHit) {
+    else if (self.type == MelonTypeWinterFirstHit)
+    {
         self.type = MelonTypeWinterSecondHit;
     }
-    else if (self.type == MelonTypeWinterSecondHit) {
+    else if (self.type == MelonTypeWinterSecondHit)
+    {
         self.type = MelonTypeWinterThirdHit;
     }
     else
-    // Remove melon with explosion effects.
     {
+        
+        // Remove melon with explosion effects.
         CCParticleSystem *explosion;
         
         // Different particle effects for melon and bomb.
-        if (self.type == MelonTypeBomb) {
+        if (self.type == MelonTypeBomb)
+        {
             explosion = (CCParticleSystem *)[CCBReader load:@"BombExplosion"];
         }
-        else {
-            explosion = (CCParticleSystem *)[CCBReader load:@"BombExplosion"];
+        else
+        {
+            explosion = (CCParticleSystem *)[CCBReader load:@"MelonExplosion"];
         }
         // Clean up particle effect.
         explosion.autoRemoveOnFinish = YES;

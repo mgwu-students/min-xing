@@ -12,13 +12,11 @@
 
 // The chance to get bomb increases at this rate per point scored.
 static const float BOMB_CHANCE_INCREASE_RATE = 0.001;
-// Chance to get a bomb melon.
 static const float INITIAL_BOMB_CHANCE = 0.0001;
 // Highest chance to get a bomb.
 static const float BOMB_CHANCE_CAP = 0.05;
 // The chance to get winter melon increases at this rate per point scored.
 static const float WINTERMELON_CHANCE_INCREASE_RATE = 0.01;
-// Chance to get a winter melon.
 static const float INITIAL_WINTERMELON_CHANCE = 0.18 + INITIAL_BOMB_CHANCE;
 // Highest chance to get a winter melon.
 static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
@@ -48,11 +46,9 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 
 - (void)didLoadFromCCB
 {
-    // Initialize chances to get bomb and winter melons.
     _chanceToGetBomb = INITIAL_BOMB_CHANCE;
     _chanceToGetWintermelon = INITIAL_WINTERMELON_CHANCE;
     
-    // Initialize score.
     _score = 0;
     
     self.userInteractionEnabled = YES;
@@ -62,7 +58,6 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 {
     [super onEnter];
     
-    // Grid's bounding box.
     _gridBox = _grid.boundingBox;
     
     // First melon label.
@@ -74,83 +69,83 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 // Melon appears on touch.
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
+     _melonAppearOnMove = NO;
+    
     // Current touch location.
-    CGPoint touchLocation = [touch locationInNode:self];
+    CGPoint touchStartLocation = [touch locationInNode:self];
     
-    // If touch point is outside the grid, don't do anything.
-    if (CGRectContainsPoint(_gridBox, touchLocation) == NO) {
-        _melonAppearOnMove = NO;
-        return;
-    }
-    
-    _melonAppearOnMove = YES;
-    
-    // Convert to grid coordinates.
-    touchLocation = [touch locationInNode:_grid];
-    
-    // Makes a new melon.
-    _melon = (Melon *)[CCBReader load:@"Melon"];
-    
-    // Updates the melon's location.
-    [self updateMelonRowAndCol:touchLocation];
- 
-    // Prevents duplicate touches.
-    if ([_grid hasObjectAtRow:_melon.row andCol:_melon.col]) {
-        return;
-    }
-    
-    // Determine what type of melon it is and change type accordingly.
-    if (_chance <= _chanceToGetBomb) {
-        _melon.type = MelonTypeBomb;
-    }
-    else {
-        if (_chance <= _chanceToGetWintermelon) {
-            _melon.type = MelonTypeWinter;
+    // Only does this if player is touching inside the grid.
+    if (CGRectContainsPoint(_gridBox, touchStartLocation))
+    {
+        _melonAppearOnMove = YES;
+        
+        // Converts to grid coordinates.
+        touchStartLocation = [touch locationInNode:_grid];
+        
+        // Makes a new melon and update its location.
+        _melon = (Melon *)[CCBReader load:@"Melon"];
+        [self updateMelonRowAndCol:touchStartLocation];
+     
+        [_grid addChild: _melon];
+        
+        // Prevents duplicate touches.
+        if ([_grid hasObjectAtRow:_melon.row andCol:_melon.col])
+        {
+            [_melon removeFromParent];
+            _melon = nil;
+            return;
         }
-        else {
-            _melon.type = MelonTypeRegular;
+        
+        // Determines what type of melon it is and changes type accordingly.
+        if (_chance <= _chanceToGetBomb)
+        {
+            _melon.type = MelonTypeBomb;
         }
-        // Updates the current melon's neighbor positions.
-        [self countMelonNeighbors];
-        // Makes clearable neighbors wobble (without removing them).
-        [self wobbleOrRemoveNeighbors:NO];
-    }
+        else
+        {
+            if (_chance <= _chanceToGetWintermelon)
+            {
+                _melon.type = MelonTypeWinter;
+            }
+            else
+            {
+                _melon.type = MelonTypeRegular;
+            }
+            
+            // Updates the melon's neighbor positions and wobble them (without removing them).
+            [self countMelonNeighbors];
+            [self wobbleOrRemoveNeighbors:NO];
+        }
 
-    // Positions the melon.
-    [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
-    // Adds the melon to the grid.
-    [_grid addChild: _melon];
+        // Positions the melon and makes it appear on the grid.
+        [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
+    }
 }
 
 // Melon moves with touch.
 - (void)touchMoved:(UITouch *)touch withEvent:(UIEvent *)event
 {
     // Current touch location.
-    CGPoint touchLocation = [touch locationInNode:self];
+    CGPoint touchMoveLocation = [touch locationInNode:self];
     
-    // If touch point is outside the grid, don't do anything.
-    if (CGRectContainsPoint(_gridBox, touchLocation) == NO) {
-        return;
-    }
-    
-    if (_melonAppearOnMove) {
-        // Convert to grid coordinates.
-        touchLocation = [touch locationInNode:_grid];
-        
+    // Only does this if player is touching inside the grid.
+    if (CGRectContainsPoint(_gridBox, touchMoveLocation) && _melonAppearOnMove)
+    {
         // Centers the melon.
         _melon.anchorPoint = ccp(0.5, 0.5);
         
-        // Updates the melon's current location.
-        [self updateMelonRowAndCol:touchLocation];
+        // Convert to grid coordinates and updates melon location.
+        touchMoveLocation = [touch locationInNode:_grid];
+        [self updateMelonRowAndCol:touchMoveLocation];
         
-        // Position melon to follow finger movements.
+        // Makes melon follow finger movements.
         [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
         
-        // Only wobble melons when the current (regular) melon doesn't overlap another melon.
-        if ([_grid hasObjectAtRow:_melon.row andCol:_melon.col] == NO) {
-            // Updates the current melon's neighbor positions.
+        // Only wobbles melons when the current melon doesn't overlap another melon while moving.
+        if ([_grid hasObjectAtRow:_melon.row andCol:_melon.col] == NO)
+        {
+            // Updates the melon's neighbor positions and wobble them (without removing them).
             [self countMelonNeighbors];
-            // Makes clearable neighbors wobble (without removing them).
             [self wobbleOrRemoveNeighbors:NO];
         }
     }
@@ -160,78 +155,76 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 - (void)touchEnded:(UITouch *)touch withEvent:(UIEvent *)event
 {
     // Current touch location.
-    CGPoint touchLocation = [touch locationInNode:self];
+    CGPoint touchEndLocation = [touch locationInNode:self];
     
     // If touch point is outside the grid, don't do anything.
-    if (CGRectContainsPoint(_gridBox, touchLocation) == NO) {
-        return;
-    }
-    
-    // Converts to grid coordinates.
-    touchLocation = [touch locationInNode:_grid];
-    
-    // Updates melon location.
-    [self updateMelonRowAndCol:touchLocation];
-    
-    // Prevents putting multiple melons at the same location.
-    if ([_grid hasObjectAtRow:_melon.row andCol:_melon.col]) {
-        // Remove the current melon if it's not properly placed.
-        [_melon removeFromParent];
-        return;
-    }
-    
-    // Position melon on board.
-    [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
-    // Adds melon to the grid.
-    [_grid addObject:_melon toRow:_melon.row andCol:_melon.col];
-    
-    // Check to remove neighbors for bomb and regular melon.
-    if (_melon.type == MelonTypeBomb) {
-        // Removes the bomb.
-        [_melon explodeOrChangeFrame];
-        [_grid removeObjectAtX:_melon.row Y:_melon.col];
+    if (CGRectContainsPoint(_gridBox, touchEndLocation))
+    {
+        // Converts to grid coordinates and updates melon location.
+        touchEndLocation = [touch locationInNode:_grid];
+        [self updateMelonRowAndCol:touchEndLocation];
         
-        // Removes surrounding melons and accumulates the score.
-        int numNeighborRemoved =[_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
-        [self updateScoreAndDifficulty:numNeighborRemoved];
-    }
-    else {
-        // Updates the current melon's neighbor positions.
-        [self countMelonNeighbors];
+        // Prevents putting multiple melons at the same location.
+        if ([_grid hasObjectAtRow:_melon.row andCol:_melon.col])
+        {
+            // Remove the current melon if it's not properly placed.
+            [_melon removeFromParent];
+            _melon = nil;
+            return;
+        }
         
-        CCLOG(@"horizontal neighbor start col: %d", _melon.horizNeighborStartCol);
-        CCLOG(@"horizontal neighbor end col: %d", _melon.horizNeighborEndCol);
-        CCLOG(@"vertical neighbor start row: %d", _melon.verticalNeighborStartRow);
-        CCLOG(@"vertical neighbor end row: %d", _melon.verticalNeighborEndRow);
+        // Position melon on board.
+        [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
         
-        // Removes the melon's neighbors on mouse release.
-        [self wobbleOrRemoveNeighbors:YES];
+        // Adds melon to the grid.
+        [_grid addObject:_melon toRow:_melon.row andCol:_melon.col];
+        
+        // Check to remove neighbors for bomb and regular melon.
+        if (_melon.type == MelonTypeBomb)
+        {
+            // Removes the bomb.
+            [_melon explodeOrChangeFrame];
+            [_grid removeObjectAtX:_melon.row Y:_melon.col];
+            
+            // Removes surrounding melons and accumulates the score.
+            int totalNeighborRemoved = [_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
+            [self updateScoreAndDifficulty:totalNeighborRemoved];
+        }
+        else
+        {
+            // Updates the melon's neighbor positions and remove them on mouse release.
+            [self countMelonNeighbors];
+            [self wobbleOrRemoveNeighbors:YES];
+        }
+        
+        [self updateMelonLabelAndIcon];
+        
+        [self printoutBoardState];
     }
-    
-    [self updateMelonLabelAndIcon];
-    
-    [self printoutBoardState];
 }
 
 #pragma mark - Updates
 
 - (void) updateMelonLabelAndIcon
 {
-    // Reloads melon.
     _melon = (Melon *)[CCBReader load:@"Melon"];
 
     // Random float between 0 and 1.
     _chance = drand48();
     
-    if (_chance <= _chanceToGetBomb) {
+    if (_chance <= _chanceToGetBomb)
+    {
         _melon.type = MelonTypeBomb;
         _numLabel.string = [NSString stringWithFormat:@" "];
     }
-    else {
-        if (_chance <= _chanceToGetWintermelon) {
+    else
+    {
+        if (_chance <= _chanceToGetWintermelon)
+        {
             _melon.type = MelonTypeWinter;
         }
-        else {
+        else
+        {
             _melon.type = MelonTypeRegular;
         }
         
@@ -240,13 +233,15 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
         _numLabel.string = [NSString stringWithFormat:@" %d", _melonLabel];
     }
     
-    // Position the melon icon.
+    // Positions the melon icon.
     [_numLabel.parent addChild:_melon];
     _melon.anchorPoint = ccp(0.5, 0.5);
-    _melon.scale = _grid.cellHeight * _grid.scaleY;
     _melon.positionInPoints = _numLabel.positionInPoints;
     
-    // Position the number on top of the melon icon.
+    // See Melon Class for overriding scale setter.
+    _melon.scale = _grid.cellHeight * _grid.scaleY;
+    
+    // Position the number label on top of the melon icon.
     _numLabel.zOrder = 1;
 }
 
@@ -265,13 +260,15 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     _scoreLabel.string = [NSString stringWithFormat: @"%d", _score];
     
     // Updates chance to get bomb.
-    if (_chanceToGetBomb < BOMB_CHANCE_CAP) {
+    if (_chanceToGetBomb < BOMB_CHANCE_CAP)
+    {
         _chanceToGetBomb += _chanceToGetBomb * BOMB_CHANCE_INCREASE_RATE;
 //        CCLOG(@"Chance to get bomb: %f", _chanceToGetBomb);
     }
     
     // Updates chance to get winte rmelon.
-    if (_chanceToGetWintermelon < WINTERMELON_CHANCE_CAP) {
+    if (_chanceToGetWintermelon < WINTERMELON_CHANCE_CAP)
+    {
         _chanceToGetWintermelon += _chanceToGetWintermelon * WINTERMELON_CHANCE_INCREASE_RATE;
 //        CCLOG(@"Chance to get wintermelon: %f", _chanceToGetWintermelon);
     }
@@ -291,10 +288,12 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     // Count the number of melons to the right of the current melon.
     for (int right = _melon.col + 1; right < _grid.numCols; right++)
     {
-        if ([_grid hasObjectAtRow:_melon.row andCol:right]) {
+        if ([_grid hasObjectAtRow:_melon.row andCol:right])
+        {
             _melon.horizNeighborEndCol++;
         }
-        else {
+        else
+        {
             break; // Only count contiguous melons.
         }
     }
@@ -302,10 +301,12 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     // Count the number of melons to the left of the current melon.
     for (int left = _melon.col - 1; left >= 0; left--)
     {
-        if ([_grid hasObjectAtRow:_melon.row andCol:left]) {
+        if ([_grid hasObjectAtRow:_melon.row andCol:left])
+        {
             _melon.horizNeighborStartCol--;
         }
-        else {
+        else
+        {
             break;
         }
     }
@@ -313,10 +314,12 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     // Count the number of melons below the current melon.
     for (int up = _melon.row + 1; up < _grid.numRows; up++)
     {
-        if ([_grid hasObjectAtRow:up andCol:_melon.col]) {
+        if ([_grid hasObjectAtRow:up andCol:_melon.col])
+        {
             _melon.verticalNeighborEndRow++;
         }
-        else {
+        else
+        {
             break;
         }
     }
@@ -324,10 +327,12 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     // Count the number of melons above the current melon.
     for (int down = _melon.row - 1; down >= 0 ; down--)
     {
-        if ([_grid hasObjectAtRow:down andCol:_melon.col]) {
+        if ([_grid hasObjectAtRow:down andCol:_melon.col])
+        {
             _melon.verticalNeighborStartRow--;
         }
-        else {
+        else
+        {
             break;
         }
     }
@@ -341,20 +346,26 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     int totalHorizNeighbors = _melon.horizNeighborEndCol - _melon.horizNeighborStartCol + 1;
     
     // Hit the melon itself.
-    if (_melonLabel == 1 && (totalHorizNeighbors == 1 || totalVerticalNeighbors == 1)) {
+    if (_melonLabel == 1 && (totalHorizNeighbors == 1 || totalVerticalNeighbors == 1))
+    {
         [self helperWobbleOrRemove:removeNeighbor NeighborsAtRow:_melon.row andCol:_melon.col];
+        
         return;
     }
     
     // Hit all vertical neighbors.
-    if (_melonLabel == totalVerticalNeighbors) {
-        for (int i = _melon.verticalNeighborStartRow; i <= _melon.verticalNeighborEndRow; i++) {
+    if (_melonLabel == totalVerticalNeighbors)
+    {
+        for (int i = _melon.verticalNeighborStartRow; i <= _melon.verticalNeighborEndRow; i++)
+        {
             [self helperWobbleOrRemove:removeNeighbor NeighborsAtRow:i andCol:_melon.col];
         }
     }
     // Hit all horizontal neighbors.
-    if (_melonLabel == totalHorizNeighbors) {
-        for (int j = _melon.horizNeighborStartCol; j <= _melon.horizNeighborEndCol; j++) {
+    if (_melonLabel == totalHorizNeighbors)
+    {
+        for (int j = _melon.horizNeighborStartCol; j <= _melon.horizNeighborEndCol; j++)
+        {
             [self helperWobbleOrRemove:removeNeighbor NeighborsAtRow:_melon.row andCol:j];
         }
     }
@@ -363,10 +374,12 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 // Helper method to remove or wobble neighbor.
 - (void) helperWobbleOrRemove:(BOOL)remove NeighborsAtRow:(int)row andCol:(int)col
 {
-    if ([_grid hasObjectAtRow:row andCol:col]) {
+    if ([_grid hasObjectAtRow:row andCol:col])
+    {
         Melon *neighbor = [_grid getObjectAtRow:row andCol:col];
         
-        if (remove) {
+        if (remove)
+        {
             // Accumulates score.
             [self updateScoreAndDifficulty:1];
 
@@ -374,11 +387,13 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
             [neighbor explodeOrChangeFrame];
             
             // Remove this melon completely.
-            if (neighbor.type == MelonTypeRegular || neighbor.type == MelonTypeWinterThirdHit) {
+            if (neighbor.type == MelonTypeRegular || neighbor.type == MelonTypeWinterThirdHit)
+            {
                 [_grid removeObjectAtX:row Y:col];
             }
         }
-        else {
+        else
+        {
             // Wobble the neighbor and the current melon.
             [neighbor wobble];
             [_melon wobble];
@@ -397,9 +412,11 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 
 - (void)printoutBoardState
 {
-    for (int row = 0; row < _grid.numRows; row++) {
+    for (int row = 0; row < _grid.numRows; row++)
+    {
         CCLOG(@"\n");
-        for (int col = 0 ; col <_grid.numCols; col++) {
+        for (int col = 0 ; col <_grid.numCols; col++)
+        {
             CCLOG(@"%d ", [_grid getObjectAtRow:row andCol:col] != [NSNull null]);
         }
     }

@@ -9,7 +9,8 @@
 #import "CCNode.h"
 
 // Types of melon.
-typedef NS_ENUM(NSInteger, MelonType) {
+typedef NS_ENUM(NSInteger, MelonType)
+{
     MelonTypeRegular,
     MelonTypeWinter,
     MelonTypeWinterFirstHit,
@@ -40,7 +41,6 @@ typedef NS_ENUM(NSInteger, MelonType) {
 
 - (void)makeMelon:(int)melonType;
 - (void)wobble;
-- (void)stopWobble;
 - (void)explodeOrChangeFrame;
 
 @end

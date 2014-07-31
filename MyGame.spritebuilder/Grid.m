@@ -70,7 +70,8 @@ static const float MARGIN = 1.0;
 // Checks if a specified position on the grid is [NSNull null].
 - (BOOL)hasObjectAtRow:(int)row andCol:(int)col
 {
-    if (_gridArray[row][col] == [NSNull null]) {
+    if (_gridArray[row][col] == [NSNull null])
+    {
         return NO;
     }
     return YES;
@@ -106,7 +107,8 @@ static const float MARGIN = 1.0;
 // Removes reference to the object stored at the specified position.
 - (void)removeObjectAtX:(int)xPos Y:(int)yPos
 {
-    if (_gridArray[xPos][yPos] != [NSNull null]) {
+    if (_gridArray[xPos][yPos] != [NSNull null])
+    {
         [_gridArray[xPos][yPos] removeFromParent];
         _gridArray[xPos][yPos] = [NSNull null];
     }
@@ -122,12 +124,15 @@ static const float MARGIN = 1.0;
         for (int j = col - 1; j <= col + 1; j++)
         {
             // Boundary check.
-            if (i < 0 || i >= GRID_ROWS || j < 0 || j >= GRID_COLUMNS) {
+            if (i < 0 || i >= GRID_ROWS || j < 0 || j >= GRID_COLUMNS)
+            {
                 break;
             }
             // Remove neighbor object.
-            if (_gridArray[i][j] != [NSNull null]) {
+            if (_gridArray[i][j] != [NSNull null])
+            {
                 [self removeObjectAtX:i Y:j];
+            
                 totalRemoved++;
             }
         }
