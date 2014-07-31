@@ -35,6 +35,7 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     float _chanceToGetWintermelon;
     float _chanceToGetBomb;
     float _chance;
+    BOOL _melonAppearOnMove;
 }
 
 #pragma mark - Initialize
@@ -78,8 +79,11 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     
     // If touch point is outside the grid, don't do anything.
     if (CGRectContainsPoint(_gridBox, touchLocation) == NO) {
+        _melonAppearOnMove = NO;
         return;
     }
+    
+    _melonAppearOnMove = YES;
     
     // Convert to grid coordinates.
     touchLocation = [touch locationInNode:_grid];
@@ -87,7 +91,7 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     // Makes a new melon.
     _melon = (Melon *)[CCBReader load:@"Melon"];
     
-    // Updatets the melon's location.
+    // Updates the melon's location.
     [self updateMelonRowAndCol:touchLocation];
  
     // Prevents duplicate touches.
@@ -129,24 +133,26 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
         return;
     }
     
-    // Convert to grid coordinates.
-    touchLocation = [touch locationInNode:_grid];
-    
-    // Centers the melon.
-    _melon.anchorPoint = ccp(0.5, 0.5);
-    
-    // Updates the melon's current location.
-    [self updateMelonRowAndCol:touchLocation];
-    
-    // Position melon to follow finger movements.
-    [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
-    
-    // Only wobble melons when the current (regular) melon doesn't overlap another melon.
-    if ([_grid hasObjectAtRow:_melon.row andCol:_melon.col] == NO) {
-        // Updates the current melon's neighbor positions.
-        [self countMelonNeighbors];
-        // Makes clearable neighbors wobble (without removing them).
-        [self wobbleOrRemoveNeighbors:NO];
+    if (_melonAppearOnMove) {
+        // Convert to grid coordinates.
+        touchLocation = [touch locationInNode:_grid];
+        
+        // Centers the melon.
+        _melon.anchorPoint = ccp(0.5, 0.5);
+        
+        // Updates the melon's current location.
+        [self updateMelonRowAndCol:touchLocation];
+        
+        // Position melon to follow finger movements.
+        [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
+        
+        // Only wobble melons when the current (regular) melon doesn't overlap another melon.
+        if ([_grid hasObjectAtRow:_melon.row andCol:_melon.col] == NO) {
+            // Updates the current melon's neighbor positions.
+            [self countMelonNeighbors];
+            // Makes clearable neighbors wobble (without removing them).
+            [self wobbleOrRemoveNeighbors:NO];
+        }
     }
 }
 
@@ -328,20 +334,26 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 }
 
 // Check if the melon's label equals the number of vertical/horizontal neighbors. If so,
-// remove that column/row.
+// remove/hit that column/row.
 - (void)wobbleOrRemoveNeighbors:(BOOL)removeNeighbor
 {
-    int numVerticalNeighbors = _melon.verticalNeighborEndRow - _melon.verticalNeighborStartRow + 1;
-    int numHorizNeighbors = _melon.horizNeighborEndCol - _melon.horizNeighborStartCol + 1;
+    int totalVerticalNeighbors = _melon.verticalNeighborEndRow - _melon.verticalNeighborStartRow + 1;
+    int totalHorizNeighbors = _melon.horizNeighborEndCol - _melon.horizNeighborStartCol + 1;
     
-    // Remove all vertical neighbors.
-    if (_melonLabel == numVerticalNeighbors) {
+    // Hit the melon itself.
+    if (_melonLabel == 1 && (totalHorizNeighbors == 1 || totalVerticalNeighbors == 1)) {
+        [self helperWobbleOrRemove:removeNeighbor NeighborsAtRow:_melon.row andCol:_melon.col];
+        return;
+    }
+    
+    // Hit all vertical neighbors.
+    if (_melonLabel == totalVerticalNeighbors) {
         for (int i = _melon.verticalNeighborStartRow; i <= _melon.verticalNeighborEndRow; i++) {
             [self helperWobbleOrRemove:removeNeighbor NeighborsAtRow:i andCol:_melon.col];
         }
     }
-    // Removes all horizontal neighbors.
-    if (_melonLabel == numHorizNeighbors) {
+    // Hit all horizontal neighbors.
+    if (_melonLabel == totalHorizNeighbors) {
         for (int j = _melon.horizNeighborStartCol; j <= _melon.horizNeighborEndCol; j++) {
             [self helperWobbleOrRemove:removeNeighbor NeighborsAtRow:_melon.row andCol:j];
         }
