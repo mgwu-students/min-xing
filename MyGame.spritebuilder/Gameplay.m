@@ -34,6 +34,7 @@ static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
     float _chanceToGetWintermelon;
     float _chanceToGetBomb;
     float _chance;
+    BOOL _firstTouch;
 }
 
 #pragma mark - Initialize
@@ -50,6 +51,8 @@ static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
     _chanceToGetWintermelon = INITIAL_WINTERMELON_CHANCE;
     
     _score = 0;
+    
+    _firstTouch = YES;
     
     self.userInteractionEnabled = YES;
 }
@@ -75,6 +78,16 @@ static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
     // If touch point is outside the grid, don't do anything.
     if (CGRectContainsPoint(_gridBox, touchLocation))
     {
+        if (_firstTouch) {
+            // Start the timer.
+            [NSTimer scheduledTimerWithTimeInterval:60.0
+                                             target:self
+                                           selector:@selector(gameover)
+                                           userInfo:nil
+                                            repeats:NO];
+            _firstTouch = NO;
+        }
+        
         // Convert to grid coordinates.
         touchLocation = [touch locationInNode:_grid];
         
