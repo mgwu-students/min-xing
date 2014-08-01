@@ -40,7 +40,6 @@ typedef NS_ENUM(NSInteger, MelonType)
 @property (nonatomic, assign) MelonType type;
 
 - (void)makeMelon:(int)melonType;
-- (void)wobble;
 - (void)explodeOrChangeFrame;
 
 @end

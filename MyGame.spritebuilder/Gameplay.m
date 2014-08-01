@@ -9,6 +9,7 @@
 #import "Gameplay.h"
 #import "Grid.h"
 #import "Melon.h"
+#import "WinPopup.h"
 
 // The chance to get bomb increases at this rate per point scored.
 static const float BOMB_CHANCE_INCREASE_RATE = 0.001;
@@ -129,12 +130,14 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 //            CCLOG(@"vertical neighbor start row: %d", _melon.verticalNeighborStartRow);
 //            CCLOG(@"vertical neighbor end row: %d", _melon.verticalNeighborEndRow);
 
-            [self wobbleOrRemoveNeighbors:YES];
+            [self removeNeighbors];
         }
         
         [self updateMelonLabelAndIcon];
         
-//        [self printoutBoardState];
+//        [self printBoardState];
+        
+        [self checkGameover];
     }
 }
 
@@ -275,7 +278,7 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 
 // Check if the melon's label equals the number of vertical/horizontal neighbors. If so,
 // remove/hit that column/row.
-- (void)wobbleOrRemoveNeighbors:(BOOL)removeNeighbor
+- (void)removeNeighbors
 {
     int totalVerticalNeighbors = _melon.verticalNeighborEndRow - _melon.verticalNeighborStartRow + 1;
     int totalHorizNeighbors = _melon.horizNeighborEndCol - _melon.horizNeighborStartCol + 1;
@@ -283,8 +286,7 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     // Hit the melon itself.
     if (_melonLabel == 1 && (totalHorizNeighbors == 1 || totalVerticalNeighbors == 1))
     {
-        CCLOG(@"HERE");
-        [self helperWobbleOrRemove:removeNeighbor NeighborsAtRow:_melon.row andCol:_melon.col];
+        [self helperRemoveNeighborsAtRow:_melon.row andCol:_melon.col];
         
         return;
     }
@@ -294,7 +296,7 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     {
         for (int i = _melon.verticalNeighborStartRow; i <= _melon.verticalNeighborEndRow; i++)
         {
-            [self helperWobbleOrRemove:removeNeighbor NeighborsAtRow:i andCol:_melon.col];
+            [self helperRemoveNeighborsAtRow:i andCol:_melon.col];
         }
     }
     // Hit all horizontal neighbors.
@@ -302,42 +304,59 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     {
         for (int j = _melon.horizNeighborStartCol; j <= _melon.horizNeighborEndCol; j++)
         {
-            [self helperWobbleOrRemove:removeNeighbor NeighborsAtRow:_melon.row andCol:j];
+            [self helperRemoveNeighborsAtRow:_melon.row andCol:j];
         }
     }
 }
 
-// Helper method to remove or wobble neighbor.
-- (void) helperWobbleOrRemove:(BOOL)remove NeighborsAtRow:(int)row andCol:(int)col
+// Helper method to remove neighbor.
+- (void) helperRemoveNeighborsAtRow:(int)row andCol:(int)col
 {
     if ([_grid hasObjectAtRow:row andCol:col])
     {
         Melon *neighbor = [_grid getObjectAtRow:row andCol:col];
-        
-        if (remove)
-        {
-            // Accumulates score.
-            [self updateScoreAndDifficulty:1];
 
-            // Loads explosion effects and possible winter melon frame changes.
-            [neighbor explodeOrChangeFrame];
-            
-            // Remove this melon completely.
-            if (neighbor.type == MelonTypeRegular || neighbor.type == MelonTypeWinterThirdHit)
-            {
-                [_grid removeObjectAtX:row Y:col];
-            }
-        }
-        else
+        // Accumulates score.
+        [self updateScoreAndDifficulty:1];
+
+        // Loads explosion effects and possible winter melon frame changes.
+        [neighbor explodeOrChangeFrame];
+        
+        // Remove this melon completely.
+        if (neighbor.type == MelonTypeRegular || neighbor.type == MelonTypeWinterThirdHit)
         {
-            // Wobble the neighbor and the current melon.
-            [neighbor wobble];
-            [_melon wobble];
+            [_grid removeObjectAtX:row Y:col];
         }
     }
 }
 
-#pragma mark - Reload
+#pragma mark - Gameover
+
+- (void)checkGameover
+{
+    for (int i = 0; i < _grid.numRows; i++)
+    {
+        for (int j = 0; j < _grid.numCols; j++)
+        {
+            if ([_grid hasObjectAtRow:i andCol:j] == NO)
+            {
+                // There exists a cell with no melon on it. Continue playing.
+                return;
+            }
+        }
+    }
+    
+    // Every position on the grid is filled. Gameover.
+    [self gameover];
+}
+
+- (void)gameover
+{
+    WinPopup *popup = (WinPopup *)[CCBReader load:@"WinPopup" owner:self];
+    popup.positionType = CCPositionTypeNormalized;
+    popup.position = ccp(0.5, 0.5);
+    [self addChild:popup];
+}
 
 - (void)restart
 {
@@ -346,7 +365,7 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 
 #pragma mark - Debugging
 
-- (void)printoutBoardState
+- (void)printBoardState
 {
     for (int row = 0; row < _grid.numRows; row++)
     {

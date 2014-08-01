@@ -55,12 +55,6 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
     _melonSprite.scale =  tileSize / _melonSprite.contentSizeInPoints.height;
 }
 
-// Makes the melon wobble.
-- (void)wobble
-{
-    [self.animationManager runAnimationsForSequenceNamed:@"wobbleTimeline"];
-}
-
 // Removes the melon with particle effects.
 - (void)explodeOrChangeFrame
 {
@@ -100,9 +94,6 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
         
         // Add the particle effect to the same node the melon is on and remove the destroyed melon.
         [self.parent addChild:explosion];
-        
-        CCLOG(@"Self position: %f %f", self.position.x, self.position.y);
-        CCLOG(@"Explosion position: %f %f", explosion.position.x, explosion.position.y);
     }
 }
 
