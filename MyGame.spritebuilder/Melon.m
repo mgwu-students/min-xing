@@ -79,7 +79,6 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
     }
     else
     {
-        
         // Remove melon with explosion effects.
         CCParticleSystem *explosion;
         
@@ -101,6 +100,9 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
         
         // Add the particle effect to the same node the melon is on and remove the destroyed melon.
         [self.parent addChild:explosion];
+        
+        CCLOG(@"Self position: %f %f", self.position.x, self.position.y);
+        CCLOG(@"Explosion position: %f %f", explosion.position.x, explosion.position.y);
     }
 }
 

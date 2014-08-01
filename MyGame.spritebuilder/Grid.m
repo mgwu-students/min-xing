@@ -100,6 +100,7 @@ static const float MARGIN = 1.0;
 // Adds an object to the board.
 - (void)addObject:(id)object toRow:(int)row andCol:(int)col
 {
+    [self addChild:object];
     _gridArray[row][col] = object;
 }
 
