@@ -69,6 +69,8 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 // Melon gets placed on touch.
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
+    [_melon removeFromParent];
+    
     // Current touch location.
     CGPoint touchLocation = [touch locationInNode:self];
     
@@ -340,7 +342,8 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
         {
             if ([_grid hasObjectAtRow:i andCol:j] == NO)
             {
-                // There exists a cell with no melon on it. Continue playing.
+                CCLOG(@"Grid at row %d col %d is null", i, j);
+                // There exists an empty cell. Continue playing.
                 return;
             }
         }
@@ -352,7 +355,7 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 
 - (void)gameover
 {
-    WinPopup *popup = (WinPopup *)[CCBReader load:@"WinPopup" owner:self];
+    WinPopup *popup = (WinPopup *)[CCBReader load:@"Gameover" owner:self];
     popup.positionType = CCPositionTypeNormalized;
     popup.position = ccp(0.5, 0.5);
     [self addChild:popup];
