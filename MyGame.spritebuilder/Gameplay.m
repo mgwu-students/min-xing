@@ -12,15 +12,15 @@
 #import "WinPopup.h"
 
 // The chance to get bomb increases at this rate per point scored.
-static const float BOMB_CHANCE_INCREASE_RATE = 0.001;
-static const float INITIAL_BOMB_CHANCE = 0.0001;
+static const float BOMB_CHANCE_INCREASE_RATE = 0.005;
+static const float INITIAL_BOMB_CHANCE = 0.001;
 // Highest chance to get a bomb.
 static const float BOMB_CHANCE_CAP = 0.05;
 // The chance to get winter melon increases at this rate per point scored.
 static const float WINTERMELON_CHANCE_INCREASE_RATE = 0.01;
 static const float INITIAL_WINTERMELON_CHANCE = 0.18 + INITIAL_BOMB_CHANCE;
 // Highest chance to get a winter melon.
-static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
+static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
 
 @implementation Gameplay
 {
@@ -359,6 +359,8 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
     popup.positionType = CCPositionTypeNormalized;
     popup.position = ccp(0.5, 0.5);
     [self addChild:popup];
+    
+    [self updateScoreAndDifficulty:0];
 }
 
 - (void)restart
