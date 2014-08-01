@@ -22,15 +22,20 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.18 + INITIAL_BOMB_CHANCE;
 // Highest chance to get a winter melon.
 static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
 
+// Total time before game over.
+static const int TOTAL_TIME_IN_SECONDS = 60;
+
 @implementation Gameplay
 {
     Grid *_grid;
     Melon *_melon;
     CCLabelTTF *_numLabel;
     CCLabelTTF *_scoreLabel;
+    CCLabelTTF *_timeLabel;
     CGRect _gridBox;
     int _melonLabel; // Current melon number label.
     int _score;
+    int _timeLeft;
     float _chanceToGetWintermelon;
     float _chanceToGetBomb;
     float _chance;
@@ -51,7 +56,7 @@ static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
     _chanceToGetWintermelon = INITIAL_WINTERMELON_CHANCE;
     
     _score = 0;
-    
+    _timeLeft = TOTAL_TIME_IN_SECONDS;
     _firstTouch = YES;
     
     self.userInteractionEnabled = YES;
@@ -80,11 +85,11 @@ static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
     {
         if (_firstTouch) {
             // Start the timer.
-            [NSTimer scheduledTimerWithTimeInterval:60.0
+            [NSTimer scheduledTimerWithTimeInterval:1.0
                                              target:self
-                                           selector:@selector(gameover)
+                                           selector:@selector(onTick:)
                                            userInfo:nil
-                                            repeats:NO];
+                                            repeats:YES];
             _firstTouch = NO;
         }
         
@@ -157,6 +162,19 @@ static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
 }
 
 #pragma mark - Updates
+
+// This is called every second by the timer.
+-(void)onTick:(NSTimer *)timer
+{
+    _timeLeft--;
+    
+    _timeLabel.string = [NSString stringWithFormat:@"%d", _timeLeft];
+    
+    if (_timeLeft == 0)
+    {
+        [self gameover];
+    }
+}
 
 - (void) updateMelonLabelAndIcon
 {
