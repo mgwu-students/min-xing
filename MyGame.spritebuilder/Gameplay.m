@@ -69,8 +69,6 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
 // Melon gets placed on touch.
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
-    [_melon removeFromParent];
-    
     // Current touch location.
     CGPoint touchLocation = [touch locationInNode:self];
     
@@ -84,10 +82,12 @@ static const float WINTERMELON_CHANCE_CAP = 0.3 + BOMB_CHANCE_CAP;
         _melon = (Melon *)[CCBReader load:@"Melon"];
         [self updateMelonRowAndCol:touchLocation];
         
+        [_grid addChild:_melon];
+        
         // Prevents duplicate touches.
         if ([_grid hasObjectAtRow:_melon.row andCol:_melon.col])
         {
-            _melon = nil;
+            [_melon removeFromParent];
             return;
         }
         
