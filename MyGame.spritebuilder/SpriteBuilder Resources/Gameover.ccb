@@ -965,8 +965,6 @@
 						</array>
 					</dict>
 				</array>
-				<key>selected</key>
-				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -980,9 +978,9 @@
 				<key>displayName</key>
 				<string>HighScore_int</string>
 				<key>memberVarAssignmentName</key>
-				<string></string>
+				<string>_highScoreLabel</string>
 				<key>memberVarAssignmentType</key>
-				<integer>1</integer>
+				<integer>2</integer>
 				<key>properties</key>
 				<array>
 					<dict>
@@ -1174,6 +1172,8 @@
 						</array>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>

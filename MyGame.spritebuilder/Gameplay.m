@@ -23,18 +23,20 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.18 + INITIAL_BOMB_CHANCE;
 static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
 
 // Total time before game over.
-static const int TOTAL_TIME_IN_SECONDS = 60;
+static const int TOTAL_TIME_IN_SECONDS = 50;
 
 @implementation Gameplay
 {
     Grid *_grid;
     Melon *_melon;
     CCLabelTTF *_numLabel;
-    CCLabelTTF *_scoreLabel;
     CCLabelTTF *_timeLabel;
+    CCLabelTTF *_scoreLabel;
+    CCLabelTTF *_highScoreLabel;
     CGRect _gridBox;
     int _melonLabel; // Current melon number label.
     int _score;
+    NSNumber *highScore;
     int _timeLeft;
     float _chanceToGetWintermelon;
     float _chanceToGetBomb;
@@ -56,6 +58,9 @@ static const int TOTAL_TIME_IN_SECONDS = 60;
     _chanceToGetWintermelon = INITIAL_WINTERMELON_CHANCE;
     
     _score = 0;
+//    highScore = [NSNumber numberWithInteger:0];
+//    [[NSUserDefaults standardUserDefaults] setObject:highScore forKey:@"highScore"];
+    
     _timeLeft = TOTAL_TIME_IN_SECONDS;
     _firstTouch = YES;
     
@@ -126,7 +131,7 @@ static const int TOTAL_TIME_IN_SECONDS = 60;
             
             // Removes surrounding melons and accumulates the score.
             int totalNeighborRemoved = [_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
-            [self updateScoreAndDifficulty:totalNeighborRemoved];
+            [self updateScoreAndDifficulty:totalNeighborRemoved andCalculateHighScore:NO];
         }
         else
         {
@@ -160,6 +165,7 @@ static const int TOTAL_TIME_IN_SECONDS = 60;
         [self checkGameover];
     }
 }
+
 
 #pragma mark - Updates
 
@@ -224,7 +230,7 @@ static const int TOTAL_TIME_IN_SECONDS = 60;
 }
 
 // Updates total score.
-- (void)updateScoreAndDifficulty:(int)addScore
+- (void)updateScoreAndDifficulty:(int)addScore andCalculateHighScore:(BOOL)calculate
 {
     // Updates score.
     _score += addScore;
@@ -242,6 +248,19 @@ static const int TOTAL_TIME_IN_SECONDS = 60;
     {
         _chanceToGetWintermelon += _chanceToGetWintermelon * WINTERMELON_CHANCE_INCREASE_RATE;
 //        CCLOG(@"Chance to get wintermelon: %f", _chanceToGetWintermelon);
+    }
+    
+    if (calculate) {
+        NSNumber *currentHighScore = [[NSUserDefaults standardUserDefaults] objectForKey:@"highScore"];
+        int hs = [currentHighScore intValue];
+
+        if (_score > hs)
+        {
+            highScore = [NSNumber numberWithInteger:_score];
+            [[NSUserDefaults standardUserDefaults] setObject:highScore forKey:@"highScore"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            _highScoreLabel.string = [NSString stringWithFormat: @"%d", highScore.integerValue];
+        }
     }
 }
 
@@ -342,6 +361,8 @@ static const int TOTAL_TIME_IN_SECONDS = 60;
     }
 }
 
+
+
 // Helper method to remove neighbor.
 - (void) helperRemoveNeighborsAtRow:(int)row andCol:(int)col
 {
@@ -350,7 +371,7 @@ static const int TOTAL_TIME_IN_SECONDS = 60;
         Melon *neighbor = [_grid getObjectAtRow:row andCol:col];
 
         // Accumulates score.
-        [self updateScoreAndDifficulty:1];
+        [self updateScoreAndDifficulty:1 andCalculateHighScore:NO];
 
         // Loads explosion effects and possible winter melon frame changes.
         [neighbor explodeOrChangeFrame];
@@ -391,7 +412,7 @@ static const int TOTAL_TIME_IN_SECONDS = 60;
     popup.position = ccp(0.5, 0.5);
     [self addChild:popup];
     
-    [self updateScoreAndDifficulty:0];
+    [self updateScoreAndDifficulty:0 andCalculateHighScore:YES];
 }
 
 - (void)restart
