@@ -58,8 +58,8 @@ static const int TOTAL_TIME_IN_SECONDS = 50;
     _chanceToGetWintermelon = INITIAL_WINTERMELON_CHANCE;
     
     _score = 0;
-//    highScore = [NSNumber numberWithInteger:0];
-//    [[NSUserDefaults standardUserDefaults] setObject:highScore forKey:@"highScore"];
+    highScore = [NSNumber numberWithInteger:9001];
+    [[NSUserDefaults standardUserDefaults] setObject:highScore forKey:@"highScore"];
     
     _timeLeft = TOTAL_TIME_IN_SECONDS;
     _firstTouch = YES;

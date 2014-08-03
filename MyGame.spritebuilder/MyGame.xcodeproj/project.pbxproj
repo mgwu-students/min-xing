@@ -11,6 +11,7 @@
 		2858DD73196B113800550ABB /* Gameplay.m in Sources */ = {isa = PBXBuildFile; fileRef = 2858DD72196B113800550ABB /* Gameplay.m */; };
 		2858DD78196B175200550ABB /* Grid.m in Sources */ = {isa = PBXBuildFile; fileRef = 2858DD77196B175200550ABB /* Grid.m */; };
 		2858DD7B196B177500550ABB /* Melon.m in Sources */ = {isa = PBXBuildFile; fileRef = 2858DD7A196B177500550ABB /* Melon.m */; };
+		288AB9E1198EB9F000A0AFE5 /* GameState.m in Sources */ = {isa = PBXBuildFile; fileRef = 288AB9E0198EB9F000A0AFE5 /* GameState.m */; };
 		28B07DFF198189E40032DF5B /* Tile.m in Sources */ = {isa = PBXBuildFile; fileRef = 28B07DFE198189E40032DF5B /* Tile.m */; };
 		8392007A18EE8E3300B6C429 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8392007918EE8E3300B6C429 /* GLKit.framework */; };
 		B71F5911188484E7003F4D28 /* iPad-old.png in Resources */ = {isa = PBXBuildFile; fileRef = B71F5907188484E7003F4D28 /* iPad-old.png */; };
@@ -68,6 +69,8 @@
 		2858DD77196B175200550ABB /* Grid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Grid.m; sourceTree = "<group>"; };
 		2858DD79196B177500550ABB /* Melon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Melon.h; sourceTree = "<group>"; };
 		2858DD7A196B177500550ABB /* Melon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Melon.m; sourceTree = "<group>"; };
+		288AB9DF198EB9F000A0AFE5 /* GameState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameState.h; sourceTree = "<group>"; };
+		288AB9E0198EB9F000A0AFE5 /* GameState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameState.m; sourceTree = "<group>"; };
 		28B07DFD198189E40032DF5B /* Tile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tile.h; sourceTree = "<group>"; };
 		28B07DFE198189E40032DF5B /* Tile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tile.m; sourceTree = "<group>"; };
 		8392007918EE8E3300B6C429 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
@@ -141,6 +144,8 @@
 				B737893E1807617C0076A88C /* AppDelegate.m */,
 				2858DD71196B113800550ABB /* Gameplay.h */,
 				2858DD72196B113800550ABB /* Gameplay.m */,
+				288AB9DF198EB9F000A0AFE5 /* GameState.h */,
+				288AB9E0198EB9F000A0AFE5 /* GameState.m */,
 				2858DD76196B175200550ABB /* Grid.h */,
 				2858DD77196B175200550ABB /* Grid.m */,
 				28B07DFD198189E40032DF5B /* Tile.h */,
@@ -361,6 +366,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B737893F1807617C0076A88C /* AppDelegate.m in Sources */,
+				288AB9E1198EB9F000A0AFE5 /* GameState.m in Sources */,
 				28B07DFF198189E40032DF5B /* Tile.m in Sources */,
 				B73789871807631A0076A88C /* main.m in Sources */,
 				2858DD73196B113800550ABB /* Gameplay.m in Sources */,
