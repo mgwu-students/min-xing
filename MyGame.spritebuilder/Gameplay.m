@@ -16,6 +16,7 @@ static const float BOMB_CHANCE_INCREASE_RATE = 0.005;
 static const float INITIAL_BOMB_CHANCE = 0.001;
 // Highest chance to get a bomb.
 static const float BOMB_CHANCE_CAP = 0.05;
+
 // The chance to get winter melon increases at this rate per point scored.
 static const float WINTERMELON_CHANCE_INCREASE_RATE = 0.01;
 static const float INITIAL_WINTERMELON_CHANCE = 0.18 + INITIAL_BOMB_CHANCE;
@@ -24,6 +25,8 @@ static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
 
 // Total time before game over.
 static const int TOTAL_TIME_IN_SECONDS = 50;
+
+static NSString* const HIGH_SCORE = @"highScore";
 
 @implementation Gameplay
 {
@@ -34,9 +37,10 @@ static const int TOTAL_TIME_IN_SECONDS = 50;
     CCLabelTTF *_scoreLabel;
     CCLabelTTF *_highScoreLabel;
     CGRect _gridBox;
-    int _melonLabel; // Current melon number label.
+    NSNumber *highScoreNum;
+    int _highScore;
     int _score;
-    NSNumber *highScore;
+    int _melonLabel; // Current melon number label.
     int _timeLeft;
     float _chanceToGetWintermelon;
     float _chanceToGetBomb;
@@ -57,10 +61,6 @@ static const int TOTAL_TIME_IN_SECONDS = 50;
     _chanceToGetBomb = INITIAL_BOMB_CHANCE;
     _chanceToGetWintermelon = INITIAL_WINTERMELON_CHANCE;
     
-    _score = 0;
-    highScore = [NSNumber numberWithInteger:9001];
-    [[NSUserDefaults standardUserDefaults] setObject:highScore forKey:@"highScore"];
-    
     _timeLeft = TOTAL_TIME_IN_SECONDS;
     _firstTouch = YES;
     
@@ -75,6 +75,8 @@ static const int TOTAL_TIME_IN_SECONDS = 50;
     
     // First melon label.
     [self updateMelonLabelAndIcon];
+    
+    highScoreNum = [[NSUserDefaults standardUserDefaults] objectForKey:@"highScore"];
 }
 
 #pragma mark - Touch Handling
@@ -250,17 +252,22 @@ static const int TOTAL_TIME_IN_SECONDS = 50;
 //        CCLOG(@"Chance to get wintermelon: %f", _chanceToGetWintermelon);
     }
     
-    if (calculate) {
+    if (calculate)
+    {
         NSNumber *currentHighScore = [[NSUserDefaults standardUserDefaults] objectForKey:@"highScore"];
         int hs = [currentHighScore intValue];
-
         if (_score > hs)
         {
-            highScore = [NSNumber numberWithInteger:_score];
-            [[NSUserDefaults standardUserDefaults] setObject:highScore forKey:@"highScore"];
+            _highScore = _score;
+            highScoreNum = [NSNumber numberWithInt:_highScore];
+            [[NSUserDefaults standardUserDefaults] setObject:highScoreNum forKey:@"highScore"];
             [[NSUserDefaults standardUserDefaults] synchronize];
-            _highScoreLabel.string = [NSString stringWithFormat: @"%d", highScore.integerValue];
         }
+        else
+        {
+            _highScore = [[[NSUserDefaults standardUserDefaults] objectForKey:HIGH_SCORE] intValue];
+        }
+        _highScoreLabel.string = [NSString stringWithFormat: @"%d", _highScore];
     }
 }
 

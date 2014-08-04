@@ -12,7 +12,7 @@
 
 + (instancetype)sharedInstance;
 
-@property (nonatomic, assign) NSInteger highScore;
+@property (nonatomic, assign) int highScore;
 @property (nonatomic, assign) BOOL tutorialCompleted;
 
 @end

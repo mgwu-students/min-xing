@@ -10,15 +10,15 @@
 
 @implementation GameState
 
-- (instancetype)init
-{
-    self = [super init];
-    
-    if (self) {
-        NSNumber *highScore = [[NSUserDefaults standardUserDefaults] objectForKey:
-                               @"highScore"];
-        self.highScore = [highScore integerValue];
-    }
-}
+//- (instancetype)init
+//{
+//    self = [super init];
+//    
+//    if (self) {
+//        self.highScore = [[NSUserDefaults standardUserDefaults] objectForKey:
+//                               @"highScore"];
+//        self.highScore = [highScore integerValue];
+//    }
+//}
 
 @end
