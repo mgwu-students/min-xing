@@ -24,8 +24,8 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.18 + INITIAL_BOMB_CHANCE;
 static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
 
 // Total time before game over.
-static const int TOTAL_TIME_IN_SECONDS = 50;
-
+static const int TOTAL_TIME_IN_SECONDS = 40;
+// Key for highscore.
 static NSString* const HIGH_SCORE = @"highScore";
 
 @implementation Gameplay
@@ -132,8 +132,9 @@ static NSString* const HIGH_SCORE = @"highScore";
             [_grid removeObjectAtX:_melon.row Y:_melon.col];
             
             // Removes surrounding melons and accumulates the score.
-            int totalNeighborRemoved = [_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
-            [self updateScoreAndDifficulty:totalNeighborRemoved andCalculateHighScore:NO];
+//            int totalNeighborRemoved = [_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
+//            [self updateDifficulty];
+//            [self updateScore:totalNeighborRemoved withNeighborsRemoved:YES];
         }
         else
         {
@@ -157,12 +158,17 @@ static NSString* const HIGH_SCORE = @"highScore";
 //            CCLOG(@"vertical neighbor start row: %d", _melon.verticalNeighborStartRow);
 //            CCLOG(@"vertical neighbor end row: %d", _melon.verticalNeighborEndRow);
 
-            [self removeNeighbors];
+            // If it's possible to explode a row/col of melons on board but the player didn't
+            // explode anything, apply a penalty. This is implemented to prevent fast random touches.
+            if ([self possibleExplosion] == YES && [self removedNeighbors] == NO)
+            {
+                [self subtractScore];
+            }
         }
         
         [self updateMelonLabelAndIcon];
         
-//        [self printBoardState];
+        [self updateDifficulty];
         
         [self checkGameover];
     }
@@ -231,13 +237,43 @@ static NSString* const HIGH_SCORE = @"highScore";
     _melon.col = location.x / _grid.cellWidth;
 }
 
-// Updates total score.
-- (void)updateScoreAndDifficulty:(int)addScore andCalculateHighScore:(BOOL)calculate
+// Accumulate score.
+- (void)addScore
 {
-    // Updates score.
-    _score += addScore;
+    _score++;
     _scoreLabel.string = [NSString stringWithFormat: @"%d", _score];
-    
+}
+
+// Apply score penalty.
+- (void)subtractScore
+{
+    _score--;
+    _scoreLabel.string = [NSString stringWithFormat: @"%d", _score];
+}
+
+// Retrieve the highs score and replace it if necessary.
+- (void)updateHighScore
+{
+    _scoreLabel.string = [NSString stringWithFormat: @"%d", _score];
+     
+    NSNumber *currentHighScore = [[NSUserDefaults standardUserDefaults] objectForKey:@"highScore"];
+    int hs = [currentHighScore intValue];
+    if (_score > hs)
+    {
+        _highScore = _score;
+        highScoreNum = [NSNumber numberWithInt:_highScore];
+        [[NSUserDefaults standardUserDefaults] setObject:highScoreNum forKey:@"highScore"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    else
+    {
+        _highScore = [[[NSUserDefaults standardUserDefaults] objectForKey:HIGH_SCORE] intValue];
+    }
+    _highScoreLabel.string = [NSString stringWithFormat: @"%d", _highScore];
+}
+
+- (void)updateDifficulty
+{
     // Updates chance to get bomb.
     if (_chanceToGetBomb < BOMB_CHANCE_CAP)
     {
@@ -250,24 +286,6 @@ static NSString* const HIGH_SCORE = @"highScore";
     {
         _chanceToGetWintermelon += _chanceToGetWintermelon * WINTERMELON_CHANCE_INCREASE_RATE;
 //        CCLOG(@"Chance to get wintermelon: %f", _chanceToGetWintermelon);
-    }
-    
-    if (calculate)
-    {
-        NSNumber *currentHighScore = [[NSUserDefaults standardUserDefaults] objectForKey:@"highScore"];
-        int hs = [currentHighScore intValue];
-        if (_score > hs)
-        {
-            _highScore = _score;
-            highScoreNum = [NSNumber numberWithInt:_highScore];
-            [[NSUserDefaults standardUserDefaults] setObject:highScoreNum forKey:@"highScore"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-        }
-        else
-        {
-            _highScore = [[[NSUserDefaults standardUserDefaults] objectForKey:HIGH_SCORE] intValue];
-        }
-        _highScoreLabel.string = [NSString stringWithFormat: @"%d", _highScore];
     }
 }
 
@@ -333,41 +351,46 @@ static NSString* const HIGH_SCORE = @"highScore";
             break;
         }
     }
+    
+    _melon.totalVerticalNeighbors = _melon.verticalNeighborEndRow - _melon.verticalNeighborStartRow + 1;
+    _melon.totalHorizNeighbors = _melon.horizNeighborEndCol - _melon.horizNeighborStartCol + 1;
 }
 
 // Check if the melon's label equals the number of vertical/horizontal neighbors. If so,
 // remove/hit that column/row.
-- (void)removeNeighbors
+- (BOOL)removedNeighbors
 {
-    int totalVerticalNeighbors = _melon.verticalNeighborEndRow - _melon.verticalNeighborStartRow + 1;
-    int totalHorizNeighbors = _melon.horizNeighborEndCol - _melon.horizNeighborStartCol + 1;
-    
-    // Hit the melon itself.
-    if (_melonLabel == 1 && (totalHorizNeighbors == 1 || totalVerticalNeighbors == 1))
+    // Hit/remove the melon itself.
+    if (_melonLabel == 1 && (_melon.totalHorizNeighbors == 1 || _melon.totalVerticalNeighbors == 1))
     {
         [self helperRemoveNeighborsAtRow:_melon.row andCol:_melon.col];
         
-        return;
+        return YES;
     }
     
+    BOOL removed = NO;
+    
     // Hit all vertical neighbors.
-    if (_melonLabel == totalVerticalNeighbors)
+    if (_melonLabel == _melon.totalVerticalNeighbors)
     {
         for (int i = _melon.verticalNeighborStartRow; i <= _melon.verticalNeighborEndRow; i++)
         {
             [self helperRemoveNeighborsAtRow:i andCol:_melon.col];
         }
+        removed = YES;
     }
     // Hit all horizontal neighbors.
-    if (_melonLabel == totalHorizNeighbors)
+    if (_melonLabel == _melon.totalHorizNeighbors)
     {
         for (int j = _melon.horizNeighborStartCol; j <= _melon.horizNeighborEndCol; j++)
         {
             [self helperRemoveNeighborsAtRow:_melon.row andCol:j];
         }
+        removed = YES;
     }
+    
+    return removed;
 }
-
 
 
 // Helper method to remove neighbor.
@@ -377,9 +400,6 @@ static NSString* const HIGH_SCORE = @"highScore";
     {
         Melon *neighbor = [_grid getObjectAtRow:row andCol:col];
 
-        // Accumulates score.
-        [self updateScoreAndDifficulty:1 andCalculateHighScore:NO];
-
         // Loads explosion effects and possible winter melon frame changes.
         [neighbor explodeOrChangeFrame];
         
@@ -388,7 +408,32 @@ static NSString* const HIGH_SCORE = @"highScore";
         {
             [_grid removeObjectAtX:row Y:col];
         }
+        
+        [self addScore];
     }
+}
+
+// Checks if there exists any possible explosion given the current board state.
+- (BOOL)possibleExplosion
+{
+    for (int i = 0; i < _grid.numRows; i++)
+    {
+        for (int j = 0; j <_grid.numCols; j++)
+        {
+            if ([_grid hasObjectAtRow:i andCol:j])
+            {
+                Melon *currentMelon = [_grid getObjectAtRow:i andCol:j];
+                
+                if (currentMelon.totalHorizNeighbors == _melonLabel ||
+                    currentMelon.totalVerticalNeighbors == _melonLabel)
+                {
+                    return YES;
+                }
+            }
+        }
+    }
+    
+    return NO;
 }
 
 #pragma mark - Gameover
@@ -401,7 +446,6 @@ static NSString* const HIGH_SCORE = @"highScore";
         {
             if ([_grid hasObjectAtRow:i andCol:j] == NO)
             {
-                CCLOG(@"Grid at row %d col %d is null", i, j);
                 // There exists an empty cell. Continue playing.
                 return;
             }
@@ -419,7 +463,7 @@ static NSString* const HIGH_SCORE = @"highScore";
     popup.position = ccp(0.5, 0.5);
     [self addChild:popup];
     
-    [self updateScoreAndDifficulty:0 andCalculateHighScore:YES];
+    [self updateHighScore];
 }
 
 - (void)restart

@@ -36,6 +36,10 @@ typedef NS_ENUM(NSInteger, MelonType)
 @property (nonatomic, assign) int verticalNeighborStartRow;
 @property (nonatomic, assign) int verticalNeighborEndRow;
 
+// Total number of vertical and horizontal neighbors.
+@property (nonatomic, assign) int totalVerticalNeighbors;
+@property (nonatomic, assign) int totalHorizNeighbors;
+
 // Type of melon.
 @property (nonatomic, assign) MelonType type;
 
