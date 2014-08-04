@@ -24,7 +24,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.18 + INITIAL_BOMB_CHANCE;
 static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
 
 // Total time before game over.
-static const int TOTAL_TIME_IN_SECONDS = 40;
+static const int TOTAL_NUM_MELONS = 40;
 // Key for highscore.
 static NSString* const HIGH_SCORE = @"highScore";
 
@@ -33,7 +33,7 @@ static NSString* const HIGH_SCORE = @"highScore";
     Grid *_grid;
     Melon *_melon;
     CCLabelTTF *_numLabel;
-    CCLabelTTF *_timeLabel;
+    CCLabelTTF *_totalMelonLabel;
     CCLabelTTF *_scoreLabel;
     CCLabelTTF *_highScoreLabel;
     CGRect _gridBox;
@@ -41,7 +41,7 @@ static NSString* const HIGH_SCORE = @"highScore";
     int _highScore;
     int _score;
     int _melonLabel; // Current melon number label.
-    int _timeLeft;
+    int _melonsLeft;
     float _chanceToGetWintermelon;
     float _chanceToGetBomb;
     float _chance;
@@ -61,7 +61,7 @@ static NSString* const HIGH_SCORE = @"highScore";
     _chanceToGetBomb = INITIAL_BOMB_CHANCE;
     _chanceToGetWintermelon = INITIAL_WINTERMELON_CHANCE;
     
-    _timeLeft = TOTAL_TIME_IN_SECONDS;
+    _melonsLeft = TOTAL_NUM_MELONS;
     _firstTouch = YES;
     
     self.userInteractionEnabled = YES;
@@ -75,7 +75,7 @@ static NSString* const HIGH_SCORE = @"highScore";
     
     // First melon label.
     [self updateMelonLabelAndIcon];
-    
+    highScoreNum = [NSNumber numberWithInt:0];
     highScoreNum = [[NSUserDefaults standardUserDefaults] objectForKey:@"highScore"];
 }
 
@@ -90,16 +90,6 @@ static NSString* const HIGH_SCORE = @"highScore";
     // If touch point is outside the grid, don't do anything.
     if (CGRectContainsPoint(_gridBox, touchLocation))
     {
-        if (_firstTouch) {
-            // Start the timer.
-            [NSTimer scheduledTimerWithTimeInterval:1.0
-                                             target:self
-                                           selector:@selector(onTick:)
-                                           userInfo:nil
-                                            repeats:YES];
-            _firstTouch = NO;
-        }
-        
         // Convert to grid coordinates.
         touchLocation = [touch locationInNode:_grid];
         
@@ -158,13 +148,12 @@ static NSString* const HIGH_SCORE = @"highScore";
 //            CCLOG(@"vertical neighbor start row: %d", _melon.verticalNeighborStartRow);
 //            CCLOG(@"vertical neighbor end row: %d", _melon.verticalNeighborEndRow);
 
-            // If it's possible to explode a row/col of melons on board but the player didn't
-            // explode anything, apply a penalty. This is implemented to prevent fast random touches.
-            if ([self possibleExplosion] == YES && [self removedNeighbors] == NO)
-            {
-                [self subtractScore];
-            }
+            int numRemoved = [self removedNeighbors];
+            [self addScore:numRemoved];
         }
+        
+        _melonsLeft--;
+        _totalMelonLabel.string = [NSString stringWithFormat:@"%d", _melonsLeft];
         
         [self updateMelonLabelAndIcon];
         
@@ -176,19 +165,6 @@ static NSString* const HIGH_SCORE = @"highScore";
 
 
 #pragma mark - Updates
-
-// This is called every second by the timer.
--(void)onTick:(NSTimer *)timer
-{
-    _timeLeft--;
-    
-    _timeLabel.string = [NSString stringWithFormat:@"%d", _timeLeft];
-    
-    if (_timeLeft == 0)
-    {
-        [self gameover];
-    }
-}
 
 - (void) updateMelonLabelAndIcon
 {
@@ -238,9 +214,9 @@ static NSString* const HIGH_SCORE = @"highScore";
 }
 
 // Accumulate score.
-- (void)addScore
+- (void)addScore:(int)num
 {
-    _score++;
+    _score += num * num;
     _scoreLabel.string = [NSString stringWithFormat: @"%d", _score];
 }
 
@@ -358,17 +334,17 @@ static NSString* const HIGH_SCORE = @"highScore";
 
 // Check if the melon's label equals the number of vertical/horizontal neighbors. If so,
 // remove/hit that column/row.
-- (BOOL)removedNeighbors
+- (int)removedNeighbors
 {
     // Hit/remove the melon itself.
     if (_melonLabel == 1 && (_melon.totalHorizNeighbors == 1 || _melon.totalVerticalNeighbors == 1))
     {
         [self helperRemoveNeighborsAtRow:_melon.row andCol:_melon.col];
         
-        return YES;
+        return 1;
     }
     
-    BOOL removed = NO;
+    int numRemoved = 0;
     
     // Hit all vertical neighbors.
     if (_melonLabel == _melon.totalVerticalNeighbors)
@@ -377,7 +353,7 @@ static NSString* const HIGH_SCORE = @"highScore";
         {
             [self helperRemoveNeighborsAtRow:i andCol:_melon.col];
         }
-        removed = YES;
+        numRemoved += _melon.totalVerticalNeighbors;
     }
     // Hit all horizontal neighbors.
     if (_melonLabel == _melon.totalHorizNeighbors)
@@ -386,10 +362,10 @@ static NSString* const HIGH_SCORE = @"highScore";
         {
             [self helperRemoveNeighborsAtRow:_melon.row andCol:j];
         }
-        removed = YES;
+        numRemoved += _melon.totalHorizNeighbors;
     }
     
-    return removed;
+    return numRemoved;
 }
 
 
@@ -408,38 +384,42 @@ static NSString* const HIGH_SCORE = @"highScore";
         {
             [_grid removeObjectAtX:row Y:col];
         }
-        
-        [self addScore];
     }
 }
 
 // Checks if there exists any possible explosion given the current board state.
-- (BOOL)possibleExplosion
-{
-    for (int i = 0; i < _grid.numRows; i++)
-    {
-        for (int j = 0; j <_grid.numCols; j++)
-        {
-            if ([_grid hasObjectAtRow:i andCol:j])
-            {
-                Melon *currentMelon = [_grid getObjectAtRow:i andCol:j];
-                
-                if (currentMelon.totalHorizNeighbors == _melonLabel ||
-                    currentMelon.totalVerticalNeighbors == _melonLabel)
-                {
-                    return YES;
-                }
-            }
-        }
-    }
-    
-    return NO;
-}
+//- (BOOL)possibleExplosion
+//{
+//    for (int i = 0; i < _grid.numRows; i++)
+//    {
+//        for (int j = 0; j <_grid.numCols; j++)
+//        {
+//            if ([_grid hasObjectAtRow:i andCol:j])
+//            {
+//                Melon *currentMelon = [_grid getObjectAtRow:i andCol:j];
+//                
+//                if (currentMelon.totalHorizNeighbors == _melonLabel ||
+//                    currentMelon.totalVerticalNeighbors == _melonLabel)
+//                {
+//                    return YES;
+//                }
+//            }
+//        }
+//    }
+//    
+//    return NO;
+//}
 
 #pragma mark - Gameover
 
 - (void)checkGameover
 {
+    if (_melonsLeft <= 0)
+    {
+        [self gameover];
+        return;
+    }
+    
     for (int i = 0; i < _grid.numRows; i++)
     {
         for (int j = 0; j < _grid.numCols; j++)

@@ -973,7 +973,7 @@
 								<string>Text</string>
 								<key>value</key>
 								<array>
-									<string>Time Left:</string>
+									<string>Melons Left:</string>
 									<false/>
 								</array>
 							</dict>
@@ -1135,7 +1135,7 @@
 						<key>displayName</key>
 						<string>timeLeft_int</string>
 						<key>memberVarAssignmentName</key>
-						<string>_timeLabel</string>
+						<string>_totalMelonLabel</string>
 						<key>memberVarAssignmentType</key>
 						<integer>1</integer>
 						<key>properties</key>
