@@ -24,7 +24,7 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.18 + INITIAL_BOMB_CHANCE;
 static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
 
 // Total time before game over.
-static const int TOTAL_NUM_MELONS = 40;
+static const int TOTAL_NUM_MELONS = 60;
 // Key for highscore.
 static NSString* const HIGH_SCORE = @"highScore";
 
@@ -189,8 +189,8 @@ static NSString* const HIGH_SCORE = @"highScore";
             _melon.type = MelonTypeRegular;
         }
         
-        // Random int btw 1 & GRID_COLUMNS.
-        _melonLabel = arc4random_uniform(_grid.numCols) + 1;
+        // Random int btw 2 & GRID_COLUMNS.
+        _melonLabel = arc4random_uniform(_grid.numCols - 1) + 2;
         _numLabel.string = [NSString stringWithFormat:@" %d", _melonLabel];
     }
     
@@ -217,13 +217,6 @@ static NSString* const HIGH_SCORE = @"highScore";
 - (void)addScore:(int)num
 {
     _score += num * num;
-    _scoreLabel.string = [NSString stringWithFormat: @"%d", _score];
-}
-
-// Apply score penalty.
-- (void)subtractScore
-{
-    _score--;
     _scoreLabel.string = [NSString stringWithFormat: @"%d", _score];
 }
 
@@ -336,14 +329,6 @@ static NSString* const HIGH_SCORE = @"highScore";
 // remove/hit that column/row.
 - (int)removedNeighbors
 {
-    // Hit/remove the melon itself.
-    if (_melonLabel == 1 && (_melon.totalHorizNeighbors == 1 || _melon.totalVerticalNeighbors == 1))
-    {
-        [self helperRemoveNeighborsAtRow:_melon.row andCol:_melon.col];
-        
-        return 1;
-    }
-    
     int numRemoved = 0;
     
     // Hit all vertical neighbors.
@@ -368,7 +353,6 @@ static NSString* const HIGH_SCORE = @"highScore";
     return numRemoved;
 }
 
-
 // Helper method to remove neighbor.
 - (void) helperRemoveNeighborsAtRow:(int)row andCol:(int)col
 {
@@ -386,29 +370,6 @@ static NSString* const HIGH_SCORE = @"highScore";
         }
     }
 }
-
-// Checks if there exists any possible explosion given the current board state.
-//- (BOOL)possibleExplosion
-//{
-//    for (int i = 0; i < _grid.numRows; i++)
-//    {
-//        for (int j = 0; j <_grid.numCols; j++)
-//        {
-//            if ([_grid hasObjectAtRow:i andCol:j])
-//            {
-//                Melon *currentMelon = [_grid getObjectAtRow:i andCol:j];
-//                
-//                if (currentMelon.totalHorizNeighbors == _melonLabel ||
-//                    currentMelon.totalVerticalNeighbors == _melonLabel)
-//                {
-//                    return YES;
-//                }
-//            }
-//        }
-//    }
-//    
-//    return NO;
-//}
 
 #pragma mark - Gameover
 
