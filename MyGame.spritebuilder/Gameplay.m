@@ -92,14 +92,19 @@ static NSString* const HIGH_SCORE = @"highScore";
 {
     for (int i = 0; i < NUM_MELONS_ON_START; i++)
     {
-        Melon *ranMelon = (Melon *)[CCBReader load:@"Melon"];
-     
         int ranRow = arc4random_uniform(_grid.numRows);
         int ranCol = arc4random_uniform(_grid.numCols);
         
-        [_grid addChild:ranMelon];
-        [_grid addObject:ranMelon toRow:ranRow andCol:ranCol];
-        [_grid positionNode:ranMelon atRow:ranRow andCol:ranCol];
+        CCLOG(@"row, col: %d %d", ranRow, ranCol);
+        
+        if ([_grid hasObjectAtRow:ranRow andCol:ranCol] == NO)
+        {
+            _melon = (Melon *)[CCBReader load:@"Melon"];
+            
+            [_grid addChild:_melon];
+            [_grid addObject:_melon toRow:ranRow andCol:ranCol];
+            [_grid positionNode:_melon atRow:ranRow andCol:ranCol];
+        }
     }
 }
 

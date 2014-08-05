@@ -10,8 +10,8 @@
 
 static NSString *regularMelon = @"MyGameAssets/watermelon.png";
 static NSString *winterMelon = @"MyGameAssets/wintermelon.png";
-static NSString *winterMelonFirstHit = @"MyGameAssets/wintermelonFirstHit.png";
-static NSString *winterMelonSecondHit = @"MyGameAssets/wintermelonSecondHit.png";
+static NSString *winterMelonFirstHit = @"MyGameAssets/wintermelon1Hit.png";
+static NSString *winterMelonSecondHit = @"MyGameAssets/wintermelon2Hit.png";
 static NSString *bomb = @"MyGameAssets/bomb_temp.png";
 
 @implementation Melon {
