@@ -8,7 +8,7 @@
 
 #import "Melon.h"
 
-static NSString *regularMelon = @"MyGameAssets/watermelon_temp.png";
+static NSString *regularMelon = @"MyGameAssets/watermelon.png";
 static NSString *winterMelon = @"MyGameAssets/wintermelon.png";
 static NSString *winterMelonFirstHit = @"MyGameAssets/wintermelonFirstHit.png";
 static NSString *winterMelonSecondHit = @"MyGameAssets/wintermelonSecondHit.png";

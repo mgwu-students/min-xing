@@ -23,34 +23,35 @@ static const float INITIAL_WINTERMELON_CHANCE = 0.2 + INITIAL_BOMB_CHANCE;
 // Highest chance to get a winter melon.
 static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
 
-
 // The chance to get a 5 is lower.
-static const int NUM_WITH_LESS_FREQUENCY = 5;
+static const int LABEL_WITH_LESS_FREQUENCY = 5;
 
 // Total time before game over.
 static const int TOTAL_NUM_MELONS = 60;
+// Number of melons on the board to start with,
+static const int NUM_MELONS_ON_START = 6;
 
 // Key for highscore.
 static NSString* const HIGH_SCORE = @"highScore";
 
 @implementation Gameplay
 {
+    CGRect _gridBox;
     Grid *_grid;
     Melon *_melon;
     CCLabelTTF *_numLabel;
     CCLabelTTF *_totalMelonLabel;
     CCLabelTTF *_scoreLabel;
     CCLabelTTF *_highScoreLabel;
-    CGRect _gridBox;
     NSNumber *highScoreNum;
     int _highScore;
     int _score;
     int _melonLabel; // Current melon number label.
     int _melonsLeft;
+    int _consecutiveExplosion;
     float _chanceToGetWintermelon;
     float _chanceToGetBomb;
     float _chance;
-    int _consecutiveExplosion;
 }
 
 #pragma mark - Initialize
@@ -77,11 +78,29 @@ static NSString* const HIGH_SCORE = @"highScore";
     
     _gridBox = _grid.boundingBox;
     
+    [self putRandomMelonsOnBoard];
+    
     // First melon label.
     [self updateMelonLabelAndIcon];
     
     // Retrieve high score.
     highScoreNum = [[NSUserDefaults standardUserDefaults] objectForKey:@"highScore"];
+}
+
+// Generate random melons on board on start.
+- (void)putRandomMelonsOnBoard
+{
+    for (int i = 0; i < NUM_MELONS_ON_START; i++)
+    {
+        Melon *ranMelon = (Melon *)[CCBReader load:@"Melon"];
+     
+        int ranRow = arc4random_uniform(_grid.numRows);
+        int ranCol = arc4random_uniform(_grid.numCols);
+        
+        [_grid addChild:ranMelon];
+        [_grid addObject:ranMelon toRow:ranRow andCol:ranCol];
+        [_grid positionNode:ranMelon atRow:ranRow andCol:ranCol];
+    }
 }
 
 #pragma mark - Touch Handling
@@ -210,7 +229,7 @@ static NSString* const HIGH_SCORE = @"highScore";
         // Random int btw 2 & GRID_COLUMNS.
         _melonLabel = arc4random_uniform(_grid.numCols - 1) + 2;
         
-        if (_melonLabel == NUM_WITH_LESS_FREQUENCY)
+        if (_melonLabel == LABEL_WITH_LESS_FREQUENCY)
         {
             // Roll again.
             _melonLabel = arc4random_uniform(_grid.numCols - 1) + 2;
