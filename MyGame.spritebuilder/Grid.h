@@ -16,9 +16,13 @@
 @property (nonatomic, assign) float cellHeight;
 
 - (BOOL)hasObjectAtRow:(int)row andCol:(int)col;
+- (BOOL)boardIsEmpty;
+- (id)getObjectAtRow:(int)row andCol:(int)col;
+
+
 - (void)positionNode:(CCNode *)node atRow:(int)row andCol:(int)col;
 - (void)addObject:(id)object toRow:(int)row andCol:(int)col;
-- (id)getObjectAtRow:(int)row andCol:(int)col;
+
 - (void)removeObjectAtX:(int)xPos Y:(int)yPos;
 - (int)removeNeighborsAroundObjectAtRow:(int)row andCol:(int)col;
 

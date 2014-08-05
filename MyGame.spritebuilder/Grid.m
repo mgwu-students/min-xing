@@ -65,7 +65,7 @@ static const float MARGIN = 1.0;
     }
 }
 
-#pragma mark - Object Checking/Positioning
+#pragma mark - Check/Get Objects
 
 // Checks if a specified position on the grid is [NSNull null].
 - (BOOL)hasObjectAtRow:(int)row andCol:(int)col
@@ -77,11 +77,30 @@ static const float MARGIN = 1.0;
     return YES;
 }
 
+// Check if the board is empty.
+- (BOOL)boardIsEmpty
+{
+    for (int row = 0; row < GRID_ROWS; row++)
+    {
+        for (int col = 0; col < GRID_COLUMNS; col++)
+        {
+            if ([self hasObjectAtRow:row andCol:col])
+            {
+                return NO;
+            }
+        }
+    }
+    
+    return YES;
+}
+
 // Returns the object stored at the specified position.
 - (id)getObjectAtRow:(int)row andCol:(int)col
 {
     return _gridArray[row][col];
 }
+
+#pragma mark - Add/Position Objects
 
 // Position an object at the specified position on the board.
 - (void)positionNode:(CCNode *)node atRow:(int)row andCol:(int)col
@@ -94,15 +113,13 @@ static const float MARGIN = 1.0;
     node.anchorPoint = ccp(0, 0);
 }
 
-
-#pragma mark - Object Adding/Deleting
-
 // Adds an object to the board.
 - (void)addObject:(id)object toRow:(int)row andCol:(int)col
 {
     _gridArray[row][col] = object;
 }
 
+#pragma mark - Remove Objects
 
 // Removes reference to the object stored at the specified position.
 - (void)removeObjectAtX:(int)xPos Y:(int)yPos
@@ -138,6 +155,20 @@ static const float MARGIN = 1.0;
         }
     }
     return totalRemoved;
+}
+
+#pragma mark - Debugging
+
+- (void)printBoardState
+{
+    for (int row = 0; row < GRID_ROWS; row++)
+    {
+        CCLOG(@"\n");
+        for (int col = 0 ; col < GRID_COLUMNS; col++)
+        {
+            CCLOG(@"%d ", _gridArray[row][col] != [NSNull null]);
+        }
+    }
 }
 
 @end

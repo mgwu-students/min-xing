@@ -117,7 +117,7 @@ static NSString* const HIGH_SCORE = @"highScore";
         int totalRemoved = 0;
         
         // Determines what type of melon it is and changes type accordingly.
-        if (_chance <= _chanceToGetBomb)
+        if (_chance <= _chanceToGetBomb && [_grid boardIsEmpty] == NO)
         {
             _melon.type = MelonTypeBomb;
             
@@ -181,7 +181,6 @@ static NSString* const HIGH_SCORE = @"highScore";
         [self checkGameover];
     }
 }
-
 
 #pragma mark - Updates
 
@@ -440,20 +439,6 @@ static NSString* const HIGH_SCORE = @"highScore";
 - (void)restart
 {
      [[CCDirector sharedDirector] replaceScene:[CCBReader loadAsScene:@"Gameplay"]];
-}
-
-#pragma mark - Debugging
-
-- (void)printBoardState
-{
-    for (int row = 0; row < _grid.numRows; row++)
-    {
-        CCLOG(@"\n");
-        for (int col = 0 ; col <_grid.numCols; col++)
-        {
-            CCLOG(@"%d ", [_grid getObjectAtRow:row andCol:col] != [NSNull null]);
-        }
-    }
 }
 
 @end
