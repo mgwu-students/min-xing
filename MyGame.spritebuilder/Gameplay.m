@@ -12,19 +12,24 @@
 #import "WinPopup.h"
 
 // The chance to get bomb increases at this rate per point scored.
-static const float BOMB_CHANCE_INCREASE_RATE = 0.005;
-static const float INITIAL_BOMB_CHANCE = 0.001;
+static const float BOMB_CHANCE_INCREASE_RATE = 0.1;
+static const float INITIAL_BOMB_CHANCE = 0.01;
 // Highest chance to get a bomb.
 static const float BOMB_CHANCE_CAP = 0.05;
 
 // The chance to get winter melon increases at this rate per point scored.
-static const float WINTERMELON_CHANCE_INCREASE_RATE = 0.01;
-static const float INITIAL_WINTERMELON_CHANCE = 0.18 + INITIAL_BOMB_CHANCE;
+static const float WINTERMELON_CHANCE_INCREASE_RATE = 0.1;
+static const float INITIAL_WINTERMELON_CHANCE = 0.2 + INITIAL_BOMB_CHANCE;
 // Highest chance to get a winter melon.
 static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
 
+
+// The chance to get a 5 is lower.
+static const int NUM_WITH_LESS_FREQUENCY = 5;
+
 // Total time before game over.
 static const int TOTAL_NUM_MELONS = 60;
+
 // Key for highscore.
 static NSString* const HIGH_SCORE = @"highScore";
 
@@ -45,7 +50,7 @@ static NSString* const HIGH_SCORE = @"highScore";
     float _chanceToGetWintermelon;
     float _chanceToGetBomb;
     float _chance;
-    BOOL _firstTouch;
+    int _consecutiveExplosion;
 }
 
 #pragma mark - Initialize
@@ -62,7 +67,6 @@ static NSString* const HIGH_SCORE = @"highScore";
     _chanceToGetWintermelon = INITIAL_WINTERMELON_CHANCE;
     
     _melonsLeft = TOTAL_NUM_MELONS;
-    _firstTouch = YES;
     
     self.userInteractionEnabled = YES;
 }
@@ -75,7 +79,8 @@ static NSString* const HIGH_SCORE = @"highScore";
     
     // First melon label.
     [self updateMelonLabelAndIcon];
-    highScoreNum = [NSNumber numberWithInt:0];
+    
+    // Retrieve high score.
     highScoreNum = [[NSUserDefaults standardUserDefaults] objectForKey:@"highScore"];
 }
 
@@ -109,6 +114,8 @@ static NSString* const HIGH_SCORE = @"highScore";
         // Adds melon to the grid.
         [_grid addObject:_melon toRow:_melon.row andCol:_melon.col];
         
+        int totalRemoved = 0;
+        
         // Determines what type of melon it is and changes type accordingly.
         if (_chance <= _chanceToGetBomb)
         {
@@ -122,9 +129,7 @@ static NSString* const HIGH_SCORE = @"highScore";
             [_grid removeObjectAtX:_melon.row Y:_melon.col];
             
             // Removes surrounding melons and accumulates the score.
-//            int totalNeighborRemoved = [_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
-//            [self updateDifficulty];
-//            [self updateScore:totalNeighborRemoved withNeighborsRemoved:YES];
+            totalRemoved = [_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
         }
         else
         {
@@ -142,14 +147,28 @@ static NSString* const HIGH_SCORE = @"highScore";
             
             // Updates the melon's neighbor positions and remove them.
             [self countMelonNeighbors];
-            
-//            CCLOG(@"horizontal neighbor start col: %d", _melon.horizNeighborStartCol);
-//            CCLOG(@"horizontal neighbor end col: %d", _melon.horizNeighborEndCol);
-//            CCLOG(@"vertical neighbor start row: %d", _melon.verticalNeighborStartRow);
-//            CCLOG(@"vertical neighbor end row: %d", _melon.verticalNeighborEndRow);
 
-            int numRemoved = [self removedNeighbors];
-            [self addScore:numRemoved];
+            totalRemoved = [self removedNeighbors];
+        }
+        
+        // Double points for consecutive explosions.
+        if (_consecutiveExplosion > 0)
+        {
+            [self addScore:totalRemoved times:_consecutiveExplosion];
+        }
+        else
+        {
+            [self addScore:totalRemoved times:1];
+            
+        }
+        
+        if (totalRemoved > 0)
+        {
+            _consecutiveExplosion++;
+        }
+        else
+        {
+            _consecutiveExplosion = 0;
         }
         
         _melonsLeft--;
@@ -191,6 +210,13 @@ static NSString* const HIGH_SCORE = @"highScore";
         
         // Random int btw 2 & GRID_COLUMNS.
         _melonLabel = arc4random_uniform(_grid.numCols - 1) + 2;
+        
+        if (_melonLabel == NUM_WITH_LESS_FREQUENCY)
+        {
+            // Roll again.
+            _melonLabel = arc4random_uniform(_grid.numCols - 1) + 2;
+        }
+        
         _numLabel.string = [NSString stringWithFormat:@" %d", _melonLabel];
     }
     
@@ -214,9 +240,11 @@ static NSString* const HIGH_SCORE = @"highScore";
 }
 
 // Accumulate score.
-- (void)addScore:(int)num
+- (void)addScore:(int)num times:(int)consecutiveTimes
 {
-    _score += num * num;
+    // Multiplier for consecutive explosions.
+    _score += num * num * consecutiveTimes;
+
     _scoreLabel.string = [NSString stringWithFormat: @"%d", _score];
 }
 
@@ -227,6 +255,7 @@ static NSString* const HIGH_SCORE = @"highScore";
      
     NSNumber *currentHighScore = [[NSUserDefaults standardUserDefaults] objectForKey:@"highScore"];
     int hs = [currentHighScore intValue];
+    
     if (_score > hs)
     {
         _highScore = _score;
@@ -238,6 +267,7 @@ static NSString* const HIGH_SCORE = @"highScore";
     {
         _highScore = [[[NSUserDefaults standardUserDefaults] objectForKey:HIGH_SCORE] intValue];
     }
+    
     _highScoreLabel.string = [NSString stringWithFormat: @"%d", _highScore];
 }
 
