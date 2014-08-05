@@ -55,7 +55,7 @@ static const float MARGIN = 1.0;
             tile.position = ccp (x, y);
             
             // Scale the tile to fit the grid.
-            tile.scale = self.cellHeight / tile.contentSizeInPoints.height;
+            tile.scale = self.cellHeight / (tile.contentSizeInPoints.height + MARGIN);
             
             [self addChild:tile];
             
@@ -108,7 +108,7 @@ static const float MARGIN = 1.0;
     node.position = ccp (col * (self.cellWidth + MARGIN), row * (self.cellHeight + MARGIN));
     
     // See Melon class for overriding scale setter.
-    node.scale = self.cellHeight - MARGIN;
+    node.scale = self.cellWidth;
     
     node.anchorPoint = ccp(0, 0);
 }

@@ -52,7 +52,7 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
 // Overriding scale.
 - (void)setScale:(float)tileSize
 {
-    _melonSprite.scale =  tileSize / _melonSprite.contentSizeInPoints.height;
+    _melonSprite.scale =  tileSize / _melonSprite.contentSizeInPoints.width;
 }
 
 // Removes the melon with particle effects.
