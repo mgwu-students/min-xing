@@ -16,6 +16,9 @@ static const float BOMB_CHANCE_INCREASE_RATE = 0.1;
 static const float INITIAL_BOMB_CHANCE = 0.01;
 // Highest chance to get a bomb.
 static const float BOMB_CHANCE_CAP = 0.05;
+// Bonus multiplier for bombs.
+static const float BOMB_BONUS_MULTIPLIER = 1.5;
+
 
 // The chance to get winter melon increases at this rate per point scored.
 static const float WINTERMELON_CHANCE_INCREASE_RATE = 0.1;
@@ -27,7 +30,7 @@ static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
 static const int LABEL_WITH_LESS_FREQUENCY = 5;
 
 // Total time before game over.
-static const int TOTAL_NUM_MELONS = 60;
+static const int TOTAL_NUM_MELONS = 40;
 // Number of melons on the board to start with,
 static const int NUM_MELONS_ON_START = 6;
 
@@ -95,8 +98,6 @@ static NSString* const HIGH_SCORE = @"highScore";
         int ranRow = arc4random_uniform(_grid.numRows);
         int ranCol = arc4random_uniform(_grid.numCols);
         
-        CCLOG(@"row, col: %d %d", ranRow, ranCol);
-        
         if ([_grid hasObjectAtRow:ranRow andCol:ranCol] == NO)
         {
             _melon = (Melon *)[CCBReader load:@"Melon"];
@@ -154,6 +155,9 @@ static NSString* const HIGH_SCORE = @"highScore";
             
             // Removes surrounding melons and accumulates the score.
             totalRemoved = [_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
+            
+            // Bonus points for bombs.
+            totalRemoved *= BOMB_BONUS_MULTIPLIER;
         }
         else
         {
@@ -300,14 +304,14 @@ static NSString* const HIGH_SCORE = @"highScore";
     if (_chanceToGetBomb < BOMB_CHANCE_CAP)
     {
         _chanceToGetBomb += _chanceToGetBomb * BOMB_CHANCE_INCREASE_RATE;
-//        CCLOG(@"Chance to get bomb: %f", _chanceToGetBomb);
+        CCLOG(@"Chance to get bomb: %f", _chanceToGetBomb);
     }
     
     // Updates chance to get winte rmelon.
     if (_chanceToGetWintermelon < WINTERMELON_CHANCE_CAP)
     {
         _chanceToGetWintermelon += _chanceToGetWintermelon * WINTERMELON_CHANCE_INCREASE_RATE;
-//        CCLOG(@"Chance to get wintermelon: %f", _chanceToGetWintermelon);
+        CCLOG(@"Chance to get wintermelon: %f", _chanceToGetWintermelon);
     }
 }
 
