@@ -96,12 +96,12 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     
     
     // TESTING ONLY.
-    _tutorialCompleted = NO;
+    // _tutorialCompleted = NO;
     
-    if (!_tutorialCompleted)
-    {
-        [self showTutorial];
-    }
+    // if (!_tutorialCompleted)
+    // {
+    //     [self showTutorial];
+    // }
 }
 
 // Generate random melons on board on start.
