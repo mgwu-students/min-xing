@@ -74,17 +74,8 @@ static NSString *bomb = @"MyGameAssets/bomb_temp.png";
     else
     {
         // Remove melon with explosion effects.
-        CCParticleSystem *explosion;
+        CCParticleSystem *explosion = (CCParticleSystem *)[CCBReader load:@"MelonExplosion"];
         
-        // Different particle effects for melon and bomb.
-        if (self.type == MelonTypeBomb)
-        {
-            explosion = (CCParticleSystem *)[CCBReader load:@"BombExplosion"];
-        }
-        else
-        {
-            explosion = (CCParticleSystem *)[CCBReader load:@"MelonExplosion"];
-        }
         // Clean up particle effect.
         explosion.autoRemoveOnFinish = YES;
         

@@ -54,7 +54,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     int _score;
     int _melonLabel; // Current melon number label.
     int _melonsLeft;
-    int _consecutiveExplosion;
+    int _consecutiveTimes; // Number of consecutive explosions.
     float _chanceToGetWintermelon;
     float _chanceToGetBomb;
     float _chance;
@@ -92,16 +92,16 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     // Retrieve high score.
     _highScoreNum = [[NSUserDefaults standardUserDefaults] objectForKey:HIGH_SCORE_KEY];
     // Retrieve whether tutorial has been completed.
-    _tutorialCompleted = [[NSUserDefaults standardUserDefaults] objectForKey:TUTORIAL_KEY];
+//    _tutorialCompleted = [[NSUserDefaults standardUserDefaults] objectForKey:TUTORIAL_KEY];
     
     
-    // TESTING ONLY.
-    _tutorialCompleted = NO;
-    
-    if (!_tutorialCompleted)
-    {
-        [self showTutorial];
-    }
+    // TESTING ONLY. DELETE THIS LINE LATER.
+//    _tutorialCompleted = NO;
+//    
+//    if (!_tutorialCompleted)
+//    {
+//        [self showTutorial];
+//    }
 }
 
 // Generate random melons on board on start.
@@ -115,10 +115,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         if ([_grid hasObjectAtRow:ranRow andCol:ranCol] == NO)
         {
             _melon = (Melon *)[CCBReader load:@"Melon"];
-            
-            [_grid addChild:_melon];
             [_grid addObject:_melon toRow:ranRow andCol:ranCol];
-            [_grid positionNode:_melon atRow:ranRow andCol:ranCol];
         }
     }
 }
@@ -132,7 +129,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     {
         _melon = (Melon *)[CCBReader load:@"Melon"];
         
-        [_grid addChild:_melon];
         [_grid addObject:_melon toRow:firstStepRow andCol:col];
         [_grid positionNode:_melon atRow:firstStepRow andCol:col];
     }
@@ -149,7 +145,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 // Melon gets placed on touch.
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
-    // Current touch location.
     CGPoint touchLocation = [touch locationInNode:self];
     
     // If touch point is outside the grid, don't do anything.
@@ -158,37 +153,33 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         // Convert to grid coordinates.
         touchLocation = [touch locationInNode:_grid];
         
-        // Makes a new melon and update its location.
-        _melon = (Melon *)[CCBReader load:@"Melon"];
-        [self updateMelonRowAndCol:touchLocation];
+        int numRemoved = 0;
+        int melonRow = touchLocation.y / _grid.cellHeight;
+        int melonCol = touchLocation.x / _grid.cellWidth;
         
-        [_grid addChild:_melon];
-        
-        // Prevents duplicate touches.
-        if ([_grid hasObjectAtRow:_melon.row andCol:_melon.col])
+        // Prevents duplicate melon placements.
+        if ([_grid hasObjectAtRow:melonRow andCol:melonCol])
         {
-            [_melon removeFromParent];
             return;
         }
         
-        // Adds melon to the grid.
-        [_grid addObject:_melon toRow:_melon.row andCol:_melon.col];
+        // Makes a new melon and updates its location.
+        _melon = (Melon *)[CCBReader load:@"Melon"];
+        _melon.row =  melonRow;
+        _melon.col = melonCol;
         
-        int totalRemoved = 0;
-        
-        // Determines what type of melon it is and changes type accordingly.
+        // Determines what type of melon it is and acts accordingly.
         if (_chance <= _chanceToGetBomb && [_grid boardIsEmpty] == NO)
         {
             _melon.type = MelonTypeBomb;
             
-            // Positions and scales melon on board.
-            [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
-            
+            [_grid addObject:_melon toRow:_melon.row andCol:_melon.col];
+
             // Removes surrounding melons and accumulates the score.
-            totalRemoved = [_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
+            numRemoved = [_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
             
             // Bonus points for bombs.
-            totalRemoved *= BOMB_BONUS_MULTIPLIER;
+            numRemoved *= BOMB_BONUS_MULTIPLIER;
         }
         else
         {
@@ -201,39 +192,16 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                 _melon.type = MelonTypeRegular;
             }
             
-            // Positions and scales melon on board.
-            [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
+            [_grid addObject:_melon toRow:_melon.row andCol:_melon.col];
             
             // Updates the melon's neighbor positions and remove them.
             [self countMelonNeighbors];
-
-            totalRemoved = [self removedNeighbors];
+            numRemoved = [self removedNeighbors];
         }
-        
-        // Double points for consecutive explosions.
-        if (_consecutiveExplosion > 0)
-        {
-            [self addScore:totalRemoved times:_consecutiveExplosion];
-        }
-        else
-        {
-            [self addScore:totalRemoved times:1];
-            
-        }
-        
-        if (totalRemoved > 0)
-        {
-            _consecutiveExplosion++;
-        }
-        else
-        {
-            _consecutiveExplosion = 0;
-        }
-        
-        _melonsLeft--;
-        _totalMelonLabel.string = [NSString stringWithFormat:@"%d", _melonsLeft];
         
         [self updateMelonLabelAndIcon];
+        
+        [self updateScore:numRemoved];
         
         [self updateDifficulty];
         
@@ -243,6 +211,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 
 #pragma mark - Updates
 
+// Updates the upper-right icon to match the current melon type and number.
 - (void) updateMelonLabelAndIcon
 {
     _melon = (Melon *)[CCBReader load:@"Melon"];
@@ -290,23 +259,33 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _numLabel.zOrder = 1;
 }
 
-// Updates the melon's row and column.
-- (void)updateMelonRowAndCol:(CGPoint)location
+// Calculates the score.
+- (void)updateScore:(int)totalRemoved
 {
-    _melon.row = location.y / _grid.cellHeight;
-    _melon.col = location.x / _grid.cellWidth;
-}
-
-// Accumulate score.
-- (void)addScore:(int)num times:(int)consecutiveTimes
-{
-    // Multiplier for consecutive explosions.
-    _score += num * num * consecutiveTimes;
-
+    // Consecutive explosions earn a bonus score multiplier.
+    if (_consecutiveTimes > 0)
+    {
+        _score += totalRemoved * totalRemoved * _consecutiveTimes;
+    }
+    else
+    {
+        _score += totalRemoved * totalRemoved;
+        
+    }
     _scoreLabel.string = [NSString stringWithFormat: @"%d", _score];
+    
+    // Updates consecutive explosion multiplier.
+    if (totalRemoved > 0)
+    {
+        _consecutiveTimes++;
+    }
+    else
+    {
+        _consecutiveTimes = 0;
+    }
 }
 
-// Retrieve the highs score and replace it if necessary.
+// Retrieves the highs score and replace it if necessary.
 - (void)updateHighScore
 {
     _scoreLabel.string = [NSString stringWithFormat: @"%d", _score];
@@ -335,14 +314,14 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     if (_chanceToGetBomb < BOMB_CHANCE_CAP)
     {
         _chanceToGetBomb += _chanceToGetBomb * BOMB_CHANCE_INCREASE_RATE;
-        CCLOG(@"Chance to get bomb: %f", _chanceToGetBomb);
+//        CCLOG(@"Chance to get bomb: %f", _chanceToGetBomb);
     }
     
     // Updates chance to get winte rmelon.
     if (_chanceToGetWintermelon < WINTERMELON_CHANCE_CAP)
     {
         _chanceToGetWintermelon += _chanceToGetWintermelon * WINTERMELON_CHANCE_INCREASE_RATE;
-        CCLOG(@"Chance to get wintermelon: %f", _chanceToGetWintermelon);
+//        CCLOG(@"Chance to get wintermelon: %f", _chanceToGetWintermelon);
     }
 }
 
@@ -463,12 +442,19 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 
 - (void)checkGameover
 {
+    // Check if the player runs out of melons.
     if (_melonsLeft <= 0)
     {
         [self gameover];
         return;
     }
+    else
+    {
+        _melonsLeft--;
+        _totalMelonLabel.string = [NSString stringWithFormat:@"%d", _melonsLeft];
+    }
     
+    // Check if the board is full.
     for (int i = 0; i < _grid.numRows; i++)
     {
         for (int j = 0; j < _grid.numCols; j++)
