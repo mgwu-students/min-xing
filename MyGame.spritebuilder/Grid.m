@@ -135,21 +135,6 @@ static const float MARGIN = 1.0;
     }
 }
 
-
-// TESTING ONLY.
-- (void)tempRemoveObjectAtX:(int)xPos Y:(int)yPos
-{
-    [self printBoardState];
-    
-    if (_gridArray[xPos][yPos] != [NSNull null])
-    {
-        CCLOG(@"Removing melon at row: %d col: %d", xPos, yPos);
-        _gridArray[xPos][yPos] = [NSNull null];
-    }
-    
-    [self printBoardState];
-}
-
 // Remove the neighbor objects surounding the current object.
 - (int)removeNeighborsAroundObjectAtRow:(int)row andCol:(int)col
 {

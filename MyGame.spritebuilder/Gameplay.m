@@ -84,24 +84,23 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     
     _gridBox = _grid.boundingBox;
     
-    [self putRandomMelonsOnBoard];
-    
-    // First melon label.
-    [self updateMelonLabelAndIcon];
-    
     // Retrieve high score.
     _highScoreNum = [[NSUserDefaults standardUserDefaults] objectForKey:HIGH_SCORE_KEY];
     // Retrieve whether tutorial has been completed.
-//    _tutorialCompleted = [[NSUserDefaults standardUserDefaults] objectForKey:TUTORIAL_KEY];
-    
+    //    _tutorialCompleted = [[NSUserDefaults standardUserDefaults] objectForKey:TUTORIAL_KEY];
     
     // TESTING ONLY. DELETE THIS LINE LATER.
-//    _tutorialCompleted = NO;
-//    
-//    if (!_tutorialCompleted)
-//    {
-//        [self showTutorial];
-//    }
+    _tutorialCompleted = NO;
+    
+    if (!_tutorialCompleted)
+    {
+        [self showTutorial];
+    }
+    
+//    [self putRandomMelonsOnBoard];
+    
+    // First melon label.
+//    [self updateRandomMelonLabelAndIcon];
 }
 
 // Generate random melons on board on start.
@@ -124,19 +123,29 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 
 - (void)showTutorial
 {
-    int firstStepRow = 2;
-    for (int col = 0; col < 3; col++)
-    {
-        _melon = (Melon *)[CCBReader load:@"Melon"];
-        
-        [_grid addObject:_melon toRow:firstStepRow andCol:col];
-        [_grid positionNode:_melon atRow:firstStepRow andCol:col];
-    }
-    
+    [self helperShowTutorialStartCol:0 endCol:2 startRow:2 endRow:2 melonLabel:4];
+
     
 //    _tutorialCompleted = YES;
 //    [[NSUserDefaults standardUserDefaults] setObject:_tutorialCompleted forKey:TUTORIAL_KEY];
 //    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+// Displays a row or column of melons on board and updates the melon label for the tutorial.
+- (void)helperShowTutorialStartCol:(int)startCol endCol:(int)endCol
+                          startRow:(int)startRow endRow:(int)endRow melonLabel:(int)label
+{
+    _melonLabel = label;
+    [self updateMelonLabelAndIcon:MelonTypeRegular];
+    
+    for (int row = startRow; row <= endRow; row++)
+    {
+        for (int col = startCol; col <= endCol; col++)
+        {
+            _melon = (Melon *)[CCBReader load:@"Melon"];
+            [_grid addObject:_melon toRow:row andCol:col];
+        }
+    }
 }
 
 
@@ -199,7 +208,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             numRemoved = [self removedNeighbors];
         }
         
-        [self updateMelonLabelAndIcon];
+        [self generateRandomMelonLabelAndIcon];
         
         [self updateScore:numRemoved];
         
@@ -212,40 +221,52 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 #pragma mark - Updates
 
 // Updates the upper-right icon to match the current melon type and number.
-- (void) updateMelonLabelAndIcon
+- (void) generateRandomMelonLabelAndIcon
 {
-    _melon = (Melon *)[CCBReader load:@"Melon"];
-
     // Random float between 0 and 1.
     _chance = drand48();
     
     if (_chance <= _chanceToGetBomb)
     {
-        _melon.type = MelonTypeBomb;
-        _numLabel.string = [NSString stringWithFormat:@" "];
+        _melonLabel = 0;
+        [self updateMelonLabelAndIcon:MelonTypeBomb];
     }
     else
     {
-        if (_chance <= _chanceToGetWintermelon)
-        {
-            _melon.type = MelonTypeWinter;
-        }
-        else
-        {
-            _melon.type = MelonTypeRegular;
-        }
-        
         // Random int btw 2 & GRID_COLUMNS.
         _melonLabel = arc4random_uniform(_grid.numCols - 1) + 2;
         
+        // Roll again for certain labels to reduce the probability of its appearance.
         if (_melonLabel == LABEL_WITH_LESS_FREQUENCY)
         {
-            // Roll again.
             _melonLabel = arc4random_uniform(_grid.numCols - 1) + 2;
         }
         
+        if (_chance <= _chanceToGetWintermelon)
+        {
+            [self updateMelonLabelAndIcon:MelonTypeWinter];
+        }
+        else
+        {
+            [self updateMelonLabelAndIcon:MelonTypeRegular];
+        }
+    }
+}
+
+// Updates the melon label and positions the melon as an icon on the upper right corner.
+- (void) updateMelonLabelAndIcon:(int)type
+{
+    if (_melonLabel)
+    {
         _numLabel.string = [NSString stringWithFormat:@" %d", _melonLabel];
     }
+    else
+    {
+        _numLabel.string = [NSString stringWithFormat:@" "];
+    }
+    
+    _melon = (Melon *)[CCBReader load:@"Melon"];
+    _melon.type = type;
     
     // Positions the melon icon.
     [_numLabel.parent addChild:_melon];
