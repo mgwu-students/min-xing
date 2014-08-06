@@ -51,6 +51,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CCLabelTTF *_highScoreLabel;
     NSNumber *_highScoreNum;
     BOOL _tutorialCompleted;
+    int _tutorialCurrentStep;
     int _tutorialAllowedRow;
     int _tutorialAllowedCol;
     int _highScore;
@@ -99,13 +100,16 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     
     if (!_tutorialCompleted)
     {
-        [self showTutorial];
+        [self showTutorialAtStep:_tutorialCurrentStep];
     }
     
-//    [self putRandomMelonsOnBoard];
-//    
-//    // First melon label.
-//    [self updateRandomMelonLabelAndIcon];
+    if (_tutorialCompleted)
+    {
+        [self putRandomMelonsOnBoard];
+        
+        // First melon label.
+        [self updateRandomMelonLabelAndIcon];
+    }
 }
 
 // Generate random melons on board on start.
@@ -126,13 +130,35 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 
 #pragma mark - Tutorial
 
-- (void)showTutorial
+- (void)showTutorialAtStep:(int)step
 {
-    _tutorialAllowedRow = 2;
-    _tutorialAllowedCol = 3;
-    [self helperShowTutorialStartCol:0 endCol:2 startRow:2 endRow:2 melonLabel:4];
-
-//    _tutorialCompleted = YES;
+    switch (step)
+    {
+        case 0:
+        {
+            [self helperShowTutorialStartCol:0 endCol:2 startRow:2 endRow:2 melonLabel:4];
+            _tutorialAllowedRow = 2;
+            _tutorialAllowedCol = 3;
+        }
+            break;
+        case 1:
+        {
+            [self helperShowTutorialStartCol:2 endCol:2 startRow:0 endRow:1 melonLabel:3];
+            _tutorialAllowedCol = 2;
+        }
+            break;
+        case 2:
+        {
+            [self helperShowTutorialStartCol:0 endCol:1 startRow:2 endRow:2 melonLabel:3];
+            [self helperShowTutorialStartCol:2 endCol:2 startRow:3 endRow:4 melonLabel:3];
+        }
+            break;
+        default:
+            _tutorialCompleted = YES;
+    }
+   
+    _tutorialCurrentStep++;
+    
 //    [[NSUserDefaults standardUserDefaults] setObject:_tutorialCompleted forKey:TUTORIAL_KEY];
 //    [[NSUserDefaults standardUserDefaults] synchronize];
 }
@@ -171,15 +197,15 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         int melonRow = touchLocation.y / _grid.cellHeight;
         int melonCol = touchLocation.x / _grid.cellWidth;
         
-        // Limit touch in tutorial mode.
-        if (!_tutorialCompleted && (melonRow != _tutorialAllowedRow ||
-                                    melonCol != _tutorialAllowedCol))
+        // Prevents duplicate melon placements.
+        if ([_grid hasObjectAtRow:melonRow andCol:melonCol])
         {
             return;
         }
         
-        // Prevents duplicate melon placements.
-        if ([_grid hasObjectAtRow:melonRow andCol:melonCol])
+        // Limit touch in tutorial mode.
+        if (!_tutorialCompleted && (melonRow != _tutorialAllowedRow ||
+                                   melonCol != _tutorialAllowedCol))
         {
             return;
         }
@@ -220,13 +246,20 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             numRemoved = [self removedNeighbors];
         }
         
-        [self updateRandomMelonLabelAndIcon];
-        
-        [self updateScore:numRemoved];
-        
-        [self updateDifficulty];
-        
-        [self checkGameover];
+        if (!_tutorialCompleted)
+        {
+            [self showTutorialAtStep:_tutorialCurrentStep];
+        }
+        else
+        {
+            [self updateRandomMelonLabelAndIcon];
+            
+            [self updateScore:numRemoved];
+            
+            [self updateDifficulty];
+            
+            [self checkGameover];
+        }
     }
 }
 
