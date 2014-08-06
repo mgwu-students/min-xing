@@ -44,6 +44,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CGRect _gridBox;
     Grid *_grid;
     Melon *_melon;
+    Melon *_melonIcon;
     CCLabelTTF *_numLabel;
     CCLabelTTF *_totalMelonLabel;
     CCLabelTTF *_scoreLabel;
@@ -75,6 +76,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     
     _melonsLeft = TOTAL_NUM_MELONS;
     
+    _melonIcon = (Melon *)[CCBReader load:@"Melon"];
+    
     self.userInteractionEnabled = YES;
 }
 
@@ -94,7 +97,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     
     if (!_tutorialCompleted)
     {
-        [self showTutorial];
+//        [self showTutorial];
     }
     
 //    [self putRandomMelonsOnBoard];
@@ -147,7 +150,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         }
     }
 }
-
 
 #pragma mark - Touch Handling
 
@@ -265,16 +267,20 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         _numLabel.string = [NSString stringWithFormat:@" "];
     }
     
-    _melon = (Melon *)[CCBReader load:@"Melon"];
-    _melon.type = type;
+    if (_melonIcon.parent)
+    {
+        [_melonIcon removeFromParent];
+    }
+    
+    _melonIcon.type = type;
     
     // Positions the melon icon.
-    [_numLabel.parent addChild:_melon];
-    _melon.anchorPoint = ccp(0.5, 0.5);
-    _melon.positionInPoints = _numLabel.positionInPoints;
+    [_numLabel.parent addChild:_melonIcon];
+    _melonIcon.anchorPoint = ccp(0.5, 0.5);
+    _melonIcon.positionInPoints = _numLabel.positionInPoints;
     
     // See Melon Class for overriding scale setter.
-    _melon.scale = _grid.cellHeight * _grid.scaleY;
+    _melonIcon.scale = _grid.cellHeight * _grid.scaleY;
     
     // Position the number label on top of the melon icon.
     _numLabel.zOrder = 1;
