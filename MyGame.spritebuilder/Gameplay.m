@@ -100,10 +100,10 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 //        [self showTutorial];
     }
     
-//    [self putRandomMelonsOnBoard];
+    [self putRandomMelonsOnBoard];
     
     // First melon label.
-//    [self updateRandomMelonLabelAndIcon];
+    [self generateRandomMelonLabelAndIcon];
 }
 
 // Generate random melons on board on start.
