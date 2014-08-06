@@ -51,6 +51,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CCLabelTTF *_highScoreLabel;
     NSNumber *_highScoreNum;
     BOOL _tutorialCompleted;
+    int _tutorialAllowedRow;
+    int _tutorialAllowedCol;
     int _highScore;
     int _score;
     int _melonLabel; // Current melon number label.
@@ -97,13 +99,13 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     
     if (!_tutorialCompleted)
     {
-//        [self showTutorial];
+        [self showTutorial];
     }
     
-    [self putRandomMelonsOnBoard];
-    
-    // First melon label.
-    [self generateRandomMelonLabelAndIcon];
+//    [self putRandomMelonsOnBoard];
+//    
+//    // First melon label.
+//    [self updateRandomMelonLabelAndIcon];
 }
 
 // Generate random melons on board on start.
@@ -126,9 +128,10 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 
 - (void)showTutorial
 {
+    _tutorialAllowedRow = 2;
+    _tutorialAllowedCol = 3;
     [self helperShowTutorialStartCol:0 endCol:2 startRow:2 endRow:2 melonLabel:4];
 
-    
 //    _tutorialCompleted = YES;
 //    [[NSUserDefaults standardUserDefaults] setObject:_tutorialCompleted forKey:TUTORIAL_KEY];
 //    [[NSUserDefaults standardUserDefaults] synchronize];
@@ -168,6 +171,13 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         int melonRow = touchLocation.y / _grid.cellHeight;
         int melonCol = touchLocation.x / _grid.cellWidth;
         
+        // Limit touch in tutorial mode.
+        if (!_tutorialCompleted && (melonRow != _tutorialAllowedRow ||
+                                    melonCol != _tutorialAllowedCol))
+        {
+            return;
+        }
+        
         // Prevents duplicate melon placements.
         if ([_grid hasObjectAtRow:melonRow andCol:melonCol])
         {
@@ -180,7 +190,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         _melon.col = melonCol;
         
         // Determines what type of melon it is and acts accordingly.
-        if (_chance <= _chanceToGetBomb && [_grid boardIsEmpty] == NO)
+        if (_tutorialCompleted && _chance <= _chanceToGetBomb && [_grid boardIsEmpty] == NO)
         {
             _melon.type = MelonTypeBomb;
             
@@ -194,7 +204,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         }
         else
         {
-            if (_chance <= _chanceToGetWintermelon)
+            if (_tutorialCompleted && _chance <= _chanceToGetWintermelon)
             {
                 _melon.type = MelonTypeWinter;
             }
@@ -210,7 +220,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             numRemoved = [self removedNeighbors];
         }
         
-        [self generateRandomMelonLabelAndIcon];
+        [self updateRandomMelonLabelAndIcon];
         
         [self updateScore:numRemoved];
         
@@ -223,7 +233,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 #pragma mark - Updates
 
 // Updates the upper-right icon to match the current melon type and number.
-- (void) generateRandomMelonLabelAndIcon
+- (void)updateRandomMelonLabelAndIcon
 {
     // Random float between 0 and 1.
     _chance = drand48();
