@@ -141,7 +141,7 @@ static const float MARGIN = 1.0;
         for (int j = col - 1; j <= col + 1; j++)
         {
             // Boundary check.
-            if (i > 0 && i < GRID_ROWS && j > 0 && j < GRID_COLUMNS &&
+            if (i >= 0 && i < GRID_ROWS && j >= 0 && j < GRID_COLUMNS &&
                 _gridArray[i][j] != [NSNull null])
             {
                 [self removeObjectAtX:i Y:j];

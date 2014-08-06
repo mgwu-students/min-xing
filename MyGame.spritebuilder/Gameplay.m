@@ -137,6 +137,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         [_grid positionNode:_melon atRow:firstStepRow andCol:col];
     }
     
+    
 //    _tutorialCompleted = YES;
 //    [[NSUserDefaults standardUserDefaults] setObject:_tutorialCompleted forKey:TUTORIAL_KEY];
 //    [[NSUserDefaults standardUserDefaults] synchronize];
@@ -182,10 +183,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             
             // Positions and scales melon on board.
             [_grid positionNode:_melon atRow:_melon.row andCol:_melon.col];
-            
-            // Removes the bomb.
-            [_melon explodeOrChangeFrame];
-            [_grid removeObjectAtX:_melon.row Y:_melon.col];
             
             // Removes surrounding melons and accumulates the score.
             totalRemoved = [_grid removeNeighborsAroundObjectAtRow:_melon.row andCol:_melon.col];
