@@ -92,7 +92,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     // Retrieve high score.
     _highScoreNum = [[NSUserDefaults standardUserDefaults] objectForKey:HIGH_SCORE_KEY];
     // Retrieve whether tutorial has been completed.
-    _tutorialCompleted = [[NSUserDefaults standardUserDefaults] objectForKey:TUTORIAL_KEY];
+//    _tutorialCompleted = [[NSUserDefaults standardUserDefaults] objectForKey:TUTORIAL_KEY];
     
     
     // TESTING ONLY.
