@@ -35,7 +35,9 @@ static const int TOTAL_NUM_MELONS = 40;
 static const int NUM_MELONS_ON_START = 6;
 
 // Key for highscore.
-static NSString* const HIGH_SCORE = @"highScore";
+static NSString* const HIGH_SCORE_KEY = @"highScore";
+// Key for whether tutorial is completed.
+static NSString* const TUTORIAL_KEY = @"tutorialDone";
 
 @implementation Gameplay
 {
@@ -46,7 +48,8 @@ static NSString* const HIGH_SCORE = @"highScore";
     CCLabelTTF *_totalMelonLabel;
     CCLabelTTF *_scoreLabel;
     CCLabelTTF *_highScoreLabel;
-    NSNumber *highScoreNum;
+    NSNumber *_highScoreNum;
+    BOOL _tutorialCompleted;
     int _highScore;
     int _score;
     int _melonLabel; // Current melon number label.
@@ -87,7 +90,18 @@ static NSString* const HIGH_SCORE = @"highScore";
     [self updateMelonLabelAndIcon];
     
     // Retrieve high score.
-    highScoreNum = [[NSUserDefaults standardUserDefaults] objectForKey:@"highScore"];
+    _highScoreNum = [[NSUserDefaults standardUserDefaults] objectForKey:HIGH_SCORE_KEY];
+    // Retrieve whether tutorial has been completed.
+    _tutorialCompleted = [[NSUserDefaults standardUserDefaults] objectForKey:TUTORIAL_KEY];
+    
+    
+    // TESTING ONLY.
+    _tutorialCompleted = NO;
+    
+    if (!_tutorialCompleted)
+    {
+        [self showTutorial];
+    }
 }
 
 // Generate random melons on board on start.
@@ -108,6 +122,26 @@ static NSString* const HIGH_SCORE = @"highScore";
         }
     }
 }
+
+#pragma mark - Tutorial
+
+- (void)showTutorial
+{
+    int firstStepRow = 2;
+    for (int col = 0; col < 3; col++)
+    {
+        _melon = (Melon *)[CCBReader load:@"Melon"];
+        
+        [_grid addChild:_melon];
+        [_grid addObject:_melon toRow:firstStepRow andCol:col];
+        [_grid positionNode:_melon atRow:firstStepRow andCol:col];
+    }
+    
+//    _tutorialCompleted = YES;
+//    [[NSUserDefaults standardUserDefaults] setObject:_tutorialCompleted forKey:TUTORIAL_KEY];
+//    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 
 #pragma mark - Touch Handling
 
@@ -280,19 +314,19 @@ static NSString* const HIGH_SCORE = @"highScore";
 {
     _scoreLabel.string = [NSString stringWithFormat: @"%d", _score];
      
-    NSNumber *currentHighScore = [[NSUserDefaults standardUserDefaults] objectForKey:@"highScore"];
+    NSNumber *currentHighScore = [[NSUserDefaults standardUserDefaults] objectForKey:HIGH_SCORE_KEY];
     int hs = [currentHighScore intValue];
     
     if (_score > hs)
     {
         _highScore = _score;
-        highScoreNum = [NSNumber numberWithInt:_highScore];
-        [[NSUserDefaults standardUserDefaults] setObject:highScoreNum forKey:@"highScore"];
+        _highScoreNum = [NSNumber numberWithInt:_highScore];
+        [[NSUserDefaults standardUserDefaults] setObject:_highScoreNum forKey:HIGH_SCORE_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     else
     {
-        _highScore = [[[NSUserDefaults standardUserDefaults] objectForKey:HIGH_SCORE] intValue];
+        _highScore = [[[NSUserDefaults standardUserDefaults] objectForKey:HIGH_SCORE_KEY] intValue];
     }
     
     _highScoreLabel.string = [NSString stringWithFormat: @"%d", _highScore];
