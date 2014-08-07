@@ -78,19 +78,42 @@ static const float MARGIN = 1.0;
 }
 
 // Check if the board is empty.
-- (BOOL)boardIsEmpty
+//- (BOOL)boardIsEmpty
+//{
+//    for (int row = 0; row < GRID_ROWS; row++)
+//    {
+//        for (int col = 0; col < GRID_COLUMNS; col++)
+//        {
+//            if ([self hasObjectAtRow:row andCol:col])
+//            {
+//                return NO;
+//            }
+//        }
+//    }
+//    
+//    return YES;
+//}
+
+- (BOOL)boardIsMoreThanHalfFull
 {
+    int totalObjects = 0;
+    
     for (int row = 0; row < GRID_ROWS; row++)
     {
-        for (int col = 0; col < GRID_COLUMNS; col++)
+        for (int col = 0; col <GRID_COLUMNS; col++)
         {
             if ([self hasObjectAtRow:row andCol:col])
             {
-                return NO;
+                totalObjects++;
             }
         }
     }
     
+    if (totalObjects <= GRID_COLUMNS * GRID_ROWS)
+    {
+        return NO;
+    }
+
     return YES;
 }
 
@@ -102,6 +125,16 @@ static const float MARGIN = 1.0;
 
 #pragma mark - Add/Position Objects
 
+// Adds an object to the board.
+- (void)addObject:(id)object toRow:(int)row andCol:(int)col
+{
+    _gridArray[row][col] = object;
+    
+    [self addChild:object];
+    
+    [self positionNode:object atRow:row andCol:col];
+}
+
 // Position an object at the specified position on the board.
 - (void)positionNode:(CCNode *)node atRow:(int)row andCol:(int)col
 {
@@ -111,12 +144,6 @@ static const float MARGIN = 1.0;
     node.scale = self.cellWidth;
     
     node.anchorPoint = ccp(0, 0);
-}
-
-// Adds an object to the board.
-- (void)addObject:(id)object toRow:(int)row andCol:(int)col
-{
-    _gridArray[row][col] = object;
 }
 
 #pragma mark - Remove Objects
@@ -141,11 +168,10 @@ static const float MARGIN = 1.0;
         for (int j = col - 1; j <= col + 1; j++)
         {
             // Boundary check.
-            if (i >= 0 && i < GRID_ROWS && j >= 0 && j < GRID_COLUMNS &&
-                _gridArray[i][j] != [NSNull null])
+            if (i >= 0 && i < GRID_ROWS && j >= 0 && j < GRID_COLUMNS)
             {
                 [self removeObjectAtX:i Y:j];
-                    
+                
                 totalRemoved++;
             }
         }
