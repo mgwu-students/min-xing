@@ -52,6 +52,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CCLabelTTF *_scoreLabelStr;
     CCLabelTTF *_highScoreLabel;
     CCLabelTTF *_tutorialText;
+    CCNode *_tutorialTextBg;
     NSNumber *_highScoreNum;
     BOOL _tutorialCompleted;
     int _tutorialCurrentStep;
@@ -110,7 +111,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     
     if (_tutorialCompleted)
     {
-        _tutorialText.string = @"";
+        _tutorialText.string = @" ";
         
         [self labelsVisible:YES];
         
@@ -145,9 +146,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     {
         case 0:
         {
-            _tutorialText.string = @"There are 3 melons in a row on the board. The number 4 \n"
-                "on the righht means you can explode a row of 4 melons. Place the 4th melon \n"
-                "on the board by tapping on the highlighted empty cell.";
+            _tutorialText.string = @" The number 4 on the right \n means you can explode \n "
+                "a row of 4 melons. \n\n Place the 4th melon \n on the highlighted spot.";
             [self helperShowTutorialStartCol:0 endCol:2 startRow:2 endRow:2 melonLabel:4];
             _tutorialAllowedRow = 2;
             _tutorialAllowedCol = 3;
@@ -155,22 +155,24 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 1:
         {
-            _tutorialText.string = @"Explosions can be vertical too (but Not diagonal)!";
+            _tutorialText.string = @" Explosions can be \n vertical too! \n\n (but Not diagonal)";
             [self helperShowTutorialStartCol:2 endCol:2 startRow:0 endRow:1 melonLabel:3];
             _tutorialAllowedCol = 2;
         }
             break;
         case 2:
         {
-            _tutorialText.string = @"Well done. You can also explode a row and a column at the same time.";
+            _tutorialText.string = @" Well done! \n\n You can also explode \n a row and a column \n "
+                "at the same time.";
             [self helperShowTutorialStartCol:0 endCol:1 startRow:2 endRow:2 melonLabel:3];
             [self helperShowTutorialStartCol:2 endCol:2 startRow:3 endRow:4 melonLabel:3];
         }
             break;
         default:
         {
-            _tutorialText.string = @"If a melon gets placed without exploding other melons, its label "
-            "disappears and it will remain on the board until another melon removes it.";
+            _tutorialText.string = @" If a melon doesn't \n explode anything, its \n label "
+                "disappears and \n it will remain on the \n board until another \n melon "
+                "removes it.";
             
             _score = 0;
             
@@ -201,7 +203,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     }
 }
 
-// Whetehr the total melon labels and the score labels are visible.
+// Whether the total melon labels and the score labels are visible.
 - (void)labelsVisible:(BOOL)visiblility
 {
     _totalMelonLabel.visible = visiblility;
@@ -209,6 +211,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     
     _scoreLabel.visible = visiblility;
     _scoreLabelStr.visible = visiblility;
+    
+    _tutorialTextBg.visible = !visiblility;
 }
 
 #pragma mark - Touch Handling
