@@ -13,24 +13,24 @@
 
 // The chance to get bomb increases at this rate per point scored.
 static const float BOMB_CHANCE_INCREASE_RATE = 0.1;
-static const float INITIAL_BOMB_CHANCE = 0.01;
-// Highest chance to get a bomb.
-static const float BOMB_CHANCE_CAP = 0.05;
+// Initial and maximum probability to get a boomb.
+static const float INITIAL_BOMB_CHANCE = 0.01, BOMB_CHANCE_CAP = 0.05;
 // Bonus multiplier for bombs.
 static const float BOMB_BONUS_MULTIPLIER = 1.5;
 
 
 // The chance to get winter melon increases at this rate per point scored.
 static const float WINTERMELON_CHANCE_INCREASE_RATE = 0.1;
-static const float INITIAL_WINTERMELON_CHANCE = 0.2 + INITIAL_BOMB_CHANCE;
-// Highest chance to get a winter melon.
-static const float WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
+// Initial and maximum probability to get a winter melon.
+static const float INITIAL_WINTERMELON_CHANCE = 0.2 + INITIAL_BOMB_CHANCE,
+                    WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
 
 // The chance to get a 5 is lower.
 static const int LABEL_WITH_LESS_FREQUENCY = 5;
 
 // Total time before game over.
 static const int TOTAL_NUM_MELONS = 40;
+
 // Number of melons on the board to start with,
 static const int NUM_MELONS_ON_START = 6;
 
@@ -43,29 +43,20 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 {
     CGRect _gridBox;
     Grid *_grid;
-    Melon *_melon;
-    Melon *_melonIcon;
-    CCLabelTTF *_numLabel;
-    CCLabelTTF *_totalMelonLabel;
-    CCLabelTTF *_totalMelonLabelStr;
-    CCLabelTTF *_scoreLabel;
-    CCLabelTTF *_scoreLabelStr;
-    CCLabelTTF *_highScoreLabel;
+    Melon *_melon, *_melonIcon;
     CCLabelTTF *_tutorialText;
-    CCNode *_tutorialTextBg;
+    CCLabelTTF *_numLabel;
+    CCLabelTTF *_totalMelonLabel, *_totalMelonLabelStr;
+    CCLabelTTF *_scoreLabel, *_scoreLabelStr, *_highScoreLabel;
+    CCButton *_playAtEndOfTutorial;
     NSNumber *_highScoreNum;
     BOOL _tutorialCompleted;
-    int _tutorialCurrentStep;
-    int _tutorialAllowedRow;
-    int _tutorialAllowedCol;
-    int _highScore;
-    int _score;
+    int _tutorialCurrentStep, _tutorialAllowedRow, _tutorialAllowedCol;
     int _melonLabel; // Current melon number label.
     int _melonsLeft;
+    int _score, _highScore;
     int _consecutiveTimes; // Number of consecutive explosions.
-    float _chanceToGetWintermelon;
-    float _chanceToGetBomb;
-    float _chance;
+    float _chance, _chanceToGetWintermelon, _chanceToGetBomb;
 }
 
 #pragma mark - Initialize
@@ -108,18 +99,29 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         
         [self showTutorialAtStep:_tutorialCurrentStep];
     }
-    
-    if (_tutorialCompleted)
+    else
     {
-        _tutorialText.string = @" ";
-        
-        [self labelsVisible:YES];
-        
-        [self putRandomMelonsOnBoard];
-        
-        // First melon label.
-        [self updateRandomMelonLabelAndIcon];
+        [self startGame];
     }
+}
+
+- (void)startGame
+{
+    _score = 0;
+    _tutorialText.string = @" ";
+    
+    if (_playAtEndOfTutorial.parent) {
+        [_playAtEndOfTutorial removeFromParent];
+    }
+    
+    _tutorialCompleted = YES;
+    
+    [self labelsVisible:YES];
+    
+    [self putRandomMelonsOnBoard];
+    
+    // First melon label.
+    [self updateRandomMelonLabelAndIcon];
 }
 
 // Generate random melons on board on start.
@@ -162,8 +164,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 2:
         {
-            _tutorialText.string = @" Well done! \n\n You can also explode \n a row and a column \n "
-                "at the same time.";
+            _tutorialText.string = @" Well done! \n\n You can also explode \n a row and a "
+                "column \n at the same time.";
             [self helperShowTutorialStartCol:0 endCol:1 startRow:2 endRow:2 melonLabel:3];
             [self helperShowTutorialStartCol:2 endCol:2 startRow:3 endRow:4 melonLabel:3];
         }
@@ -174,9 +176,10 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                 "disappears and \n it will remain on the \n board until another \n melon "
                 "removes it.";
             
-            _score = 0;
+            _tutorialAllowedRow = -1;
+            _tutorialAllowedCol = -1;
             
-            _tutorialCompleted = YES;
+            [self labelsVisible:YES];
         }
     }
    
@@ -212,7 +215,9 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _scoreLabel.visible = visiblility;
     _scoreLabelStr.visible = visiblility;
     
-    _tutorialTextBg.visible = !visiblility;
+    _playAtEndOfTutorial.visible = visiblility;
+    
+    _tutorialText.visible = !visiblility;
 }
 
 #pragma mark - Touch Handling
