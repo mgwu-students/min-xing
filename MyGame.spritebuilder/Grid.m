@@ -94,6 +94,11 @@ static const float MARGIN = 1.0;
     return YES;
 }
 
+- (BOOL)boardIsMoreThanHalfFull
+{
+    
+}
+
 // Returns the object stored at the specified position.
 - (id)getObjectAtRow:(int)row andCol:(int)col
 {

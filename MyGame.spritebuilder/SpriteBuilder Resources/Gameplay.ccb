@@ -1709,7 +1709,7 @@
 				<key>displayName</key>
 				<string>CCButton</string>
 				<key>memberVarAssignmentName</key>
-				<string>_playAtEndOfTutorial</string>
+				<string>_playButtonAtEndOfTutorial</string>
 				<key>memberVarAssignmentType</key>
 				<integer>1</integer>
 				<key>properties</key>
@@ -1812,7 +1812,7 @@
 						<string>String</string>
 						<key>value</key>
 						<array>
-							<string>Play!</string>
+							<string>Got it!</string>
 							<false/>
 						</array>
 					</dict>

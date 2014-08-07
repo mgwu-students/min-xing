@@ -48,7 +48,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CCLabelTTF *_numLabel;
     CCLabelTTF *_totalMelonLabel, *_totalMelonLabelStr;
     CCLabelTTF *_scoreLabel, *_scoreLabelStr, *_highScoreLabel;
-    CCButton *_playAtEndOfTutorial;
+    CCButton *_playButtonAtEndOfTutorial;
+    CCParticleSystem *_cellHighlight;
     NSNumber *_highScoreNum;
     BOOL _tutorialCompleted;
     int _tutorialCurrentStep, _tutorialAllowedRow, _tutorialAllowedCol;
@@ -90,7 +91,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     // Retrieve whether tutorial has been completed.
     //    _tutorialCompleted = [[NSUserDefaults standardUserDefaults] objectForKey:TUTORIAL_KEY];
     
-    // TESTING ONLY. DELETE THIS LINE LATER.
+    // TESTING ONLY.
     _tutorialCompleted = NO;
     
     if (!_tutorialCompleted)
@@ -107,12 +108,12 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 
 - (void)startGame
 {
-    if (_playAtEndOfTutorial.parent) {
-        [_playAtEndOfTutorial removeFromParent];
+    if (_playButtonAtEndOfTutorial.parent)
+    {
+        [_playButtonAtEndOfTutorial removeFromParent];
     }
     
     _score = 0;
-    
     _tutorialCompleted = YES;
     
     [self labelsVisible:YES];
@@ -148,18 +149,16 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 0:
         {
             _tutorialText.string = @" The number 4 on the right \n means you can explode \n "
-                "a row of 4 melons. \n\n Place the 4th melon \n on the highlighted spot.";
+                "a row of 4 melons. \n\n Place the 4th melon \n on the glowing cell.";
             [self helperShowTutorialStartCol:0 endCol:2 startRow:2 endRow:2 melonLabel:4];
-            _tutorialAllowedRow = 2;
-            _tutorialAllowedCol = 3;
+            [self updatedAllowedRow:2 andCol:3];
         }
             break;
         case 1:
         {
             _tutorialText.string = @" Explosions can be \n vertical too! \n\n (but Not diagonal)";
             [self helperShowTutorialStartCol:2 endCol:2 startRow:0 endRow:1 melonLabel:3];
-            _tutorialAllowedRow = 2;
-            _tutorialAllowedCol = 2;
+            [self updatedAllowedRow:2 andCol:2];
         }
             break;
         case 2:
@@ -168,8 +167,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                 "column \n at the same time.";
             [self helperShowTutorialStartCol:0 endCol:1 startRow:2 endRow:2 melonLabel:3];
             [self helperShowTutorialStartCol:2 endCol:2 startRow:3 endRow:4 melonLabel:3];
-            _tutorialAllowedRow = 2;
-            _tutorialAllowedCol = 2;
+            [self updatedAllowedRow:2 andCol:2];
         }
             break;
         default:
@@ -178,10 +176,9 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                 "disappears and \n it will remain on the \n board until another \n melon "
                 "removes it.";
             
-            _tutorialAllowedRow = -1;
-            _tutorialAllowedCol = -1;
+            [self updatedAllowedRow:-1 andCol:-1];
             
-            [self labelsVisible:YES];
+            _playButtonAtEndOfTutorial.visible = YES;
         }
     }
    
@@ -209,6 +206,35 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     }
 }
 
+// In tutorial mode, touch is only allowed in one cell at each step.
+- (void)updatedAllowedRow:(int)row andCol:(int)col
+{
+    _tutorialAllowedRow = row;
+    _tutorialAllowedCol = col;
+        
+    [self highlightCellAtRow:row andCol:col];
+}
+
+// In tutorial mode, highlight the cell the player is supposed to tap.
+- (void)highlightCellAtRow:(int)row andCol:(int)col
+{
+    if (_cellHighlight.parent)
+    {
+        [_cellHighlight removeFromParent];
+    }
+    
+    if (row >= 0 && row < _grid.numRows && col >= 0 && col < _grid.numCols)
+    {
+        _cellHighlight = (CCParticleSystem *)[CCBReader load:@"highlightedCell"];
+        
+        [_grid addChild:_cellHighlight];
+        
+        _cellHighlight.position = ccp(col * _grid.cellWidth + _grid.cellWidth / 2,
+                                 row * _grid.cellHeight + _grid.cellHeight / 2);
+        _cellHighlight.anchorPoint = ccp(0.5, 0.5);
+    }
+}
+
 // Whether the total melon labels and the score labels are visible.
 - (void)labelsVisible:(BOOL)visiblility
 {
@@ -218,7 +244,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _scoreLabel.visible = visiblility;
     _scoreLabelStr.visible = visiblility;
     
-    _playAtEndOfTutorial.visible = visiblility;
+    _playButtonAtEndOfTutorial.visible = visiblility;
     
     _tutorialText.visible = !visiblility;
 }
