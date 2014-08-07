@@ -48,7 +48,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CCLabelTTF *_numLabel;
     CCLabelTTF *_totalMelonLabel, *_totalMelonLabelStr;
     CCLabelTTF *_scoreLabel, *_scoreLabelStr, *_highScoreLabel;
-    CCButton *_playButtonAtEndOfTutorial;
+    CCButton *_playButtonAtEndOfTutorial, *_tutorialAgain;
     CCParticleSystem *_cellHighlight;
     NSNumber *_highScoreNum;
     BOOL _tutorialCompleted;
@@ -113,6 +113,11 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         [_playButtonAtEndOfTutorial removeFromParent];
     }
     
+    if (_tutorialAgain.parent)
+    {
+        [_tutorialAgain removeFromParent];
+    }
+    
     _score = 0;
     _tutorialCompleted = YES;
     
@@ -148,7 +153,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     {
         case 0:
         {
-            _tutorialText.string = @" The number 4 on the right \n means you can explode \n "
+            _tutorialText.string = @"\n The number 4 on the right \n means you can explode \n "
                 "a row of 4 melons. \n\n Place the 4th melon \n on the glowing cell.";
             [self helperShowTutorialStartCol:0 endCol:2 startRow:2 endRow:2
                                   melonLabel:4 type:MelonTypeRegular];
@@ -157,7 +162,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 1:
         {
-            _tutorialText.string = @" Explosions can be \n vertical too! \n\n "
+            _tutorialText.string = @"\n\n Explosions can be vertical\n too!\n\n "
                 "(but Not diagonal...)";
             [self helperShowTutorialStartCol:2 endCol:2 startRow:0 endRow:1
                                   melonLabel:3 type:MelonTypeRegular];
@@ -166,7 +171,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 2:
         {
-            _tutorialText.string = @" Well done! \n\n You can also explode \n a row and a "
+            _tutorialText.string = @"\n Well done! \n\n You can also explode \n a row and a "
                 "column \n together.";
             [self helperShowTutorialStartCol:0 endCol:1 startRow:2 endRow:2
                                   melonLabel:3 type:MelonTypeRegular];
@@ -177,7 +182,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 3:
         {
-            _tutorialText.string = @" Nice job! \n\n Winter melon takes \n 3 hits to remove.";
+            _tutorialText.string = @"\n Nice job! \n\n Winter melon takes \n 3 hits to remove.";
             [self helperShowTutorialStartCol:0 endCol:0 startRow:2 endRow:2
                                   melonLabel:4 type:MelonTypeWinter];
             [self helperShowTutorialStartCol:1 endCol:1 startRow:2 endRow:2
@@ -195,7 +200,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 5:
         {
-            _tutorialText.string = @"\n\n Now you can remove \n it.";
+            _tutorialText.string = @"\n\n Great! Now you can \n remove it.";
         }
             break;
         case 6:
@@ -226,12 +231,13 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         default:
         {
-            _tutorialText.string = @"\n Very nice! \n You have a limited number \n of melons. "
+            _tutorialText.string = @" Very nice!! \n\n You have a limited number \n of melons. "
                 "Game ends \n when they run out. Use \n them wisely and shoot \n for a high "
                 "score!";
             [self updateAllowedRow:-1 andCol:-1];
             
             _playButtonAtEndOfTutorial.visible = YES;
+            _tutorialAgain.visible = YES;
         }
     }
    
@@ -299,8 +305,19 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _scoreLabelStr.visible = visiblility;
     
     _playButtonAtEndOfTutorial.visible = visiblility;
+    _tutorialAgain.visible = visiblility;
     
     _tutorialText.visible = !visiblility;
+}
+
+// Go through the tutorial again.
+- (void)showTutorialAgain
+{
+    [self labelsVisible:NO];
+    
+    _tutorialCurrentStep = 0;
+    
+    [self showTutorialAtStep:_tutorialCurrentStep];
 }
 
 #pragma mark - Touch Handling
@@ -395,7 +412,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     // Random float between 0 and 1.
     _chance = drand48();
     
-    if (_chance <= _chanceToGetBomb)
+    if (_chance <= _chanceToGetBomb && [_grid boardIsMoreThanHalfFull])
     {
         _melonLabel = 0;
         [self updateMelonLabelAndIcon:MelonTypeBomb];
