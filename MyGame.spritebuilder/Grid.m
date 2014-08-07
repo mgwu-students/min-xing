@@ -78,25 +78,43 @@ static const float MARGIN = 1.0;
 }
 
 // Check if the board is empty.
-- (BOOL)boardIsEmpty
+//- (BOOL)boardIsEmpty
+//{
+//    for (int row = 0; row < GRID_ROWS; row++)
+//    {
+//        for (int col = 0; col < GRID_COLUMNS; col++)
+//        {
+//            if ([self hasObjectAtRow:row andCol:col])
+//            {
+//                return NO;
+//            }
+//        }
+//    }
+//    
+//    return YES;
+//}
+
+- (BOOL)boardIsMoreThanHalfFull
 {
+    int totalObjects = 0;
+    
     for (int row = 0; row < GRID_ROWS; row++)
     {
-        for (int col = 0; col < GRID_COLUMNS; col++)
+        for (int col = 0; col <GRID_COLUMNS; col++)
         {
             if ([self hasObjectAtRow:row andCol:col])
             {
-                return NO;
+                totalObjects++;
             }
         }
     }
     
-    return YES;
-}
+    if (totalObjects <= GRID_COLUMNS * GRID_ROWS)
+    {
+        return NO;
+    }
 
-- (BOOL)boardIsMoreThanHalfFull
-{
-    
+    return YES;
 }
 
 // Returns the object stored at the specified position.

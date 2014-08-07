@@ -17,8 +17,8 @@
 
 - (BOOL)hasObjectAtRow:(int)row andCol:(int)col;
 - (BOOL)boardIsEmpty;
+- (BOOL)boardIsMoreThanHalfFull;
 - (id)getObjectAtRow:(int)row andCol:(int)col;
-
 
 - (void)positionNode:(CCNode *)node atRow:(int)row andCol:(int)col;
 - (void)addObject:(id)object toRow:(int)row andCol:(int)col;

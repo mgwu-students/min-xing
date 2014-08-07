@@ -285,7 +285,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         _melon.col = melonCol;
         
         // Determines what type of melon it is and acts accordingly.
-        if (_tutorialCompleted && _chance <= _chanceToGetBomb && [_grid boardIsEmpty] == NO)
+        if (_chance <= _chanceToGetBomb && [_grid boardIsMoreThanHalfFull])
         {
             _melon.type = MelonTypeBomb;
             
@@ -587,7 +587,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         [self gameover];
         return;
     }
-    else
+    else if (_melon.type != MelonTypeBomb)
     {
         _melonsLeft--;
         _totalMelonLabel.string = [NSString stringWithFormat:@"%d", _melonsLeft];
