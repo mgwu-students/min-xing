@@ -230,8 +230,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         default:
         {
-            _tutorialText.string = @"Very nice!!\nYou have a limited\n number of melons.\n"
-                "Game ends when\nthey run out. Shoot\nfor a high score!";
+            _tutorialText.string = @"Very nice!!\nYou have a limited\nnumber of melons.\n"
+                "Game ends when they\nrun out. Shoot\nfor a high score!";
             [self updateAllowedRow:-1 andCol:-1];
             
             _playButtonAtEndOfTutorial.visible = YES;

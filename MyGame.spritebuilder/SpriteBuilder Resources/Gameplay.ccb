@@ -1729,10 +1729,10 @@
 						<string>Position</string>
 						<key>value</key>
 						<array>
-							<real>158</real>
-							<real>282</real>
+							<real>0.5</real>
+							<real>267</real>
 							<integer>0</integer>
-							<integer>0</integer>
+							<integer>2</integer>
 							<integer>0</integer>
 						</array>
 					</dict>
@@ -2055,10 +2055,10 @@
 						<string>Position</string>
 						<key>value</key>
 						<array>
-							<real>159</real>
+							<real>0.5</real>
 							<real>166</real>
 							<integer>0</integer>
-							<integer>0</integer>
+							<integer>2</integer>
 							<integer>0</integer>
 						</array>
 					</dict>
