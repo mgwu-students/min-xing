@@ -107,12 +107,11 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 
 - (void)startGame
 {
-    _score = 0;
-    _tutorialText.string = @" ";
-    
     if (_playAtEndOfTutorial.parent) {
         [_playAtEndOfTutorial removeFromParent];
     }
+    
+    _score = 0;
     
     _tutorialCompleted = YES;
     
@@ -159,6 +158,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         {
             _tutorialText.string = @" Explosions can be \n vertical too! \n\n (but Not diagonal)";
             [self helperShowTutorialStartCol:2 endCol:2 startRow:0 endRow:1 melonLabel:3];
+            _tutorialAllowedRow = 2;
             _tutorialAllowedCol = 2;
         }
             break;
@@ -168,6 +168,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                 "column \n at the same time.";
             [self helperShowTutorialStartCol:0 endCol:1 startRow:2 endRow:2 melonLabel:3];
             [self helperShowTutorialStartCol:2 endCol:2 startRow:3 endRow:4 melonLabel:3];
+            _tutorialAllowedRow = 2;
+            _tutorialAllowedCol = 2;
         }
             break;
         default:
@@ -191,7 +193,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 
 // Displays a row or column of melons on board and updates the melon label for the tutorial.
 - (void)helperShowTutorialStartCol:(int)startCol endCol:(int)endCol
-                          startRow:(int)startRow endRow:(int)endRow melonLabel:(int)label
+                          startRow:(int)startRow endRow:(int)endRow
+                          melonLabel:(int)label
 {
     _melonLabel = label;
     [self updateMelonLabelAndIcon:MelonTypeRegular];
