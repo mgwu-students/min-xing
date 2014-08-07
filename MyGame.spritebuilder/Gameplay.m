@@ -153,8 +153,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     {
         case 0:
         {
-            _tutorialText.string = @"\n The number 4 on the right \n means you can explode \n "
-                "a row of 4 melons. \n\n Place the 4th melon \n on the glowing cell.";
+            _tutorialText.string = @"\nThe number 4 on the right\nmeans you can explode\n"
+                "a row of 4 melons.\n\nPlace the 4th melon\non the glowing cell.";
             [self helperShowTutorialStartCol:0 endCol:2 startRow:2 endRow:2
                                   melonLabel:4 type:MelonTypeRegular];
             [self updateAllowedRow:2 andCol:3];
@@ -162,8 +162,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 1:
         {
-            _tutorialText.string = @"\n\n Explosions can be vertical\n too!\n\n "
-                "(but Not diagonal...)";
+            _tutorialText.string = @"\n\nExplosions can be vertical\ntoo!\n\n"
+                "(But not diagonal...)";
             [self helperShowTutorialStartCol:2 endCol:2 startRow:0 endRow:1
                                   melonLabel:3 type:MelonTypeRegular];
             [self updateAllowedRow:2 andCol:2];
@@ -171,8 +171,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 2:
         {
-            _tutorialText.string = @"\n Well done! \n\n You can also explode \n a row and a "
-                "column \n together.";
+            _tutorialText.string = @"\nWell done!\n\nYou can also explode\na row and a "
+                "column\ntogether.";
             [self helperShowTutorialStartCol:0 endCol:1 startRow:2 endRow:2
                                   melonLabel:3 type:MelonTypeRegular];
             [self helperShowTutorialStartCol:2 endCol:2 startRow:3 endRow:4
@@ -182,7 +182,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 3:
         {
-            _tutorialText.string = @"\n Nice job! \n\n Winter melon takes \n 3 hits to remove.";
+            _tutorialText.string = @"\nNice job!\n\nWinter melon takes\n3 hits to remove.";
             [self helperShowTutorialStartCol:0 endCol:0 startRow:2 endRow:2
                                   melonLabel:4 type:MelonTypeWinter];
             [self helperShowTutorialStartCol:1 endCol:1 startRow:2 endRow:2
@@ -192,7 +192,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 4:
         {
-            _tutorialText.string = @"\n\n Hit the winter melon \n again.";
+            _tutorialText.string = @"\n\nHit the winter melon\nagain.";
             [self updateAllowedRow:2 andCol:1];
             _melonLabel = 2;
             [self updateMelonLabelAndIcon:MelonTypeRegular];
@@ -200,14 +200,13 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 5:
         {
-            _tutorialText.string = @"\n\n Great! Now you can \n remove it.";
+            _tutorialText.string = @"\n\nGreat! Now you can\nremove it.";
         }
             break;
         case 6:
         {
-            _tutorialText.string = @" If a melon doesn't \n explode anything, its \n label "
-            "disappears and \n it will remain on the \n board until another \n melon "
-            "removes it.";
+            _tutorialText.string = @"If a melon doesn't\nexplode anything, its\nlabel "
+            "disappears and\nit will remain on the\nboard until another\nmelon removes it.";
             _melonLabel = 2;
             [self updateMelonLabelAndIcon:MelonTypeRegular];
             [self updateAllowedRow:4 andCol:2];
@@ -215,7 +214,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 7:
         {
-            _tutorialText.string = @"\n\n Place another one.";
+            _tutorialText.string = @"\n\nPlace another one.";
             _melonLabel = 4;
             [self updateMelonLabelAndIcon:MelonTypeRegular];
             [self updateAllowedRow:4 andCol:4];
@@ -223,7 +222,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 8:
         {
-            _tutorialText.string = @"\n\n Label 3 works. \n Now explode them!";
+            _tutorialText.string = @"\n\nLabel 3 works.\nNow explode them!";
             _melonLabel = 3;
             [self updateMelonLabelAndIcon:MelonTypeRegular];
             [self updateAllowedRow:4 andCol:3];
@@ -231,9 +230,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         default:
         {
-            _tutorialText.string = @" Very nice!! \n\n You have a limited number \n of melons. "
-                "Game ends \n when they run out. Use \n them wisely and shoot \n for a high "
-                "score!";
+            _tutorialText.string = @"Very nice!!\nYou have a limited\n number of melons.\n"
+                "Game ends when\nthey run out. Shoot\nfor a high score!";
             [self updateAllowedRow:-1 andCol:-1];
             
             _playButtonAtEndOfTutorial.visible = YES;
