@@ -167,7 +167,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 2:
         {
             _tutorialText.string = @" Well done! \n\n You can also explode \n a row and a "
-                "column \n at the same time.";
+                "column \n together.";
             [self helperShowTutorialStartCol:0 endCol:1 startRow:2 endRow:2
                                   melonLabel:3 type:MelonTypeRegular];
             [self helperShowTutorialStartCol:2 endCol:2 startRow:3 endRow:4
@@ -177,35 +177,58 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 3:
         {
-            _tutorialText.string = @" Nice job! \n\n Winter melons take \n 3 hits to remove.";
-            [self helperShowTutorialStartCol:0 endCol:1 startRow:2 endRow:2
+            _tutorialText.string = @" Nice job! \n\n Winter melon takes \n 3 hits to remove.";
+            [self helperShowTutorialStartCol:0 endCol:0 startRow:2 endRow:2
                                   melonLabel:4 type:MelonTypeWinter];
-            [self helperShowTutorialStartCol:2 endCol:2 startRow:2 endRow:2
-                                  melonLabel:4 type:MelonTypeRegular];
-            [self updateAllowedRow:2 andCol:3];
+            [self helperShowTutorialStartCol:1 endCol:1 startRow:2 endRow:2
+                                  melonLabel:3 type:MelonTypeRegular];
+            [self updateAllowedRow:2 andCol:2];
         }
             break;
         case 4:
         {
-            _tutorialText.string = @"\n\n Hit the winter melons \n again.";
-            [self updateAllowedRow:2 andCol:2];
-            _melonLabel = 3;
+            _tutorialText.string = @"\n\n Hit the winter melon \n again.";
+            [self updateAllowedRow:2 andCol:1];
+            _melonLabel = 2;
             [self updateMelonLabelAndIcon:MelonTypeRegular];
         }
             break;
         case 5:
         {
-            _tutorialText.string = @"\n\n Now you can remove \n them!";
+            _tutorialText.string = @"\n\n Now you can remove \n it.";
+        }
+            break;
+        case 6:
+        {
+            _tutorialText.string = @" If a melon doesn't \n explode anything, its \n label "
+            "disappears and \n it will remain on the \n board until another \n melon "
+            "removes it.";
+            _melonLabel = 2;
+            [self updateMelonLabelAndIcon:MelonTypeRegular];
+            [self updateAllowedRow:4 andCol:2];
+        }
+            break;
+        case 7:
+        {
+            _tutorialText.string = @"\n\n Place another one.";
+            _melonLabel = 4;
+            [self updateMelonLabelAndIcon:MelonTypeRegular];
+            [self updateAllowedRow:4 andCol:4];
+        }
+            break;
+        case 8:
+        {
+            _tutorialText.string = @"\n\n Label 3 works. \n Now explode them!";
+            _melonLabel = 3;
+            [self updateMelonLabelAndIcon:MelonTypeRegular];
+            [self updateAllowedRow:4 andCol:3];
         }
             break;
         default:
         {
-            _tutorialText.string = @" If a melon doesn't \n explode anything, its \n label "
-                "disappears and \n it will remain on the \n board until another \n melon "
-                "removes it.";
-            
-            _tutorialText.string = @"\n You have a limited number \n of melons. Game ends \n when "
-                "they run out. \n Use them wisely and \n shoot for a high score!";
+            _tutorialText.string = @"\n Very nice! \n You have a limited number \n of melons. "
+                "Game ends \n when they run out. Use \n them wisely and shoot \n for a high "
+                "score!";
             [self updateAllowedRow:-1 andCol:-1];
             
             _playButtonAtEndOfTutorial.visible = YES;
