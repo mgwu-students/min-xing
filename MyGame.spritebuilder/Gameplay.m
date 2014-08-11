@@ -10,6 +10,7 @@
 #import "Grid.h"
 #import "Melon.h"
 #import "WinPopup.h"
+#import "TutorialPopup.h"
 
 // The chance to get bomb increases at this rate per point scored.
 static const float BOMB_CHANCE_INCREASE_RATE = 0.1;
@@ -34,6 +35,9 @@ static const int TOTAL_NUM_MELONS = 40;
 // Number of melons on the board to start with,
 static const int NUM_MELONS_ON_START = 6;
 
+// Number of pixels below the label in the y-axis.
+static const int MELON_ICON_Y_OFFSET = 60;
+
 // Key for highscore.
 static NSString* const HIGH_SCORE_KEY = @"highScore";
 // Key for whether tutorial is completed.
@@ -44,11 +48,12 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CGRect _gridBox;
     Grid *_grid;
     Melon *_melon, *_melonIcon;
-    CCLabelTTF *_tutorialText;
+    TutorialPopup *_tutorialPopup;
+    CCLabelTTF *_tutorialText, *_popupText;
     CCLabelTTF *_numLabel;
     CCLabelTTF *_totalMelonLabel, *_totalMelonLabelStr;
     CCLabelTTF *_scoreLabel, *_scoreLabelStr, *_highScoreLabel;
-    CCButton *_playButtonAtEndOfTutorial, *_tutorialAgain;
+    CCButton *_playButtonAtEndOfTutorial, *_tutorialAgain, *_popupNextStep;
     CCParticleSystem *_cellHighlight;
     NSNumber *_highScoreNum;
     BOOL _tutorialCompleted;
@@ -96,7 +101,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     
     if (!_tutorialCompleted)
     {
-        [self labelsVisible:NO];
+        [self tutorialLabelsVisible:NO];
         
         [self showTutorialAtStep:_tutorialCurrentStep];
     }
@@ -121,7 +126,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _score = 0;
     _tutorialCompleted = YES;
     
-    [self labelsVisible:YES];
+    [self tutorialLabelsVisible:YES];
     
     [self putRandomMelonsOnBoard];
     
@@ -153,85 +158,103 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     {
         case 0:
         {
-            _tutorialText.string = @"\nThe number 4 on the right\nmeans you can explode\n"
-                "a row of 4 melons.\n\nPlace the 4th melon\non the glowing cell.";
-            [self helperShowTutorialStartCol:0 endCol:2 startRow:2 endRow:2
-                                  melonLabel:4 type:MelonTypeRegular];
-            [self updateAllowedRow:2 andCol:3];
+            [self loadTutorialPopup];
+            [self tutorialPopupVisible: YES];
+            
+            _popupText.string = @"The goal of the game is...";
         }
             break;
         case 1:
         {
-            _tutorialText.string = @"\n\nExplosions can be vertical\ntoo!\n\n"
-                "(But not diagonal...)";
-            [self helperShowTutorialStartCol:2 endCol:2 startRow:0 endRow:1
-                                  melonLabel:3 type:MelonTypeRegular];
-            [self updateAllowedRow:2 andCol:2];
+            _popupText.string = @"\n The label on the top right... ";
+            
+            _melonLabel = 3;
+            [self updateMelonLabelAndIcon:MelonTypeRegular];
         }
             break;
         case 2:
         {
-            _tutorialText.string = @"\nWell done!\n\nYou can also explode\na row and a "
-                "column\ntogether.";
-            [self helperShowTutorialStartCol:0 endCol:1 startRow:2 endRow:2
-                                  melonLabel:3 type:MelonTypeRegular];
-            [self helperShowTutorialStartCol:2 endCol:2 startRow:3 endRow:4
-                                  melonLabel:3 type:MelonTypeRegular];
-            [self updateAllowedRow:2 andCol:2];
+            [self tutorialPopupVisible:NO];
+            
+            _tutorialText.string = @"\nSuppose the random number is 4. Place this melon on the "
+                "glowing cell";
+            
+            [self helperShowTutorialStartCol:0 endCol:0 startRow:0 endRow:4
+                                  melonLabel:4 type:MelonTypeRegular];
+            [self helperShowTutorialStartCol:1 endCol:1 startRow:2 endRow:2
+                                  melonLabel:4 type:MelonTypeRegular];
+            [self helperShowTutorialStartCol:2 endCol:2 startRow:2 endRow:2
+                                  melonLabel:4 type:MelonTypeRegular];
+            [self helperShowTutorialStartCol:3 endCol:3 startRow:0 endRow:0
+                                  melonLabel:4 type:MelonTypeRegular];
+            [self helperShowTutorialStartCol:4 endCol:4 startRow:1 endRow:1
+                                  melonLabel:4 type:MelonTypeRegular];
+            [self updateAllowedRow:2 andCol:3];
         }
             break;
         case 3:
         {
-            _tutorialText.string = @"\nNice job!\n\nWinter melon takes\n3 hits to remove.";
-            [self helperShowTutorialStartCol:0 endCol:0 startRow:2 endRow:2
-                                  melonLabel:4 type:MelonTypeWinter];
-            [self helperShowTutorialStartCol:1 endCol:1 startRow:2 endRow:2
-                                  melonLabel:3 type:MelonTypeRegular];
-            [self updateAllowedRow:2 andCol:2];
+            _tutorialText.string = @"\n\nNice job! Explosions can be vertical too!\n\n"
+                "(But not diagonal) Place melon on board.";
+            
+            _melonLabel = 5;
+            [self updateMelonLabelAndIcon:MelonTypeRegular];
+            
+            [self updateAllowedRow:2 andCol:0];
         }
             break;
         case 4:
         {
-            _tutorialText.string = @"\n\nHit the winter melon\nagain.";
-            [self updateAllowedRow:2 andCol:1];
+            _tutorialText.string = @"You can also explode\na row and a column\ntogether. "
+                "Tap on one of the glowing cells.";
+            
             _melonLabel = 2;
             [self updateMelonLabelAndIcon:MelonTypeRegular];
+            
+            [self updateAllowedRow:1 andCol:3];
+            [self updateAllowedRow:0 andCol:4];
         }
             break;
         case 5:
         {
-            _tutorialText.string = @"\n\nGreat! Now you can\nremove it.";
+            [self tutorialPopupVisible:YES];
+            
+            _popupText.string = @"There are 2 types of melons: the green one you saw "
+                "and this blue one. Each time you get a random type.";
+            
+            [self updateMelonLabelAndIcon:MelonTypeWinter];
+            
+            [self updateAllowedRow:-1 andCol:-1];
         }
             break;
         case 6:
         {
-            _tutorialText.string = @"If a melon doesn't\nexplode anything, its\nlabel "
-            "disappears and\nit will remain on the\nboard until another\nmelon removes it.";
-            _melonLabel = 2;
-            [self updateMelonLabelAndIcon:MelonTypeRegular];
-            [self updateAllowedRow:4 andCol:2];
+            [self tutorialPopupVisible:NO];
+            
+            _melonLabel = 4;
+            [self updateMelonLabelAndIcon:MelonTypeWinter];
+            _tutorialText.string = @"Place the winter melon anywhere on the board";
         }
             break;
         case 7:
         {
-            _tutorialText.string = @"\n\nPlace another one.";
-            _melonLabel = 4;
-            [self updateMelonLabelAndIcon:MelonTypeRegular];
-            [self updateAllowedRow:4 andCol:4];
+            _melonLabel = 2;
+            [self updateMelonLabelAndIcon:MelonTypeWinter];
+            _tutorialText.string = @"Place another one.";
         }
             break;
         case 8:
         {
-            _tutorialText.string = @"\n\nLabel 3 works.\nNow explode them!";
-            _melonLabel = 3;
-            [self updateMelonLabelAndIcon:MelonTypeRegular];
-            [self updateAllowedRow:4 andCol:3];
+            [self tutorialPopupVisible:YES];
+            
+            _popupText.string = @"Good job. A winter melon takes 3 hits to clear. "
+                "Place it wisely.";
         }
             break;
         default:
         {
             _tutorialText.string = @"Very nice!!\nYou have a limited\nnumber of melons.\n"
-                "Game ends when they\nrun out. Shoot\nfor a high score!";
+                "Shoot\nfor a high score!";
             [self updateAllowedRow:-1 andCol:-1];
             
             _playButtonAtEndOfTutorial.visible = YES;
@@ -294,7 +317,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 }
 
 // Whether the total melon labels and the score labels are visible.
-- (void)labelsVisible:(BOOL)visiblility
+- (void)tutorialLabelsVisible:(BOOL)visiblility
 {
     _totalMelonLabel.visible = visiblility;
     _totalMelonLabelStr.visible = visiblility;
@@ -308,10 +331,33 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _tutorialText.visible = !visiblility;
 }
 
+- (void)loadTutorialPopup
+{
+    _tutorialPopup = (TutorialPopup *)[CCBReader load:@"Tutorial" owner:self];
+//    _tutorialPopup.positionType = CCPositionTypeNormalized;
+//    _tutorialPopup.position = ccp(0.5, 0.5);
+    _tutorialPopup.position = _grid.position;
+    _tutorialPopup.anchorPoint = ccp(0, 0);
+    [self addChild:_tutorialPopup];
+}
+
+- (void)tutorialPopupVisible:(BOOL)visibility
+{
+    _tutorialPopup.visible = visibility;
+    
+    _tutorialText.visible = !visibility;
+}
+
+// Goes to the next step of the tutorial.
+- (void)goToTutorialNextStep
+{
+    [self showTutorialAtStep:_tutorialCurrentStep];
+}
+
 // Go through the tutorial again.
 - (void)showTutorialAgain
 {
-    [self labelsVisible:NO];
+    [self tutorialLabelsVisible:NO];
     
     _tutorialCurrentStep = 0;
     
@@ -342,9 +388,10 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         }
         
         // Limit touch in tutorial mode.
-        if (!_tutorialCompleted && (melonRow != _tutorialAllowedRow ||
-                                   melonCol != _tutorialAllowedCol))
+        if (!_tutorialCompleted && _tutorialAllowedRow >=0 && _tutorialAllowedCol >= 0 &&
+            (melonRow != _tutorialAllowedRow || melonCol != _tutorialAllowedCol))
         {
+            CCLOG(@"Limited touch.");
             return;
         }
         
@@ -459,7 +506,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     // Positions the melon icon.
     [_numLabel.parent addChild:_melonIcon];
     _melonIcon.anchorPoint = ccp(0.5, 0.5);
-    _melonIcon.positionInPoints = _numLabel.positionInPoints;
+    _melonIcon.positionInPoints = ccp(_numLabel.positionInPoints.x,
+                                      _numLabel.positionInPoints.y - MELON_ICON_Y_OFFSET);
     
     // See Melon Class for overriding scale setter.
     _melonIcon.scale = _grid.cellHeight * _grid.scaleY;
