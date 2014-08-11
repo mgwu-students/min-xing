@@ -98,7 +98,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     //    _tutorialCompleted = [[NSUserDefaults standardUserDefaults] objectForKey:TUTORIAL_KEY];
     
     // TESTING ONLY.
-    _tutorialCompleted = NO;
+    _tutorialCompleted = YES;
     
     if (!_tutorialCompleted)
     {
@@ -126,6 +126,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     
     _score = 0;
     _tutorialCompleted = YES;
+    _acceptTouch = YES;
     
     [self tutorialLabelsVisible:YES];
     
@@ -403,16 +404,13 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         }
         
 
-        // Makes a new melon and updates its location.
-        _melon = (Melon *)[CCBReader load:@"Melon"];
+        // Updates the melon's location.
         _melon.row =  melonRow;
         _melon.col = melonCol;
         
         // Determines what type of melon it is and acts accordingly.
-        if (_chance <= _chanceToGetBomb && [_grid boardIsMoreThanHalfFull])
+        if (_melon.type == MelonTypeBomb && [_grid boardIsMoreThanHalfFull])
         {
-            _melon.type = MelonTypeBomb;
-            
             [_grid addObject:_melon toRow:_melon.row andCol:_melon.col];
 
             // Removes surrounding melons and accumulates the score.
@@ -423,15 +421,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         }
         else
         {
-            if (_tutorialCompleted && _chance <= _chanceToGetWintermelon)
-            {
-                _melon.type = MelonTypeWinter;
-            }
-            else
-            {
-                _melon.type = MelonTypeRegular;
-            }
-            
             [_grid addObject:_melon toRow:_melon.row andCol:_melon.col];
             
             // Updates the melon's neighbor positions and remove them.
@@ -461,12 +450,16 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 // Updates the upper-right icon to match the current melon type and number.
 - (void)updateRandomMelonLabelAndIcon
 {
+    // Loads a new melon.
+    _melon = (Melon *)[CCBReader load:@"Melon"];
+    
     // Random float between 0 and 1.
     _chance = drand48();
     
     if (_chance <= _chanceToGetBomb && [_grid boardIsMoreThanHalfFull])
     {
         _melonLabel = 0;
+        _melon.type = MelonTypeBomb;
         [self updateMelonLabelAndIcon:MelonTypeBomb];
     }
     else
@@ -482,10 +475,12 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         
         if (_chance <= _chanceToGetWintermelon)
         {
+            _melon.type = MelonTypeWinter;
             [self updateMelonLabelAndIcon:MelonTypeWinter];
         }
         else
         {
+            _melon.type = MelonTypeRegular;
             [self updateMelonLabelAndIcon:MelonTypeRegular];
         }
     }
@@ -739,10 +734,10 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 {
     WinPopup *popup = (WinPopup *)[CCBReader load:@"Gameover" owner:self];
     popup.positionType = CCPositionTypeNormalized;
-    popup.anchorPoint = ccp(0.5, 0.5);
+    popup.position = ccp(0.5, 0.5);
     [self addChild:popup];
     
-    [self updateHighScore];
+    [self updateHighScore];;
 }
 
 - (void)restart
