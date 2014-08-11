@@ -57,6 +57,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CCParticleSystem *_cellHighlight;
     NSNumber *_highScoreNum;
     BOOL _tutorialCompleted;
+    BOOL _acceptTouch;
     int _tutorialCurrentStep, _tutorialAllowedRow, _tutorialAllowedCol;
     int _melonLabel; // Current melon number label.
     int _melonsLeft;
@@ -230,17 +231,18 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 6:
         {
             [self tutorialPopupVisible:NO];
+            _tutorialText.string = @"Place the winter melon anywhere on the board";
             
             _melonLabel = 4;
             [self updateMelonLabelAndIcon:MelonTypeWinter];
-            _tutorialText.string = @"Place the winter melon anywhere on the board";
         }
             break;
         case 7:
         {
+            _tutorialText.string = @"Place another one.";
+            
             _melonLabel = 2;
             [self updateMelonLabelAndIcon:MelonTypeWinter];
-            _tutorialText.string = @"Place another one.";
         }
             break;
         case 8:
@@ -255,6 +257,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         {
             _tutorialText.string = @"Very nice!!\nYou have a limited\nnumber of melons.\n"
                 "Shoot\nfor a high score!";
+            
             [self updateAllowedRow:-1 andCol:-1];
             
             _playButtonAtEndOfTutorial.visible = YES;
@@ -334,10 +337,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 - (void)loadTutorialPopup
 {
     _tutorialPopup = (TutorialPopup *)[CCBReader load:@"Tutorial" owner:self];
-//    _tutorialPopup.positionType = CCPositionTypeNormalized;
-//    _tutorialPopup.position = ccp(0.5, 0.5);
-    _tutorialPopup.position = _grid.position;
-    _tutorialPopup.anchorPoint = ccp(0, 0);
+    _tutorialPopup.positionType = CCPositionTypeNormalized;
+    _tutorialPopup.position = ccp(0.35, 0.6);
     [self addChild:_tutorialPopup];
 }
 
@@ -345,6 +346,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 {
     _tutorialPopup.visible = visibility;
     
+    _acceptTouch = !visibility;
     _tutorialText.visible = !visibility;
 }
 
@@ -369,6 +371,11 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 // Melon gets placed on touch.
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
+    if (!_acceptTouch)
+    {
+        return;
+    }
+    
     CGPoint touchLocation = [touch locationInNode:self];
     
     // If touch point is outside the grid, don't do anything.
@@ -732,7 +739,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 {
     WinPopup *popup = (WinPopup *)[CCBReader load:@"Gameover" owner:self];
     popup.positionType = CCPositionTypeNormalized;
-    popup.position = ccp(0.5, 0.5);
+    popup.anchorPoint = ccp(0.5, 0.5);
     [self addChild:popup];
     
     [self updateHighScore];
