@@ -191,10 +191,11 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                                   melonLabel:4 type:MelonTypeRegular];
             [self helperShowTutorialStartCol:4 endCol:4 startRow:1 endRow:1
                                   melonLabel:4 type:MelonTypeRegular];
-            [self updateAllowedRow:2 andCol:3];
             
             // Lets the player place a regular melon on board.
             _melon = (Melon *)[CCBReader load:@"Melon"];
+            [self updateAllowedRow:2 andCol:3];
+            [self highlightCellAtRow:_tutorialAllowedRow andCol:_tutorialAllowedCol];
         }
             break;
         case 3:
@@ -315,7 +316,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _tutorialAllowedRow = row;
     _tutorialAllowedCol = col;
         
-    [self highlightCellAtRow:row andCol:col];
+//    [self highlightCellAtRow:row andCol:col];
 }
 
 // In tutorial mode, highlight the cell the player is supposed to tap.
@@ -418,8 +419,11 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         // Tutorial mode limits touch.
         if ([self tutorialPreventsTouchAtRow:melonRow andCol:melonCol])
         {
+            [self highlightCellAtRow:_tutorialAllowedRow andCol:_tutorialAllowedCol];
             return;
         }
+        
+        [_cellHighlight removeFromParent];
 
         // Updates the melon's location.
         _melon.row =  melonRow;
