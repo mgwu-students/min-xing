@@ -415,11 +415,9 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             return;
         }
         
-        // Limit touch in tutorial mode.
-        if (!_tutorialCompleted && _tutorialAllowedRow >=0 && _tutorialAllowedCol >= 0 &&
-            (melonRow != _tutorialAllowedRow || melonCol != _tutorialAllowedCol))
+        // Tutorial mode limits touch.
+        if ([self tutorialPreventsTouchAtRow:melonRow andCol:melonCol])
         {
-            CCLOG(@"Limited touch.");
             return;
         }
 
@@ -444,6 +442,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             
             // Updates the melon's neighbor positions and remove them.
             [self countMelonNeighbors];
+            
             numRemoved = [self removedNeighbors];
         }
         
@@ -463,6 +462,20 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         }
     }
 }
+
+
+// Tutorial mode limits touch.
+- (BOOL)tutorialPreventsTouchAtRow:(int)row andCol:(int)col
+{
+    if (!_tutorialCompleted && _tutorialAllowedRow >=0 && _tutorialAllowedCol >= 0 &&
+        (row != _tutorialAllowedRow || col != _tutorialAllowedCol))
+    {
+        return YES;
+    }
+    
+    return NO;
+}
+
 
 #pragma mark - Updates
 
