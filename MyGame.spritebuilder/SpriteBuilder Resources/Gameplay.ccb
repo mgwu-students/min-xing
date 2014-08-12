@@ -308,7 +308,7 @@
 						<key>displayName</key>
 						<string>score_string</string>
 						<key>memberVarAssignmentName</key>
-						<string>_scoreLabelStr</string>
+						<string>_scoreLabelText</string>
 						<key>memberVarAssignmentType</key>
 						<integer>1</integer>
 						<key>properties</key>
@@ -975,9 +975,9 @@
 						<key>customClass</key>
 						<string></string>
 						<key>displayName</key>
-						<string>timeLeft</string>
+						<string>melonsLeft</string>
 						<key>memberVarAssignmentName</key>
-						<string>_totalMelonLabelStr</string>
+						<string>_totalMelonLabelText</string>
 						<key>memberVarAssignmentType</key>
 						<integer>1</integer>
 						<key>properties</key>
@@ -1184,6 +1184,8 @@
 								</array>
 							</dict>
 						</array>
+						<key>selected</key>
+						<true/>
 					</dict>
 					<dict>
 						<key>UUID</key>
@@ -1195,7 +1197,7 @@
 						<key>customClass</key>
 						<string></string>
 						<key>displayName</key>
-						<string>timeLeft_int</string>
+						<string>melonsLeft_int</string>
 						<key>memberVarAssignmentName</key>
 						<string>_totalMelonLabel</string>
 						<key>memberVarAssignmentType</key>

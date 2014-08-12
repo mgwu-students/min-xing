@@ -54,11 +54,12 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CCLabelTTF *_totalMelonLabel, *_totalMelonLabelText;
     CCLabelTTF *_scoreLabel, *_scoreLabelText, *_highScoreLabel;
     CCButton *_playButtonAtEndOfTutorial, *_tutorialAgain, *_popupNextStep;
-    CCParticleSystem *_cellHighlight;
+    CCParticleSystem *_cellHighlight1, *_cellHighlight2;
     NSNumber *_highScoreNum;
     BOOL _tutorialCompleted;
     BOOL _acceptTouch;
-    int _tutorialCurrentStep, _tutorialAllowedRow, _tutorialAllowedCol;
+    int _tutorialCurrentStep;
+    int _tutorialAllowedRow1, _tutorialAllowedCol1, _tutorialAllowedRow2, _tutorialAllowedCol2;
     int _melonLabel; // Current melon number label.
     int _melonsLeft;
     int _score, _highScore;
@@ -82,6 +83,9 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _melonsLeft = TOTAL_NUM_MELONS;
     
     _melonIcon = (Melon *)[CCBReader load:@"Melon"];
+    
+    _cellHighlight1 = (CCParticleSystem *)[CCBReader load:@"highlightedCell"];
+    _cellHighlight2 = (CCParticleSystem *)[CCBReader load:@"highlightedCell"];
     
     self.userInteractionEnabled = YES;
 }
@@ -194,8 +198,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             
             // Lets the player place a regular melon on board.
             _melon = (Melon *)[CCBReader load:@"Melon"];
-            [self updateAllowedRow:2 andCol:3];
-            [self highlightCellAtRow:_tutorialAllowedRow andCol:_tutorialAllowedCol];
+            [self updateAllowedRow1:2 andCol1:3 row2:-1 andCol2:-1];
+            [self highlight:_cellHighlight1 CellAtRow:_tutorialAllowedRow1 andCol:_tutorialAllowedCol1];
         }
             break;
         case 3:
@@ -206,7 +210,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             _melonLabel = 5;
             [self updateMelonLabelAndIcon:MelonTypeRegular];
             
-            [self updateAllowedRow:2 andCol:0];
+            [self updateAllowedRow1:2 andCol1:0 row2:-1 andCol2:-1];
         }
             break;
         case 4:
@@ -217,8 +221,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             _melonLabel = 2;
             [self updateMelonLabelAndIcon:MelonTypeRegular];
             
-            [self updateAllowedRow:1 andCol:3];
-            [self updateAllowedRow:0 andCol:4];
+            [self updateAllowedRow1:1 andCol1:3 row2:0 andCol2:4];
         }
             break;
         case 5:
@@ -230,7 +233,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             
             [self updateMelonLabelAndIcon:MelonTypeWinter];
             
-            [self updateAllowedRow:-1 andCol:-1];
+            [self updateAllowedRow1:-1 andCol1:-1 row2:-1 andCol2:-1];
         }
             break;
         case 6:
@@ -278,7 +281,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             _tutorialText.string = @"Very nice!!\nYou have a limited\nnumber of melons.\n"
                 "Shoot\nfor a high score!";
             
-            [self updateAllowedRow:-1 andCol:-1];
+            [self updateAllowedRow1:-1 andCol1:-1 row2:-1 andCol2:-1];
             
             _playButtonAtEndOfTutorial.visible = YES;
             _tutorialAgain.visible = YES;
@@ -311,31 +314,24 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 }
 
 // In tutorial mode, touch is only allowed in one cell at each step.
-- (void)updateAllowedRow:(int)row andCol:(int)col
+- (void)updateAllowedRow1:(int)row1 andCol1:(int)col1 row2:(int)row2 andCol2:(int)col2
 {
-    _tutorialAllowedRow = row;
-    _tutorialAllowedCol = col;
-        
-//    [self highlightCellAtRow:row andCol:col];
+    _tutorialAllowedRow1 = row1;
+    _tutorialAllowedCol1 = col1;
+    
+    _tutorialAllowedRow2 = row2;
+    _tutorialAllowedCol2 = col2;
 }
 
 // In tutorial mode, highlight the cell the player is supposed to tap.
-- (void)highlightCellAtRow:(int)row andCol:(int)col
+- (void)highlight:(CCParticleSystem*)cellHighlight CellAtRow:(int)row andCol:(int)col
 {
-    if (_cellHighlight.parent)
-    {
-        [_cellHighlight removeFromParent];
-    }
-    
     if (row >= 0 && row < _grid.numRows && col >= 0 && col < _grid.numCols)
     {
-        _cellHighlight = (CCParticleSystem *)[CCBReader load:@"highlightedCell"];
-        
-        [_grid addChild:_cellHighlight];
-        
-        _cellHighlight.position = ccp(col * _grid.cellWidth + _grid.cellWidth / 2,
+        [_grid addChild:cellHighlight];
+        cellHighlight.position = ccp(col * _grid.cellWidth + _grid.cellWidth / 2,
                                  row * _grid.cellHeight + _grid.cellHeight / 2);
-        _cellHighlight.anchorPoint = ccp(0.5, 0.5);
+        cellHighlight.anchorPoint = ccp(0.5, 0.5);
     }
 }
 
@@ -416,15 +412,17 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             return;
         }
         
+        [_cellHighlight1 removeFromParent];
+        [_cellHighlight2 removeFromParent];
+        
         // Tutorial mode limits touch.
-        if ([self tutorialPreventsTouchAtRow:melonRow andCol:melonCol])
+        if ([self tutorialAllowsTouchAtRow:melonRow andCol:melonCol] == NO)
         {
-            [self highlightCellAtRow:_tutorialAllowedRow andCol:_tutorialAllowedCol];
+            [self highlight:_cellHighlight1 CellAtRow:_tutorialAllowedRow1 andCol:_tutorialAllowedCol1];
+            [self highlight:_cellHighlight2 CellAtRow:_tutorialAllowedRow2 andCol:_tutorialAllowedCol2];
             return;
         }
         
-        [_cellHighlight removeFromParent];
-
         // Updates the melon's location.
         _melon.row =  melonRow;
         _melon.col = melonCol;
@@ -469,15 +467,19 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 
 
 // Tutorial mode limits touch.
-- (BOOL)tutorialPreventsTouchAtRow:(int)row andCol:(int)col
+- (BOOL)tutorialAllowsTouchAtRow:(int)row andCol:(int)col
 {
-    if (!_tutorialCompleted && _tutorialAllowedRow >=0 && _tutorialAllowedCol >= 0 &&
-        (row != _tutorialAllowedRow || col != _tutorialAllowedCol))
+    if (!_tutorialCompleted && _tutorialAllowedRow1 >=0 && _tutorialAllowedCol1 >= 0)
     {
-        return YES;
+        if (!(row == _tutorialAllowedRow1 && col == _tutorialAllowedCol1) &&
+            !(row == _tutorialAllowedRow2 && col == _tutorialAllowedCol2))
+        {
+            return NO;
+        }
     }
     
-    return NO;
+    // Tutorial completed or clicked on the allowed spot(s).
+    return YES;
 }
 
 
