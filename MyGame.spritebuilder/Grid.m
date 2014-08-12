@@ -180,6 +180,18 @@ static const float MARGIN = 1.0;
     return totalRemoved;
 }
 
+// Removes all objects on board.
+- (void)clearBoard
+{
+    for (int i = 0; i < GRID_ROWS; i++)
+    {
+        for (int j = 0; j < GRID_COLUMNS; j++)
+        {
+            [self removeObjectAtX:i Y:j];
+        }
+    }
+}
+
 #pragma mark - Debugging
 
 - (void)printBoardState

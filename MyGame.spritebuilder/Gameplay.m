@@ -98,7 +98,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     //    _tutorialCompleted = [[NSUserDefaults standardUserDefaults] objectForKey:TUTORIAL_KEY];
     
     // TESTING ONLY.
-    _tutorialCompleted = YES;
+    _tutorialCompleted = NO;
     
     if (!_tutorialCompleted)
     {
@@ -192,6 +192,9 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             [self helperShowTutorialStartCol:4 endCol:4 startRow:1 endRow:1
                                   melonLabel:4 type:MelonTypeRegular];
             [self updateAllowedRow:2 andCol:3];
+            
+            // Lets the player place a regular melon on board.
+            _melon = (Melon *)[CCBReader load:@"Melon"];
         }
             break;
         case 3:
@@ -234,6 +237,9 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             [self tutorialPopupVisible:NO];
             _tutorialText.string = @"Place the winter melon anywhere on the board";
             
+            _melon = (Melon *)[CCBReader load:@"Melon"];
+            _melon.type = MelonTypeWinter;
+            
             _melonLabel = 4;
             [self updateMelonLabelAndIcon:MelonTypeWinter];
         }
@@ -242,11 +248,21 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         {
             _tutorialText.string = @"Place another one.";
             
+            _melon = (Melon *)[CCBReader load:@"Melon"];
+            _melon.type = MelonTypeWinter;
+            
             _melonLabel = 2;
             [self updateMelonLabelAndIcon:MelonTypeWinter];
         }
             break;
         case 8:
+        {
+            _tutorialText.string = @"Click anywhere on the grid to continue";
+            
+            _melon = (Melon *)[CCBReader load:@"Melon"];
+        }
+            break;
+        case 9:
         {
             [self tutorialPopupVisible:YES];
             
@@ -256,6 +272,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         default:
         {
+            [self tutorialPopupVisible:NO];
+            
             _tutorialText.string = @"Very nice!!\nYou have a limited\nnumber of melons.\n"
                 "Shoot\nfor a high score!";
             
@@ -361,6 +379,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 - (void)showTutorialAgain
 {
     [self tutorialLabelsVisible:NO];
+    
+    [_grid clearBoard];
     
     _tutorialCurrentStep = 0;
     

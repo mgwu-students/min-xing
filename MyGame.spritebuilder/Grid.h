@@ -16,7 +16,6 @@
 @property (nonatomic, assign) float cellHeight;
 
 - (BOOL)hasObjectAtRow:(int)row andCol:(int)col;
-- (BOOL)boardIsEmpty;
 - (BOOL)boardIsMoreThanHalfFull;
 - (id)getObjectAtRow:(int)row andCol:(int)col;
 
@@ -25,5 +24,6 @@
 
 - (void)removeObjectAtX:(int)xPos Y:(int)yPos;
 - (int)removeNeighborsAroundObjectAtRow:(int)row andCol:(int)col;
+- (void)clearBoard;
 
 @end
