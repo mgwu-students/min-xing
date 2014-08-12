@@ -51,8 +51,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     TutorialPopup *_tutorialPopup;
     CCLabelTTF *_tutorialText, *_popupText;
     CCLabelTTF *_numLabel;
-    CCLabelTTF *_totalMelonLabel, *_totalMelonLabelStr;
-    CCLabelTTF *_scoreLabel, *_scoreLabelStr, *_highScoreLabel;
+    CCLabelTTF *_totalMelonLabel, *_totalMelonLabelText;
+    CCLabelTTF *_scoreLabel, *_scoreLabelText, *_highScoreLabel;
     CCButton *_playButtonAtEndOfTutorial, *_tutorialAgain, *_popupNextStep;
     CCParticleSystem *_cellHighlight;
     NSNumber *_highScoreNum;
@@ -178,7 +178,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         {
             [self tutorialPopupVisible:NO];
             
-            _tutorialText.string = @"\nSuppose the random number is 4. Place this melon on the "
+            _tutorialText.string = @"\nSuppose the random number is 4.\nPlace this melon on the "
                 "glowing cell";
             
             [self helperShowTutorialStartCol:0 endCol:0 startRow:0 endRow:4
@@ -224,8 +224,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         {
             [self tutorialPopupVisible:YES];
             
-            _popupText.string = @"There are 2 types of melons: the green one you saw "
-                "and this blue one. Each time you get a random type.";
+            _popupText.string = @"There are 2 types of melons:\nthe green one you saw\n"
+                "and this blue one.\nEach time you get a random type.";
             
             [self updateMelonLabelAndIcon:MelonTypeWinter];
             
@@ -235,7 +235,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 6:
         {
             [self tutorialPopupVisible:NO];
-            _tutorialText.string = @"Place the winter melon anywhere on the board";
+            _tutorialText.string = @"Place the winter melon\nanywhere on the board";
             
             _melon = (Melon *)[CCBReader load:@"Melon"];
             _melon.type = MelonTypeWinter;
@@ -257,7 +257,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 8:
         {
-            _tutorialText.string = @"Click anywhere on the grid to continue";
+            _tutorialText.string = @"Click anywhere on the\ngrid to continue";
             
             _melon = (Melon *)[CCBReader load:@"Melon"];
         }
@@ -266,7 +266,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         {
             [self tutorialPopupVisible:YES];
             
-            _popupText.string = @"Good job. A winter melon takes 3 hits to clear. "
+            _popupText.string = @"Good job. A winter melon\ntakes 3 hits to clear. "
                 "Place it wisely.";
         }
             break;
@@ -342,10 +342,10 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 - (void)tutorialLabelsVisible:(BOOL)visiblility
 {
     _totalMelonLabel.visible = visiblility;
-    _totalMelonLabelStr.visible = visiblility;
+    _totalMelonLabelText.visible = visiblility;
     
     _scoreLabel.visible = visiblility;
-    _scoreLabelStr.visible = visiblility;
+    _scoreLabelText.visible = visiblility;
     
     _playButtonAtEndOfTutorial.visible = visiblility;
     _tutorialAgain.visible = visiblility;
@@ -422,7 +422,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             CCLOG(@"Limited touch.");
             return;
         }
-        
 
         // Updates the melon's location.
         _melon.row =  melonRow;

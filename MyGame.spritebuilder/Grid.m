@@ -158,6 +158,18 @@ static const float MARGIN = 1.0;
     }
 }
 
+// Removes all objects on board.
+- (void)clearBoard
+{
+    for (int i = 0; i < GRID_ROWS; i++)
+    {
+        for (int j = 0; j < GRID_COLUMNS; j++)
+        {
+            [self removeObjectAtX:i Y:j];
+        }
+    }
+}
+
 // Remove the neighbor objects surounding the current object.
 - (int)removeNeighborsAroundObjectAtRow:(int)row andCol:(int)col
 {
@@ -178,18 +190,6 @@ static const float MARGIN = 1.0;
     }
     
     return totalRemoved;
-}
-
-// Removes all objects on board.
-- (void)clearBoard
-{
-    for (int i = 0; i < GRID_ROWS; i++)
-    {
-        for (int j = 0; j < GRID_COLUMNS; j++)
-        {
-            [self removeObjectAtX:i Y:j];
-        }
-    }
 }
 
 #pragma mark - Debugging
