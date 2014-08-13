@@ -38,6 +38,9 @@ static const int NUM_MELONS_ON_START = 6;
 // Number of pixels below the label in the y-axis.
 static const int MELON_ICON_Y_OFFSET = 60;
 
+// After this number of explosions, stops highlighting cells with possible explosions.
+//static const int NUM_EXPLOSIONS_BEFORE_TUTORIAL_HIGHLIGHT_STOPS = 5;
+
 // Key for highscore.
 static NSString* const HIGH_SCORE_KEY = @"highScore";
 // Key for whether tutorial is completed.
@@ -56,8 +59,9 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CCButton *_playButtonAtEndOfTutorial, *_tutorialAgain;
     CCParticleSystem *_cellHighlight1, *_cellHighlight2;
     NSNumber *_highScoreNum;
-    BOOL _tutorialCompleted;
+    BOOL _tutorialCompleted, _stepCompleted;
     BOOL _acceptTouch;
+    BOOL _hightlightModeOn;
     int _tutorialCurrentStep;
     int _tutorialAllowedRow1, _tutorialAllowedCol1, _tutorialAllowedRow2, _tutorialAllowedCol2;
     int _melonLabel; // Current melon number label.
@@ -195,10 +199,12 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             [self helperShowTutorialStartCol:4 endCol:4 startRow:1 endRow:1
                                   melonLabel:4 type:MelonTypeRegular];
             
+            [self highlightExplosionCellsForLabel:_melonLabel];
+            
             // Lets the player place a regular melon on board.
             _melon = (Melon *)[CCBReader load:@"Melon"];
             [self updateAllowedRow1:2 andCol1:3 row2:-1 andCol2:-1];
-            [self highlight:_cellHighlight1 CellAtRow:_tutorialAllowedRow1 andCol:_tutorialAllowedCol1];
+//            [self highlight:_cellHighlight1 CellAtRow:_tutorialAllowedRow1 andCol:_tutorialAllowedCol1];
         }
             break;
         case 3:
@@ -386,6 +392,32 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     [self showTutorialAtStep:_tutorialCurrentStep];
 }
 
+// Highlights all the cells where an explosion is possible.
+- (void)highlightExplosionCellsForLabel:(int)label
+{
+    for (int row = 0; row < _grid.numRows; row++)
+    {
+        for (int col = 0; col < _grid.numCols; col++)
+        {
+            _melon = (Melon *)[CCBReader load:@"Melon"];
+            _melon.row = row;
+            _melon.col = col;
+            
+            [_grid addChild:_melon];
+            
+            [self countMelonNeighbors];
+            
+            if (_melon.totalHorizNeighbors == label || _melon.totalVerticalNeighbors == label)
+            {
+                CCParticleSystem *_highlightOneCell = (CCParticleSystem *)[CCBReader load:@"highlightedCell"];
+                [self highlight:_highlightOneCell CellAtRow:row andCol:col];
+            }
+            
+            [_melon removeFromParent];
+        }
+    }
+}
+
 #pragma mark - Touch Handling
 
 // Melon gets placed on touch.
@@ -414,8 +446,14 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             return;
         }
         
-        [_cellHighlight1 removeFromParent];
-        [_cellHighlight2 removeFromParent];
+        if (_cellHighlight1.parent)
+        {
+            [_cellHighlight1 removeFromParent];
+        }
+        if (_cellHighlight2)
+        {
+            [_cellHighlight2 removeFromParent];
+        }
         
         // Tutorial mode limits touch.
         if ([self tutorialAllowsTouchAtRow:melonRow andCol:melonCol] == NO)
@@ -423,7 +461,11 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             [self highlight:_cellHighlight1 CellAtRow:_tutorialAllowedRow1 andCol:_tutorialAllowedCol1];
             [self highlight:_cellHighlight2 CellAtRow:_tutorialAllowedRow2 andCol:_tutorialAllowedCol2];
             
-            return;
+            _stepCompleted = NO;
+        }
+        else
+        {
+            _stepCompleted = YES;
         }
         
         // Updates the melon's location.
@@ -442,11 +484,16 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         
         if (!_tutorialCompleted)
         {
-            _tutorialCurrentStep++;
+            if (_stepCompleted)
+            {
+                _tutorialCurrentStep++;
+            }
+            
             [self showTutorialAtStep:_tutorialCurrentStep];
         }
-        else
+        else if (_tutorialCompleted)
         {
+
             [self updateRandomMelonLabelAndIcon];
             
             [self updateScore:numRemoved];

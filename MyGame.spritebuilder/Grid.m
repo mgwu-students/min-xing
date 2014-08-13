@@ -77,23 +77,7 @@ static const float MARGIN = 1.0;
     return YES;
 }
 
-// Check if the board is empty.
-//- (BOOL)boardIsEmpty
-//{
-//    for (int row = 0; row < GRID_ROWS; row++)
-//    {
-//        for (int col = 0; col < GRID_COLUMNS; col++)
-//        {
-//            if ([self hasObjectAtRow:row andCol:col])
-//            {
-//                return NO;
-//            }
-//        }
-//    }
-//    
-//    return YES;
-//}
-
+// Checks if more than half of the board is filled with objects.
 - (BOOL)boardIsMoreThanHalfFull
 {
     int totalObjects = 0;
