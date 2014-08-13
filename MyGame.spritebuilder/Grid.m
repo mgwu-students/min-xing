@@ -19,6 +19,15 @@ static const float MARGIN = 1.0;
 
 #pragma mark - Initialize
 
+- (instancetype)init
+{
+    self = [super init];
+    
+    [self setupGrid];
+    
+    return self;
+}
+
 - (void)onEnter
 {
     [super onEnter];
@@ -70,11 +79,11 @@ static const float MARGIN = 1.0;
 // Checks if a specified position on the grid is [NSNull null].
 - (BOOL)hasObjectAtRow:(int)row andCol:(int)col
 {
-    if (_gridArray[row][col] == [NSNull null])
+    if (_gridArray[row][col] != [NSNull null])
     {
-        return NO;
+        return YES;
     }
-    return YES;
+    return NO;
 }
 
 // Checks if more than half of the board is filled with objects.
@@ -110,13 +119,16 @@ static const float MARGIN = 1.0;
 #pragma mark - Add/Position Objects
 
 // Adds an object to the board.
-- (void)addObject:(id)object toRow:(int)row andCol:(int)col
+- (void)addObject:(id)object toRow:(int)row andCol:(int)col asChild:(BOOL)addChild
 {
     _gridArray[row][col] = object;
     
-    [self addChild:object];
-    
-    [self positionNode:object atRow:row andCol:col];
+    if (addChild)
+    {
+        [self addChild:object];
+        
+        [self positionNode:object atRow:row andCol:col];
+    }
 }
 
 // Position an object at the specified position on the board.
@@ -133,29 +145,33 @@ static const float MARGIN = 1.0;
 #pragma mark - Remove Objects
 
 // Removes reference to the object stored at the specified position.
-- (void)removeObjectAtX:(int)xPos Y:(int)yPos
+- (void)removeObjectAtX:(int)xPos Y:(int)yPos fromParent:(BOOL)removeChild
 {
     if (_gridArray[xPos][yPos] != [NSNull null])
     {
-        [_gridArray[xPos][yPos] removeFromParent];
+        if (removeChild)
+        {
+            [_gridArray[xPos][yPos] removeFromParent];
+        }
+    
         _gridArray[xPos][yPos] = [NSNull null];
     }
 }
 
 // Removes all objects on board.
-- (void)clearBoard
+- (void)clearBoardAndRemoveChildren:(BOOL)remove
 {
     for (int i = 0; i < GRID_ROWS; i++)
     {
         for (int j = 0; j < GRID_COLUMNS; j++)
         {
-            [self removeObjectAtX:i Y:j];
+            [self removeObjectAtX:i Y:j fromParent:remove];
         }
     }
 }
 
 // Remove the neighbor objects surounding the current object.
-- (int)removeNeighborsAroundObjectAtRow:(int)row andCol:(int)col
+- (int)removeNeighborsAroundObjectAtRow:(int)row andCol:(int)col fromParent:(int)remove
 {
     int totalRemoved = 0;
     
@@ -166,7 +182,7 @@ static const float MARGIN = 1.0;
             // Boundary check.
             if (i >= 0 && i < GRID_ROWS && j >= 0 && j < GRID_COLUMNS)
             {
-                [self removeObjectAtX:i Y:j];
+                [self removeObjectAtX:i Y:j fromParent:remove];
                 
                 totalRemoved++;
             }
