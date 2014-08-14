@@ -52,7 +52,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     Grid *_grid, *_highlightedCells;
     Melon *_melon, *_melonIcon;
     TutorialPopup *_tutorialPopup;
-    CCLabelTTF *_tutorialText, *_tutorialPopupText;
+    CCLabelTTF *_tutorialText, *_tutorialPopupText, *_gameOverText;
     CCLabelTTF *_totalMelonLabel, *_totalMelonLabelText;
     CCLabelTTF *_scoreLabel, *_scoreLabelText, *_highScoreLabel;
     CCLabelTTF *_numLabel;
@@ -315,7 +315,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         {
             [self tutorialPopupVisible:NO];
             _tutorialText.string = @"Very nice!!\nYou have a limited\nnumber of melons.\n"
-                "Shoot\nfor a high score!";
+                "Shoot for a high score!";
             
             _backButtonAtTop.visible = NO;
             
@@ -900,6 +900,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     if (_melonsLeft <= 0)
     {
         [self gameover];
+        _gameOverText.string = @"No more melons left..";
+        
         return;
     }
     else if (_melon.type != MelonTypeBomb)
@@ -923,6 +925,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     
     // Every position on the grid is filled. Gameover.
     [self gameover];
+    _gameOverText.string = @"Board is full!";
 }
 
 - (void)gameover
