@@ -39,7 +39,7 @@ static const int NUM_MELONS_ON_START = 6;
 static const int MELON_ICON_Y_OFFSET = 60;
 
 // After this number of explosions, stops highlighting cells with possible explosions.
-//static const int NUM_EXPLOSIONS_BEFORE_TUTORIAL_HIGHLIGHT_STOPS = 5;
+static const int NUM_EXPLOSIONS_BEFORE_TUTORIAL_HIGHLIGHT_STOPS = 5;
 
 // Key for highscore.
 static NSString* const HIGH_SCORE_KEY = @"highScore";
@@ -59,7 +59,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CCButton *_playButtonAtEndOfTutorial, *_tutorialAgain;
     CCParticleSystem *_cellHighlight1, *_cellHighlight2;
     NSNumber *_highScoreNum;
-    BOOL _tutorialCompleted, _stepCompleted;
+    BOOL _tutorialCompleted;
     BOOL _acceptTouch;
     BOOL _hightlightModeOn;
     int _tutorialCurrentStep;
@@ -67,6 +67,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     int _melonsLeft;
     int _score, _highScore;
     int _consecutiveTimes; // Number of consecutive explosions.
+    int _numExplosionsAfterGameStarts; // Show hints before this reaches NUM_EXPLOSIONS_BEFORE_TUTORIAL_HIGHLIGHT_STOPS.
     float _chance, _chanceToGetWintermelon, _chanceToGetBomb;
 }
 
@@ -490,35 +491,41 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             numRemoved = [self melonPlacedUpdateNumRemoved:numRemoved];
         }
         
-        CCLOG(@"numRemoved %d", numRemoved);
-        
-        if (numRemoved == _melonLabel)
-        {
-            _stepCompleted = YES;
-        }
-        else
-        {
-            _stepCompleted = NO;
-            [self highlightExplosionCells];
-        }
-        
         if (!_tutorialCompleted)
         {
-            if (_stepCompleted || _melon.type == MelonTypeWinter)
+            if (numRemoved == _melonLabel || _melon.type == MelonTypeWinter)
             {
                 [self goToTutorialNextStep];
             }
             else
             {
+                [self highlightExplosionCells];
+                
                 int melonType = _melon.type;
                 _melon = (Melon *)[CCBReader load:@"Melon"];
                 _melon.type = melonType;
             }
         }
-        else if (_tutorialCompleted)
+        else
         {
-
+            int labelTemp = _melonLabel;
+            
             [self updateRandomMelonLabelAndIcon];
+            
+            if (_numExplosionsAfterGameStarts <
+                NUM_EXPLOSIONS_BEFORE_TUTORIAL_HIGHLIGHT_STOPS)
+            {
+                [self highlightExplosionCells];
+                
+                if (numRemoved == labelTemp)
+                {
+                    _numExplosionsAfterGameStarts++;
+                }
+            }
+            else
+            {
+                [_highlightedCells clearBoardAndRemoveChildren:YES];
+            }
             
             [self updateScore:numRemoved];
             
@@ -526,8 +533,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             
             [self checkGameover];
         }
-        
-//        [self highlightExplosionCells];
     }
 }
 
