@@ -137,6 +137,10 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     
     [self tutorialLabelsVisible:YES];
     
+    [_grid clearBoardAndRemoveChildren:YES];
+    
+    [_highlightedCells clearBoardAndRemoveChildren:YES];
+    
     [self putRandomMelonsOnBoard];
     
     // First melon label.
@@ -170,7 +174,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             [self tutorialPopupVisible: YES];
             _popupText.string = @"The goal of the game is...";
             
-            [self helperShowTutorialStartCol:0 endCol:0 startRow:0 endRow:4
+            [self helperShowTutorialStartCol:0 endCol:0 startRow:0 endRow:2
                                   melonLabel:4 type:MelonTypeRegular];
             [self helperShowTutorialStartCol:1 endCol:1 startRow:2 endRow:2
                                   melonLabel:4 type:MelonTypeRegular];
@@ -178,8 +182,10 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                                   melonLabel:4 type:MelonTypeRegular];
             [self helperShowTutorialStartCol:3 endCol:3 startRow:0 endRow:0
                                   melonLabel:4 type:MelonTypeRegular];
-            [self helperShowTutorialStartCol:4 endCol:4 startRow:1 endRow:1
-                                  melonLabel:4 type:MelonTypeRegular];
+            [self helperShowTutorialStartCol:4 endCol:4 startRow:1 endRow:3
+                                  melonLabel:5 type:MelonTypeRegular];
+         
+            _numLabel.string = [NSString stringWithFormat:@" "];
         }
             break;
         case 1:
@@ -202,18 +208,25 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             _melonLabel = 4;
             [self updateMelonLabelAndIconType:MelonTypeRegular];
             
-            [self highlightExplosionCells];
         }
             break;
         case 3:
         {
             [self tutorialPopupVisible: NO];
                         
-            _tutorialText.string = @"\n\nNice job! Explosions can be vertical too!\n\n"
+            _tutorialText.string = @"\n\nNice job! Now try to make a 5!\n\n"
                 "(But not diagonal) Place melon on board.";
+        
+            [_grid clearBoardAndRemoveChildren:YES];
+            
+            [self helperShowTutorialStartCol:0 endCol:3 startRow:0 endRow:0
+                                  melonLabel:4 type:MelonTypeRegular];
+            [self helperShowTutorialStartCol:1 endCol:1 startRow:1 endRow:2
+                                  melonLabel:4 type:MelonTypeRegular];
+            [self helperShowTutorialStartCol:2 endCol:2 startRow:2 endRow:2
+                                  melonLabel:4 type:MelonTypeRegular];
             
             _melon = (Melon *)[CCBReader load:@"Melon"];
-            
             _melonLabel = 5;
             [self updateMelonLabelAndIconType:MelonTypeRegular];
         }
@@ -221,10 +234,21 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 4:
         {
             [self tutorialPopupVisible: NO];
-            _tutorialText.string = @"You can also explode\na row and a column together. ";
+            _tutorialText.string = @"You can also explode\na row and a column together.\n"
+                "Now try to make explode a row/column of 2.";
+            
+            [_grid clearBoardAndRemoveChildren:YES];
+            
+            [self helperShowTutorialStartCol:0 endCol:3 startRow:3 endRow:3
+                                  melonLabel:4 type:MelonTypeRegular];
+            [self helperShowTutorialStartCol:1 endCol:2 startRow:2 endRow:2
+                                  melonLabel:4 type:MelonTypeRegular];
+            [self helperShowTutorialStartCol:3 endCol:3 startRow:0 endRow:0
+                                  melonLabel:4 type:MelonTypeRegular];
+            [self helperShowTutorialStartCol:4 endCol:4 startRow:0 endRow:1
+                                  melonLabel:4 type:MelonTypeRegular];
             
             _melon = (Melon *)[CCBReader load:@"Melon"];
-            
             _melonLabel = 2;
             [self updateMelonLabelAndIconType:MelonTypeRegular];
         }
@@ -234,6 +258,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             [self tutorialPopupVisible:YES];
             _popupText.string = @"There are 2 types of melons:\nthe green one you saw\n"
                 "and this blue one.\nEach time you get a random type.";
+            
+            [_grid clearBoardAndRemoveChildren:YES];
             
             [self updateMelonLabelAndIconType:MelonTypeWinter];
         }
@@ -268,6 +294,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             _tutorialText.string = @"Click anywhere on the\ngrid to continue";
             
             _melon = (Melon *)[CCBReader load:@"Melon"];
+            _melon.type = MelonTypeWinter;
         }
             break;
         case 9:
@@ -275,8 +302,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             [self tutorialPopupVisible:YES];
             _popupText.string = @"Good job. A winter melon\ntakes 3 hits to clear.\n"
                 "Place it wisely.";
-            
-            [_melon removeFromParent];
         }
             break;
         case 10:
@@ -352,7 +377,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _tutorialCurrentStep++;
     [self showTutorialAtStep:_tutorialCurrentStep];
     
-    [self highlightExplosionCells];
+    [_highlightedCells clearBoardAndRemoveChildren:YES];
+//    [self highlightExplosionCells];
 }
 
 // Go through the tutorial again.
@@ -370,7 +396,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 // Highlights all the cells where an explosion is possible.
 - (void)highlightExplosionCells
 {
-    [_highlightedCells printBoardState];
+//    [_highlightedCells printBoardState];
     
     for (int row = 0; row < _grid.numRows; row++)
     {
@@ -464,6 +490,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             numRemoved = [self melonPlacedUpdateNumRemoved:numRemoved];
         }
         
+        CCLOG(@"numRemoved %d", numRemoved);
+        
         if (numRemoved == _melonLabel)
         {
             _stepCompleted = YES;
@@ -471,16 +499,21 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         else
         {
             _stepCompleted = NO;
+            [self highlightExplosionCells];
         }
         
         if (!_tutorialCompleted)
         {
-            if (_stepCompleted)
+            if (_stepCompleted || _melon.type == MelonTypeWinter)
             {
-                _tutorialCurrentStep++;
+                [self goToTutorialNextStep];
             }
-            
-            [self showTutorialAtStep:_tutorialCurrentStep];
+            else
+            {
+                int melonType = _melon.type;
+                _melon = (Melon *)[CCBReader load:@"Melon"];
+                _melon.type = melonType;
+            }
         }
         else if (_tutorialCompleted)
         {
@@ -494,7 +527,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             [self checkGameover];
         }
         
-        [self highlightExplosionCells];
+//        [self highlightExplosionCells];
     }
 }
 
@@ -757,6 +790,13 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         numRemoved += _melon.totalHorizNeighbors;
     }
     
+    if (_melon.totalHorizNeighbors == _melon.totalVerticalNeighbors && numRemoved != 0)
+    {
+        numRemoved /= 2;
+    }
+    
+    CCLOG(@"horiz neighbors: %d vertical neighbors: %d", _melon.totalHorizNeighbors,
+          _melon.totalVerticalNeighbors);
     return numRemoved;
 }
 
