@@ -218,7 +218,7 @@
 						<key>type</key>
 						<string>FontTTF</string>
 						<key>value</key>
-						<string>Helvetica</string>
+						<string>MyGameAssets/chewy/Chewy.ttf</string>
 					</dict>
 					<dict>
 						<key>name</key>
@@ -344,6 +344,8 @@
 						</array>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -543,7 +545,7 @@
 						<key>type</key>
 						<string>FontTTF</string>
 						<key>value</key>
-						<string>Helvetica</string>
+						<string>MyGameAssets/chewy/Chewy.ttf</string>
 					</dict>
 					<dict>
 						<key>name</key>
@@ -869,7 +871,7 @@
 						<key>type</key>
 						<string>FontTTF</string>
 						<key>value</key>
-						<string>Helvetica</string>
+						<string>MyGameAssets/chewy/Chewy.ttf</string>
 					</dict>
 					<dict>
 						<key>name</key>
@@ -1007,7 +1009,7 @@
 				<key>customClass</key>
 				<string></string>
 				<key>displayName</key>
-				<string>CCButton</string>
+				<string>try again</string>
 				<key>memberVarAssignmentName</key>
 				<string>_repeatButton</string>
 				<key>memberVarAssignmentType</key>
@@ -1195,7 +1197,7 @@
 						<key>type</key>
 						<string>FontTTF</string>
 						<key>value</key>
-						<string>Helvetica</string>
+						<string>MyGameAssets/chewy/Chewy.ttf</string>
 					</dict>
 					<dict>
 						<key>name</key>
@@ -1333,7 +1335,7 @@
 				<key>customClass</key>
 				<string></string>
 				<key>displayName</key>
-				<string>CCButton</string>
+				<string>OK</string>
 				<key>memberVarAssignmentName</key>
 				<string>_hideHighlightsButton</string>
 				<key>memberVarAssignmentType</key>
@@ -1521,7 +1523,7 @@
 						<key>type</key>
 						<string>FontTTF</string>
 						<key>value</key>
-						<string>Helvetica</string>
+						<string>MyGameAssets/chewy/Chewy.ttf</string>
 					</dict>
 					<dict>
 						<key>name</key>
@@ -1648,8 +1650,6 @@
 						</array>
 					</dict>
 				</array>
-				<key>selected</key>
-				<true/>
 			</dict>
 		</array>
 		<key>customClass</key>

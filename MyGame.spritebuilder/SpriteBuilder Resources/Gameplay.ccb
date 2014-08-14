@@ -381,7 +381,7 @@
 								<key>type</key>
 								<string>FontTTF</string>
 								<key>value</key>
-								<string>Helvetica-Bold</string>
+								<string>MyGameAssets/chewy/Chewy.ttf</string>
 							</dict>
 							<dict>
 								<key>name</key>
@@ -618,7 +618,7 @@
 								<key>type</key>
 								<string>FontTTF</string>
 								<key>value</key>
-								<string>Helvetica-Bold</string>
+								<string>MyGameAssets/chewy/Chewy.ttf</string>
 							</dict>
 							<dict>
 								<key>name</key>
@@ -825,7 +825,7 @@
 								<key>type</key>
 								<string>FontTTF</string>
 								<key>value</key>
-								<string>Helvetica</string>
+								<string>MyGameAssets/chewy/Chewy.ttf</string>
 							</dict>
 							<dict>
 								<key>name</key>
@@ -1045,7 +1045,7 @@
 								<key>type</key>
 								<string>FontTTF</string>
 								<key>value</key>
-								<string>Helvetica-Bold</string>
+								<string>MyGameAssets/chewy/Chewy.ttf</string>
 							</dict>
 							<dict>
 								<key>name</key>
@@ -1265,7 +1265,7 @@
 								<key>type</key>
 								<string>FontTTF</string>
 								<key>value</key>
-								<string>Helvetica-Bold</string>
+								<string>MyGameAssets/chewy/Chewy.ttf</string>
 							</dict>
 							<dict>
 								<key>name</key>
@@ -1485,7 +1485,7 @@
 								<key>type</key>
 								<string>FontTTF</string>
 								<key>value</key>
-								<string>Helvetica</string>
+								<string>MyGameAssets/chewy/Chewy.ttf</string>
 							</dict>
 							<dict>
 								<key>name</key>
@@ -1730,7 +1730,7 @@
 						<key>value</key>
 						<array>
 							<real>0.5</real>
-							<real>267</real>
+							<real>268</real>
 							<integer>0</integer>
 							<integer>2</integer>
 							<integer>0</integer>
@@ -1895,7 +1895,7 @@
 						<key>type</key>
 						<string>FontTTF</string>
 						<key>value</key>
-						<string>Helvetica</string>
+						<string>MyGameAssets/chewy/Chewy.ttf</string>
 					</dict>
 					<dict>
 						<key>name</key>
@@ -2221,7 +2221,7 @@
 						<key>type</key>
 						<string>FontTTF</string>
 						<key>value</key>
-						<string>Helvetica</string>
+						<string>MyGameAssets/chewy/Chewy.ttf</string>
 					</dict>
 					<dict>
 						<key>name</key>
@@ -2348,6 +2348,8 @@
 						</array>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -2547,7 +2549,7 @@
 						<key>type</key>
 						<string>FontTTF</string>
 						<key>value</key>
-						<string>Helvetica</string>
+						<string>MyGameAssets/chewy/Chewy.ttf</string>
 					</dict>
 					<dict>
 						<key>name</key>
@@ -2674,8 +2676,6 @@
 						</array>
 					</dict>
 				</array>
-				<key>selected</key>
-				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -2687,7 +2687,7 @@
 				<key>customClass</key>
 				<string></string>
 				<key>displayName</key>
-				<string>CCButton</string>
+				<string>back</string>
 				<key>memberVarAssignmentName</key>
 				<string>_backButtonAtTop</string>
 				<key>memberVarAssignmentType</key>
@@ -2875,7 +2875,7 @@
 						<key>type</key>
 						<string>FontTTF</string>
 						<key>value</key>
-						<string>Helvetica</string>
+						<string>MyGameAssets/chewy/Chewy.ttf</string>
 					</dict>
 					<dict>
 						<key>name</key>
