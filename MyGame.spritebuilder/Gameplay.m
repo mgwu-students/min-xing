@@ -588,6 +588,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                 
                 [self tutorialPopupVisible:YES];
                 
+                _tutorialPopup.anchorPoint = ccp(0.5, 0.5);
+                
                 _tutorialPopupText.string = @"Very nicely done.\nNow you're on your own!";
                 
                 _hideHighlightsButton.visible = YES;
