@@ -580,7 +580,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                     _numExplosionsAfterGameStarts++;
                 }
             }
-            else
+            else if (_numExplosionsAfterGameStarts ==
+                     NUM_EXPLOSIONS_BEFORE_TUTORIAL_HIGHLIGHT_STOPS)
             {
                 // Explosions completed. Exit highlight mode.
                 [_highlightedCells clearBoardAndRemoveChildren:YES];
@@ -592,6 +593,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                 _hideHighlightsButton.visible = YES;
                 _backButton.visible = NO;
                 _nextButton.visible = NO;
+                
+                _numExplosionsAfterGameStarts++;
             }
             
             [self updateScore:numRemoved];
