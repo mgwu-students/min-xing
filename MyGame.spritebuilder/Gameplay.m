@@ -189,6 +189,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             
             _backButton.visible = NO;
             _backButtonAtTop.visible = NO;
+            _nextButtonAtTop.visible = NO;
         }
             break;
         case 1:
@@ -617,6 +618,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                 [self tutorialPopupVisible:YES];
                 
                 _tutorialPopup.anchorPoint = ccp(0.5, 0.5);
+                _tutorialPopup.zOrder = 1;
                 
                 _tutorialPopupText.string = @"Very nicely done.\nNow you're on your own!";
                 
@@ -927,7 +929,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 - (void)checkGameover
 {
     // Check if the player runs out of melons.
-    if (_melonsLeft <= 0)
+    if (_melonsLeft <= 1)
     {
         [self gameover];
         _gameOverText.string = @"No more melons left..";
