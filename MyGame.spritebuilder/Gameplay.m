@@ -57,6 +57,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CCLabelTTF *_scoreLabel, *_scoreLabelText, *_highScoreLabel;
     CCLabelTTF *_numLabel;
     CCButton *_playButtonAtEndOfTutorial, *_tutorialAgain;
+    CCButton *_backButton, *_backButtonAtTop, *_nextButton;
     CCParticleSystem *_cellHighlight1, *_cellHighlight2;
     NSNumber *_highScoreNum;
     BOOL _tutorialCompleted;
@@ -98,7 +99,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     [super onEnter];
     
     _gridBox = _grid.boundingBox;
-    
+
     // Retrieve high score.
     _highScoreNum = [[NSUserDefaults standardUserDefaults] objectForKey:HIGH_SCORE_KEY];
     // Retrieve whether tutorial has been completed.
@@ -175,6 +176,29 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             [self tutorialPopupVisible: YES];
             _popupText.string = @"The goal of the game is...";
             
+            _numLabel.string = [NSString stringWithFormat:@" "];
+            
+            _backButton.visible = NO;
+            _backButtonAtTop.visible = NO;
+        }
+            break;
+        case 1:
+        {
+            [self tutorialPopupVisible: YES];
+            _popupText.string = @"\n The label on the top right... ";
+            
+            _melonLabel = 3;
+            [self updateMelonLabelAndIconType:MelonTypeRegular];
+            
+            _backButton.visible = YES;
+        }
+            break;
+        case 2:
+        {
+            [self tutorialPopupVisible:NO];
+            _tutorialText.string = @"\nSuppose the random number is 4.\nPlace this melon on the "
+                "glowing cell";
+
             [self helperShowTutorialStartCol:0 endCol:0 startRow:0 endRow:2
                                   melonLabel:4 type:MelonTypeRegular];
             [self helperShowTutorialStartCol:1 endCol:1 startRow:2 endRow:2
@@ -185,30 +209,12 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                                   melonLabel:4 type:MelonTypeRegular];
             [self helperShowTutorialStartCol:4 endCol:4 startRow:1 endRow:3
                                   melonLabel:5 type:MelonTypeRegular];
-         
-            _numLabel.string = [NSString stringWithFormat:@" "];
-        }
-            break;
-        case 1:
-        {
-            [self tutorialPopupVisible: YES];
-            _popupText.string = @"\n The label on the top right... ";
-            
-            _melonLabel = 3;
-            [self updateMelonLabelAndIconType:MelonTypeRegular];
-        }
-            break;
-        case 2:
-        {
-            [self tutorialPopupVisible:NO];
-            _tutorialText.string = @"\nSuppose the random number is 4.\nPlace this melon on the "
-                "glowing cell";
             
             _melon = (Melon *)[CCBReader load:@"Melon"];
-            
             _melonLabel = 4;
             [self updateMelonLabelAndIconType:MelonTypeRegular];
             
+            _backButtonAtTop.visible = YES;
         }
             break;
         case 3:
@@ -311,6 +317,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             _tutorialText.string = @"Very nice!!\nYou have a limited\nnumber of melons.\n"
                 "Shoot\nfor a high score!";
             
+            _backButtonAtTop.visible = NO;
+            
             _playButtonAtEndOfTutorial.visible = YES;
             _tutorialAgain.visible = YES;
         }
@@ -373,13 +381,28 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 }
 
 // Goes to the next step of the tutorial.
-- (void)goToTutorialNextStep
+- (void)goToTutorialNextStepAndClearBoard
 {
+    [_highlightedCells clearBoardAndRemoveChildren:YES];
+    [_grid clearBoardAndRemoveChildren:YES];
+
+    _nextButton.visible = NO;
+
     _tutorialCurrentStep++;
     [self showTutorialAtStep:_tutorialCurrentStep];
-    
+}
+
+- (void)goToTutorialPreviousStep
+{
+    _nextButton.visible = NO;
     [_highlightedCells clearBoardAndRemoveChildren:YES];
-//    [self highlightExplosionCells];
+    [_grid clearBoardAndRemoveChildren:YES];
+    
+    _tutorialCurrentStep--;
+    if (_tutorialCurrentStep >= 0)
+    {
+        [self showTutorialAtStep:_tutorialCurrentStep];
+    }
 }
 
 // Go through the tutorial again.
@@ -480,7 +503,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         // Updates the melon's location.
         _melon.row =  melonRow;
         _melon.col = melonCol;
-        
+    
         // Determines what type of melon it is and acts accordingly.
         if (_melon.type == MelonTypeBomb && [_grid boardIsMoreThanHalfFull])
         {
@@ -493,17 +516,25 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         
         if (!_tutorialCompleted)
         {
-            if (numRemoved == _melonLabel || _melon.type == MelonTypeWinter)
+            if (_melon.type != MelonTypeRegular)
             {
-                [self goToTutorialNextStep];
+                _tutorialCurrentStep++;
+                [self showTutorialAtStep:_tutorialCurrentStep];
             }
             else
             {
                 [self highlightExplosionCells];
                 
-                int melonType = _melon.type;
-                _melon = (Melon *)[CCBReader load:@"Melon"];
-                _melon.type = melonType;
+                if (numRemoved == _melonLabel)
+                {
+                    _nextButton.visible = YES;
+                }
+                else
+                {
+                    int melonType = _melon.type;
+                    _melon = (Melon *)[CCBReader load:@"Melon"];
+                    _melon.type = melonType;
+                }
             }
         }
         else
@@ -788,6 +819,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         }
         numRemoved += _melon.totalVerticalNeighbors;
     }
+    
     // Hit all horizontal neighbors.
     if (_melonLabel == _melon.totalHorizNeighbors)
     {
@@ -803,8 +835,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         numRemoved /= 2;
     }
     
-    CCLOG(@"horiz neighbors: %d vertical neighbors: %d", _melon.totalHorizNeighbors,
-          _melon.totalVerticalNeighbors);
     return numRemoved;
 }
 
