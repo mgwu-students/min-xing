@@ -56,10 +56,9 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CCLabelTTF *_totalMelonLabel, *_totalMelonLabelText;
     CCLabelTTF *_scoreLabel, *_scoreLabelText, *_highScoreLabel;
     CCLabelTTF *_numLabel;
-    CCButton *_playButtonAtEndOfTutorial, *_tutorialAgain;
+    CCButton *_playButtonAtEndOfTutorial, *_tutorialAgain, *_hideHighlightsButton;
     CCButton *_backButton, *_nextButton, *_repeatButton;
     CCButton *_backButtonAtTop, *_nextButtonAtTop;
-    CCParticleSystem *_cellHighlight1, *_cellHighlight2;
     NSNumber *_highScoreNum;
     BOOL _tutorialCompleted;
     BOOL _acceptTouch;
@@ -378,8 +377,10 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _tutorialPopup.visible = visibility;
     _nextButton.visible = visibility;
     _backButton.visible = visibility;
-    
+ 
     _repeatButton.visible = !visibility;
+    _hideHighlightsButton.visible = !visibility;
+    
     _tutorialText.visible = !visibility;
     _acceptTouch = !visibility;
 }
@@ -478,6 +479,12 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     }
 }
 
+- (void)hideHighlights
+{
+    _tutorialPopup.visible = NO;
+    _acceptTouch = YES;
+}
+
 #pragma mark - Touch Handling
 
 // Melon gets placed on touch.
@@ -513,11 +520,11 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         // Determines what type of melon it is and acts accordingly.
         if (_melon.type == MelonTypeBomb && [_grid boardIsMoreThanHalfFull])
         {
-            numRemoved = [self bombPlacedUpdateNumRemoved:numRemoved];
+            numRemoved = [self bombPlacedStoreNumRemoved:numRemoved];
         }
         else
         {
-            numRemoved = [self melonPlacedUpdateNumRemoved:numRemoved];
+            numRemoved = [self melonPlacedStoreNumRemoved:numRemoved];
         }
         
         if (!_tutorialCompleted)
@@ -577,6 +584,14 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             {
                 // Explosions completed. Exit highlight mode.
                 [_highlightedCells clearBoardAndRemoveChildren:YES];
+                
+                [self tutorialPopupVisible:YES];
+                
+                _tutorialPopupText.string = @"Very nicely done.\nNow you're on your own!";
+                
+                _hideHighlightsButton.visible = YES;
+                _backButton.visible = NO;
+                _nextButton.visible = NO;
             }
             
             [self updateScore:numRemoved];
@@ -589,7 +604,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 }
 
 // Counts how many melons have been removed by the bomb.
-- (int)bombPlacedUpdateNumRemoved:(int)totalRemoved
+- (int)bombPlacedStoreNumRemoved:(int)totalRemoved
 {
     [_grid addObject:_melon toRow:_melon.row andCol:_melon.col asChild:YES];
     
@@ -603,7 +618,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 }
 
 // Counts how many melons have been removed by the melon.
-- (int)melonPlacedUpdateNumRemoved:(int)totalRemoved
+- (int)melonPlacedStoreNumRemoved:(int)totalRemoved
 {
     [_grid addObject:_melon toRow:_melon.row andCol:_melon.col asChild:YES];
     
