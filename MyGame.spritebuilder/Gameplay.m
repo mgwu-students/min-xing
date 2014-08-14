@@ -56,9 +56,11 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CCLabelTTF *_totalMelonLabel, *_totalMelonLabelText;
     CCLabelTTF *_scoreLabel, *_scoreLabelText, *_highScoreLabel;
     CCLabelTTF *_numLabel;
-    CCButton *_playButtonAtEndOfTutorial, *_tutorialAgain, *_hideHighlightsButton;
+    CCButton *_playButtonAtEndOfTutorial, *_tutorialAgain, *_tutorialButton;
+    CCButton *_hideHighlightsButton;
     CCButton *_backButton, *_nextButton, *_repeatButton;
     CCButton *_backButtonAtTop, *_nextButtonAtTop;
+    CCParticleSystem *_shineNextButtonAtTop;
     NSNumber *_highScoreNum;
     BOOL _tutorialCompleted;
     BOOL _acceptTouch;
@@ -89,6 +91,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     
     _melonIcon = (Melon *)[CCBReader load:@"Melon"];
     
+    _shineNextButtonAtTop = (CCParticleSystem *)[CCBReader load:@"shineNextButton"];
+    
     _highlightedCells = [[Grid alloc]init];
     
     self.userInteractionEnabled = YES;
@@ -110,6 +114,9 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     
     if (!_tutorialCompleted)
     {
+        // Option for user to go back to this tutorial later.
+        _tutorialButton.visible = NO;
+        
         [self tutorialLabelsVisible:NO];
         [self loadTutorialPopup];
         
@@ -136,6 +143,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _score = 0;
     _tutorialCompleted = YES;
     _acceptTouch = YES;
+    
+    _tutorialButton.visible = YES;
     
     [self tutorialLabelsVisible:YES];
     
@@ -385,9 +394,25 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _acceptTouch = !visibility;
 }
 
+// Gives the player the option to click on the "next" button.
+- (void)completeStep
+{
+    _nextButtonAtTop.visible = YES;
+    
+    if (!_shineNextButtonAtTop.parent)
+    {
+        [_nextButtonAtTop.parent addChild:_shineNextButtonAtTop];
+        _shineNextButtonAtTop.positionInPoints = _nextButtonAtTop.positionInPoints;
+    }
+    
+    _tutorialText.visible = NO;
+}
+
 // Goes to the next step of the tutorial.
 - (void)goToTutorialNextStep
 {
+    [_shineNextButtonAtTop removeFromParent];
+    
     _tutorialCurrentStep++;
     [self loadTutorialStep:_tutorialCurrentStep];
 }
@@ -417,6 +442,9 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 // Go through the tutorial again.
 - (void)showTutorialAgain
 {
+    _tutorialButton.visible = NO;
+    _tutorialCompleted = NO;
+    
     [self tutorialLabelsVisible:NO];
     
     [_grid clearBoardAndRemoveChildren:YES];
@@ -552,7 +580,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                 
                 if (numRemoved == _melonLabel)
                 {
-                    _nextButtonAtTop.visible = YES;
+                    [self completeStep];
                 }
                 else
                 {
