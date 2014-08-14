@@ -508,6 +508,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         }
         else
         {
+            // Previous explosion label.
             int labelTemp = _melonLabel;
             
             [self updateRandomMelonLabelAndIcon];
@@ -517,6 +518,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             {
                 [self highlightExplosionCells];
                 
+                // 1 explosion completed.
                 if (numRemoved == labelTemp)
                 {
                     _numExplosionsAfterGameStarts++;
@@ -524,6 +526,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             }
             else
             {
+                // Explosions completed. Exit highlight mode.
                 [_highlightedCells clearBoardAndRemoveChildren:YES];
             }
             
