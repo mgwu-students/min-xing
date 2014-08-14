@@ -86,6 +86,12 @@ static const float MARGIN = 1.0;
     return NO;
 }
 
+// Returns the object stored at the specified position.
+- (id)getObjectAtRow:(int)row andCol:(int)col
+{
+    return _gridArray[row][col];
+}
+
 // Checks if more than half of the board is filled with objects.
 - (BOOL)boardIsMoreThanHalfFull
 {
@@ -110,11 +116,23 @@ static const float MARGIN = 1.0;
     return YES;
 }
 
-// Returns the object stored at the specified position.
-- (id)getObjectAtRow:(int)row andCol:(int)col
+// Checks if more than half of the board is filled with objects.
+- (BOOL)boardIsFull
 {
-    return _gridArray[row][col];
+    for (int row = 0; row < GRID_ROWS; row++)
+    {
+        for (int col = 0; col <GRID_COLUMNS; col++)
+        {
+            if ([self hasObjectAtRow:row andCol:col] == NO)
+            {
+                return NO;
+            }
+        }
+    }
+    
+    return YES;
 }
+
 
 #pragma mark - Add/Position Objects
 

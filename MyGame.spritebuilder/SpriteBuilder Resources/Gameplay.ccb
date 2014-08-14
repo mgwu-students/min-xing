@@ -2361,7 +2361,7 @@
 				<key>displayName</key>
 				<string>continue</string>
 				<key>memberVarAssignmentName</key>
-				<string>_nextButton</string>
+				<string>_nextButtonAtTop</string>
 				<key>memberVarAssignmentType</key>
 				<integer>1</integer>
 				<key>properties</key>
@@ -2419,7 +2419,7 @@
 						<string>Block</string>
 						<key>value</key>
 						<array>
-							<string>goToTutorialNextStepAndClearBoard</string>
+							<string>goToTutorialNextStep</string>
 							<integer>1</integer>
 						</array>
 					</dict>
@@ -2674,6 +2674,8 @@
 						</array>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -3000,8 +3002,6 @@
 						</array>
 					</dict>
 				</array>
-				<key>selected</key>
-				<true/>
 			</dict>
 		</array>
 		<key>customClass</key>

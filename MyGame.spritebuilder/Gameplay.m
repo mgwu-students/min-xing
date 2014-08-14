@@ -52,12 +52,13 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     Grid *_grid, *_highlightedCells;
     Melon *_melon, *_melonIcon;
     TutorialPopup *_tutorialPopup;
-    CCLabelTTF *_tutorialText, *_popupText;
+    CCLabelTTF *_tutorialText, *_tutorialPopupText;
     CCLabelTTF *_totalMelonLabel, *_totalMelonLabelText;
     CCLabelTTF *_scoreLabel, *_scoreLabelText, *_highScoreLabel;
     CCLabelTTF *_numLabel;
     CCButton *_playButtonAtEndOfTutorial, *_tutorialAgain;
-    CCButton *_backButton, *_backButtonAtTop, *_nextButton;
+    CCButton *_backButton, *_nextButton, *_repeatButton;
+    CCButton *_backButtonAtTop, *_nextButtonAtTop;
     CCParticleSystem *_cellHighlight1, *_cellHighlight2;
     NSNumber *_highScoreNum;
     BOOL _tutorialCompleted;
@@ -174,7 +175,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 0:
         {
             [self tutorialPopupVisible: YES];
-            _popupText.string = @"The goal of the game is...";
+            _tutorialPopupText.string = @"The goal of the game is...";
             
             _numLabel.string = [NSString stringWithFormat:@" "];
             
@@ -185,7 +186,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 1:
         {
             [self tutorialPopupVisible: YES];
-            _popupText.string = @"\n The label on the top right... ";
+            _tutorialPopupText.string = @"\n The label on the top right... ";
             
             _melonLabel = 3;
             [self updateMelonLabelAndIconType:MelonTypeRegular];
@@ -263,7 +264,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 5:
         {
             [self tutorialPopupVisible:YES];
-            _popupText.string = @"There are 2 types of melons:\nthe green one you saw\n"
+            _tutorialPopupText.string = @"There are 2 types of melons:\nthe green one you saw\n"
                 "and this blue one.\nEach time you get a random type.";
             
             [_grid clearBoardAndRemoveChildren:YES];
@@ -307,7 +308,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 9:
         {
             [self tutorialPopupVisible:YES];
-            _popupText.string = @"Good job. A winter melon\ntakes 3 hits to clear.\n"
+            _tutorialPopupText.string = @"Good job. A winter melon\ntakes 3 hits to clear.\n"
                 "Place it wisely.";
         }
             break;
@@ -375,35 +376,42 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 - (void)tutorialPopupVisible:(BOOL)visibility
 {
     _tutorialPopup.visible = visibility;
+    _nextButton.visible = visibility;
+    _backButton.visible = visibility;
     
-    _acceptTouch = !visibility;
+    _repeatButton.visible = !visibility;
     _tutorialText.visible = !visibility;
+    _acceptTouch = !visibility;
 }
 
 // Goes to the next step of the tutorial.
-- (void)goToTutorialNextStepAndClearBoard
+- (void)goToTutorialNextStep
 {
-    [_highlightedCells clearBoardAndRemoveChildren:YES];
-    [_grid clearBoardAndRemoveChildren:YES];
-
-    _nextButton.visible = NO;
-
     _tutorialCurrentStep++;
-    [self showTutorialAtStep:_tutorialCurrentStep];
+    [self loadTutorialStep:_tutorialCurrentStep];
 }
 
 - (void)goToTutorialPreviousStep
 {
-    _nextButton.visible = NO;
+    _tutorialCurrentStep--;
+    [self loadTutorialStep:_tutorialCurrentStep];
+}
+
+- (void)repeatTutorialStep
+{
+    [self showTutorialAtStep:_tutorialCurrentStep];
+}
+
+- (void)loadTutorialStep:(int)step
+{
+    _nextButtonAtTop.visible = NO;
+    
     [_highlightedCells clearBoardAndRemoveChildren:YES];
     [_grid clearBoardAndRemoveChildren:YES];
     
-    _tutorialCurrentStep--;
-    if (_tutorialCurrentStep >= 0)
-    {
-        [self showTutorialAtStep:_tutorialCurrentStep];
-    }
+    [self showTutorialAtStep:step];
 }
+
 
 // Go through the tutorial again.
 - (void)showTutorialAgain
@@ -420,8 +428,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 // Highlights all the cells where an explosion is possible.
 - (void)highlightExplosionCells
 {
-//    [_highlightedCells printBoardState];
-    
     for (int row = 0; row < _grid.numRows; row++)
     {
         for (int col = 0; col < _grid.numCols; col++)
@@ -516,6 +522,18 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         
         if (!_tutorialCompleted)
         {
+            if ([_grid boardIsFull])
+            {
+                [self tutorialPopupVisible:YES];
+                
+                _tutorialPopupText.string = @"Don't worry,\nlet's try this step again.";
+                
+                _repeatButton.visible = YES;
+                _backButton.visible = NO;
+                _nextButton.visible = NO;
+                
+            }
+            
             if (_melon.type != MelonTypeRegular)
             {
                 _tutorialCurrentStep++;
@@ -527,7 +545,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                 
                 if (numRemoved == _melonLabel)
                 {
-                    _nextButton.visible = YES;
+                    _nextButtonAtTop.visible = YES;
                 }
                 else
                 {
