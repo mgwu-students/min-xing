@@ -107,17 +107,14 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     // Retrieve high score.
     _highScoreNum = [[NSUserDefaults standardUserDefaults] objectForKey:HIGH_SCORE_KEY];
     // Retrieve whether tutorial has been completed.
-    //    _tutorialCompleted = [[NSUserDefaults standardUserDefaults] objectForKey:TUTORIAL_KEY];
-    
-    // TESTING ONLY.
-    _tutorialCompleted = NO;
+//     _tutorialCompleted = [[NSUserDefaults standardUserDefaults] boolForKey:TUTORIAL_KEY];
     
     if (!_tutorialCompleted)
     {
         // Option for user to go back to this tutorial later.
         _tutorialButton.visible = NO;
         
-        [self tutorialLabelsVisible:NO];
+        [self tutorialLabelsHide:NO];
         [self loadTutorialPopup];
         
         [self showTutorialAtStep:_tutorialCurrentStep];
@@ -141,12 +138,14 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     }
     
     _score = 0;
-    _tutorialCompleted = YES;
     _acceptTouch = YES;
-    
     _tutorialButton.visible = YES;
     
-    [self tutorialLabelsVisible:YES];
+    _tutorialCompleted = YES;
+//    [[NSUserDefaults standardUserDefaults] setBool:_tutorialCompleted forKey:TUTORIAL_KEY];
+//    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    [self tutorialLabelsHide:YES];
     
     [_grid clearBoardAndRemoveChildren:YES];
     
@@ -183,7 +182,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 0:
         {
             [self tutorialPopupVisible: YES];
-            _tutorialPopupText.string = @"The goal of the game is...";
+            _tutorialPopupText.string = @"The goal of the game is... ";
             
             _numLabel.string = [NSString stringWithFormat:@" "];
             
@@ -206,8 +205,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 2:
         {
             [self tutorialPopupVisible:NO];
-            _tutorialText.string = @"\nSuppose the random number is 4.\nPlace this melon on the "
-                "glowing cell";
+            _tutorialText.string = @"\nSuppose the random number is 4.\nPlace this "
+                "melon on an empty\nspot to explode\narow of 4 melons";
 
             [self helperShowTutorialStartCol:0 endCol:0 startRow:0 endRow:2
                                   melonLabel:4 type:MelonTypeRegular];
@@ -231,8 +230,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         {
             [self tutorialPopupVisible: NO];
                         
-            _tutorialText.string = @"\n\nNice job! Now try to make a 5!\n\n"
-                "(But not diagonal) Place melon on board.";
+            _tutorialText.string = @"\n\nNice job! Now try to make a 5!";
         
             [_grid clearBoardAndRemoveChildren:YES];
             
@@ -336,8 +334,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         default:
             break;
     }
-//    [[NSUserDefaults standardUserDefaults] setObject:_tutorialCompleted forKey:TUTORIAL_KEY];
-//    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 // Displays a row or column of melons on board and updates the melon label for the tutorial.
@@ -360,18 +356,20 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 }
 
 // Whether the total melon labels and the score labels are visible.
-- (void)tutorialLabelsVisible:(BOOL)visiblility
+- (void)tutorialLabelsHide:(BOOL)visible
 {
-    _totalMelonLabel.visible = visiblility;
-    _totalMelonLabelText.visible = visiblility;
+    _totalMelonLabel.visible = visible;
+    _totalMelonLabelText.visible = visible;
     
-    _scoreLabel.visible = visiblility;
-    _scoreLabelText.visible = visiblility;
+    _scoreLabel.visible = visible;
+    _scoreLabelText.visible = visible;
     
-    _playButtonAtEndOfTutorial.visible = visiblility;
-    _tutorialAgain.visible = visiblility;
+    _playButtonAtEndOfTutorial.visible = visible;
+    _tutorialAgain.visible = visible;
     
-    _tutorialText.visible = !visiblility;
+    _nextButtonAtTop.visible = !visible;
+    _backButtonAtTop.visible = !visible;
+    _tutorialText.visible = !visible;
 }
 
 - (void)loadTutorialPopup
@@ -382,17 +380,18 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     [self addChild:_tutorialPopup];
 }
 
-- (void)tutorialPopupVisible:(BOOL)visibility
+- (void)tutorialPopupVisible:(BOOL)visible
 {
-    _tutorialPopup.visible = visibility;
-    _nextButton.visible = visibility;
-    _backButton.visible = visibility;
- 
-    _repeatButton.visible = !visibility;
-    _hideHighlightsButton.visible = !visibility;
+    _tutorialPopup.visible = visible;
+    _backButton.visible = visible;
+    _nextButton.visible = visible;
     
-    _tutorialText.visible = !visibility;
-    _acceptTouch = !visibility;
+    _backButtonAtTop.visible = !visible;
+    _tutorialText.visible = !visible;
+    _acceptTouch = !visible;
+    
+    _repeatButton.visible = !visible;
+    _hideHighlightsButton.visible = !visible;
 }
 
 // Gives the player the option to click on the "next" button.
@@ -426,6 +425,11 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 
 - (void)repeatTutorialStep
 {
+    if (_tutorialCurrentStep != 0)
+    {
+        _backButtonAtTop.visible = YES;
+    }
+    
     [self showTutorialAtStep:_tutorialCurrentStep];
 }
 
@@ -446,9 +450,10 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _tutorialButton.visible = NO;
     _tutorialCompleted = NO;
     
-    [self tutorialLabelsVisible:NO];
+    [self tutorialLabelsHide:NO];
     
     [_grid clearBoardAndRemoveChildren:YES];
+    [_highlightedCells clearBoardAndRemoveChildren:YES];
     
     _tutorialCurrentStep = 0;
     
@@ -561,12 +566,15 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             if ([_grid boardIsFull])
             {
                 [self tutorialPopupVisible:YES];
+                _repeatButton.visible = YES;
                 
                 _tutorialPopupText.string = @"Don't worry,\nlet's try this step again.";
                 
-                _repeatButton.visible = YES;
                 _backButton.visible = NO;
                 _nextButton.visible = NO;
+                _backButtonAtTop.visible = NO;
+                _nextButtonAtTop.visible = NO;
+                [_shineNextButtonAtTop removeFromParent];
                 
             }
             
