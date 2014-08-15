@@ -26,6 +26,9 @@ static const float WINTERMELON_CHANCE_INCREASE_RATE = 0.1;
 static const float INITIAL_WINTERMELON_CHANCE = 0.2 + INITIAL_BOMB_CHANCE,
                     WINTERMELON_CHANCE_CAP = 0.5 + BOMB_CHANCE_CAP;
 
+// Consecutive explosions gives a bonus multiplier.
+static const int EXPLOSION_TIMES_BONUS_CAP = 3;
+
 // The chance to get a 5 is lower.
 static const int LABEL_WITH_LESS_FREQUENCY = 5;
 
@@ -749,9 +752,15 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 - (void)updateScore:(int)totalRemoved
 {
     // Consecutive explosions earn a bonus score multiplier.
-    if (_consecutiveTimes > 0)
+    if (_consecutiveTimes > 0 && _consecutiveTimes <= EXPLOSION_TIMES_BONUS_CAP)
     {
         _score += totalRemoved * totalRemoved * _consecutiveTimes;
+        
+        // Reset the number of consecutive explosions.
+        if (_consecutiveTimes == EXPLOSION_TIMES_BONUS_CAP)
+        {
+            _consecutiveTimes = 0;
+        }
     }
     else
     {
