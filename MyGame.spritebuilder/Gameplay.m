@@ -200,8 +200,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             
             _melonLabel = 3;
             [self updateMelonLabelAndIconType:MelonTypeRegular];
-            
-            _backButton.visible = YES;
         }
             break;
         case 2:
@@ -225,22 +223,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             [self updateMelonLabelAndIconType:MelonTypeRegular];
             
             [self highlightExplosionCells];
-            
-            _backButtonAtTop.visible = YES;
         }
             break;
-//        case 3:
-//        {
-//            [self tutorialPopupVisible: YES];
-//            _tutorialPopupText.string = @"\n\nGood job!\n\nThe number stays\nthe same throughout\na step of "
-//                "the\ntutorial, but in the\ngame it changes\nevery time you\nplace a melon.";
-//            
-//            _melonLabel = 2;
-//            [self updateMelonLabelAndIconType:MelonTypeRegular];
-//            
-//            _backButton.visible = YES;
-//        }
-//            break;
         case 3:
         {
             [self tutorialPopupVisible: NO];
@@ -304,6 +288,12 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             break;
         case 7:
         {
+            [self tutorialPopupVisible:YES];
+            _tutorialPopupText.string = @"\nA winter melon\ntakes 3 hits to clear.";
+        }
+            break;
+        case 8:
+        {
             [self tutorialPopupVisible:NO];
             _tutorialText.string = @"Place the winter melon\nanywhere on the board.";
             
@@ -314,7 +304,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             [self updateMelonLabelAndIconType:MelonTypeWinter];
         }
             break;
-        case 8:
+        case 9:
         {
             [self tutorialPopupVisible: NO];
             _tutorialText.string = @"Place another winter\nmelon.";
@@ -326,20 +316,13 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             [self updateMelonLabelAndIconType:MelonTypeWinter];
         }
             break;
-        case 9:
+        case 10:
         {
             [self tutorialPopupVisible: NO];
             _tutorialText.string = @"Click any empty cell to\ncontinue.";
             
             _melon = (Melon *)[CCBReader load:@"Melon"];
             _melon.type = MelonTypeWinter;
-        }
-            break;
-        case 10:
-        {
-            [self tutorialPopupVisible:YES];
-            _tutorialPopupText.string = @"\nWell done!\n\nA winter melon\ntakes 3 hits to clear.\n"
-                "Place it wisely.";
         }
             break;
         case 11:
@@ -355,6 +338,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         }
             break;
         default:
+            [self tutorialPopupVisible:NO];
             break;
     }
 }
@@ -442,8 +426,11 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 
 - (void)goToTutorialPreviousStep
 {
-    _tutorialCurrentStep--;
-    [self loadTutorialStep:_tutorialCurrentStep];
+    if (_tutorialCurrentStep > 0)
+    {
+        _tutorialCurrentStep--;
+        [self loadTutorialStep:_tutorialCurrentStep];
+    }
 }
 
 - (void)repeatTutorialStep
@@ -463,6 +450,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     [_highlightedCells clearBoardAndRemoveChildren:YES];
     [_grid clearBoardAndRemoveChildren:YES];
     
+    [self tutorialPopupVisible:NO];
     [self showTutorialAtStep:step];
 }
 
@@ -541,6 +529,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 // Melon gets placed on touch.
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
+    CCLOG(@"tutorial current step %d", _tutorialCurrentStep);
+    
     if (!_acceptTouch)
     {
         return;
