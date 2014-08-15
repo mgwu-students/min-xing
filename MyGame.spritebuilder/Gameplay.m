@@ -63,7 +63,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     CCButton *_hideHighlightsButton;
     CCButton *_backButton, *_nextButton, *_repeatButton;
     CCButton *_backButtonAtTop, *_nextButtonAtTop;
-    CCParticleSystem *_shineNextButtonAtTop;
+    CCNode *_nextArrow;
     NSNumber *_highScoreNum;
     BOOL _tutorialCompleted;
     BOOL _acceptTouch;
@@ -93,8 +93,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _melonsLeft = TOTAL_NUM_MELONS;
     
     _melonIcon = (Melon *)[CCBReader load:@"Melon"];
-    
-    _shineNextButtonAtTop = (CCParticleSystem *)[CCBReader load:@"shineNextButton"];
     
     _highlightedCells = [[Grid alloc]init];
     
@@ -190,6 +188,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             _backButton.visible = NO;
             _backButtonAtTop.visible = NO;
             _nextButtonAtTop.visible = NO;
+            _nextArrow.visible = NO;
         }
             break;
         case 1:
@@ -331,6 +330,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
             _tutorialText.string = @"Your number of melons\nis limited. Shoot for a\nhigh score!";
             
             _backButtonAtTop.visible = NO;
+            
             _playButtonAtEndOfTutorial.visible = YES;
             _tutorialAgainButton.visible = YES;
             
@@ -375,6 +375,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     _tutorialAgainButton.visible = visible;
     
     _nextButtonAtTop.visible = !visible;
+    _nextArrow.visible = !visible;
     _backButtonAtTop.visible = !visible;
     _tutorialText.visible = !visible;
 }
@@ -405,21 +406,13 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 - (void)completeStep
 {
     _nextButtonAtTop.visible = YES;
-    
-    if (!_shineNextButtonAtTop.parent)
-    {
-        [_nextButtonAtTop.parent addChild:_shineNextButtonAtTop];
-        _shineNextButtonAtTop.positionInPoints = _nextButtonAtTop.positionInPoints;
-    }
-    
-    _tutorialText.visible = NO;
+    _nextArrow.visible = YES;
+    _tutorialText.string = @"There, you got it!";
 }
 
 // Goes to the next step of the tutorial.
 - (void)goToTutorialNextStep
 {
-    [_shineNextButtonAtTop removeFromParent];
-    
     _tutorialCurrentStep++;
     [self loadTutorialStep:_tutorialCurrentStep];
 }
@@ -445,6 +438,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 
 - (void)loadTutorialStep:(int)step
 {
+    _nextArrow.visible = NO;
     _nextButtonAtTop.visible = NO;
     
     [_highlightedCells clearBoardAndRemoveChildren:YES];
@@ -529,8 +523,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 // Melon gets placed on touch.
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
-    CCLOG(@"tutorial current step %d", _tutorialCurrentStep);
-    
     if (!_acceptTouch)
     {
         return;
@@ -581,8 +573,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                 _nextButton.visible = NO;
                 _backButtonAtTop.visible = NO;
                 _nextButtonAtTop.visible = NO;
-                [_shineNextButtonAtTop removeFromParent];
-                
             }
             
             if (_melon.type != MelonTypeRegular)

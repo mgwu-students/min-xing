@@ -1695,8 +1695,6 @@
 						</array>
 					</dict>
 				</array>
-				<key>selected</key>
-				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -1905,7 +1903,7 @@
 						<string>FloatScale</string>
 						<key>value</key>
 						<array>
-							<real>13</real>
+							<real>15</real>
 							<integer>0</integer>
 						</array>
 					</dict>
@@ -2023,6 +2021,8 @@
 						</array>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 			</dict>
 		</array>
 		<key>customClass</key>
