@@ -11,7 +11,7 @@
 	<key>CFBundleIconFile</key>
 	<string>Icon</string>
 	<key>CFBundleIconFile~ipad</key>
-	<string>Icon</string>
+	<string>Icon-72</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.apportable.${PRODUCT_NAME:rfc1034identifier}</string>
 	<key>CFBundleInfoDictionaryVersion</key>

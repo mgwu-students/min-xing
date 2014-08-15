@@ -107,7 +107,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     // Retrieve high score.
     _highScoreNum = [[NSUserDefaults standardUserDefaults] objectForKey:HIGH_SCORE_KEY];
     // Retrieve whether tutorial has been completed.
-//     _tutorialCompleted = [[NSUserDefaults standardUserDefaults] boolForKey:TUTORIAL_KEY];
+     _tutorialCompleted = [[NSUserDefaults standardUserDefaults] boolForKey:TUTORIAL_KEY];
     
     if (!_tutorialCompleted)
     {
@@ -115,7 +115,6 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         _tutorialButton.visible = NO;
         
         [self tutorialLabelsHide:NO];
-        [self loadTutorialPopup];
         
         [self showTutorialAtStep:_tutorialCurrentStep];
     }
@@ -127,34 +126,25 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 
 - (void)startGame
 {
-    if (_playButtonAtEndOfTutorial.parent)
-    {
-        [_playButtonAtEndOfTutorial removeFromParent];
-    }
-    
-    if (_tutorialAgain.parent)
-    {
-        [_tutorialAgain removeFromParent];
-    }
-    
     _score = 0;
     _acceptTouch = YES;
-    _tutorialButton.visible = YES;
-    
-    _tutorialCompleted = YES;
-//    [[NSUserDefaults standardUserDefaults] setBool:_tutorialCompleted forKey:TUTORIAL_KEY];
-//    [[NSUserDefaults standardUserDefaults] synchronize];
     
     [self tutorialLabelsHide:YES];
+    _tutorialButton.visible = YES;
+    _playButtonAtEndOfTutorial.visible = NO;
+    _tutorialAgain.visible = NO;
     
     [_grid clearBoardAndRemoveChildren:YES];
-    
     [_highlightedCells clearBoardAndRemoveChildren:YES];
     
     [self putRandomMelonsOnBoard];
     
     // First melon label.
     [self updateRandomMelonLabelAndIcon];
+    
+    _tutorialCompleted = YES;
+    [[NSUserDefaults standardUserDefaults] setBool:_tutorialCompleted forKey:TUTORIAL_KEY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 // Generate random melons on board on start.
@@ -181,6 +171,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
     {
         case 0:
         {
+            [self loadTutorialPopup];
             [self tutorialPopupVisible: YES];
             _tutorialPopupText.string = @"The goal of the game is... ";
             
@@ -448,7 +439,10 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 - (void)showTutorialAgain
 {
     _tutorialButton.visible = NO;
+    
     _tutorialCompleted = NO;
+    [[NSUserDefaults standardUserDefaults] setBool:_tutorialCompleted forKey:TUTORIAL_KEY];
+    [[NSUserDefaults standardUserDefaults]synchronize];
     
     [self tutorialLabelsHide:NO];
     
@@ -623,16 +617,17 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                 // Explosions completed. Exit highlight mode.
                 [_highlightedCells clearBoardAndRemoveChildren:YES];
                 
-                [self tutorialPopupVisible:YES];
-                
-                _tutorialPopup.anchorPoint = ccp(0.5, 0.5);
-                _tutorialPopup.zOrder = 1;
-                
-                _tutorialPopupText.string = @"Very nicely done.\nNow you're on your own!";
-                
-                _hideHighlightsButton.visible = YES;
-                _backButton.visible = NO;
-                _nextButton.visible = NO;
+//                _tutorialPopup.anchorPoint = ccp(0.5, 0.5);
+//
+//                [self tutorialPopupVisible:YES];
+//                
+//                _tutorialPopup.zOrder = 1;
+//                
+//                _tutorialPopupText.string = @"Very nicely done.\nNow you're on your own!";
+//                
+//                _hideHighlightsButton.visible = YES;
+//                _backButton.visible = NO;
+//                _nextButton.visible = NO;
                 
                 _numExplosionsAfterGameStarts++;
             }
@@ -663,12 +658,15 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 // Counts how many melons have been removed by the melon.
 - (int)melonPlacedStoreNumRemoved:(int)totalRemoved
 {
-    [_grid addObject:_melon toRow:_melon.row andCol:_melon.col asChild:YES];
-    
-    // Updates the melon's neighbor positions and remove them.
-    [self countMelonNeighborsOfMelon:_melon];
-    
-    totalRemoved = [self removedNeighbors];
+    if (!_melon.parent)
+    {
+        [_grid addObject:_melon toRow:_melon.row andCol:_melon.col asChild:YES];
+        
+        // Updates the melon's neighbor positions and remove them.
+        [self countMelonNeighborsOfMelon:_melon];
+        
+        totalRemoved = [self removedNeighbors];
+    }
     
     return totalRemoved;
 }
