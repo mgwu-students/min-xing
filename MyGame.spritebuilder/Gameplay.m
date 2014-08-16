@@ -39,7 +39,7 @@ static const int TOTAL_NUM_MELONS = 40;
 static const int NUM_MELONS_ON_START = 6;
 
 // Number of pixels below the label in the y-axis.
-static const int MELON_ICON_Y_OFFSET = 50;
+static const int MELON_ICON_Y_OFFSET = 0;
 
 // After this number of explosions, stops highlighting cells with possible explosions.
 static const int NUM_EXPLOSIONS_BEFORE_TUTORIAL_HIGHLIGHT_STOPS = 5;
@@ -194,8 +194,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 1:
         {
             [self tutorialPopupVisible: YES];
-            _tutorialPopupText.string = @"\n\nThe number on the\ntop right is for\nyour current melon.\n\n"
-                "3 means if you add\na 3rd melon to a\nrow or column of\n2 melons, all 3\nmelons will explode.";
+            _tutorialPopupText.string = @"\n\nThe number 3 on the\nmelon means if you add\n"
+                "a 3rd melon to a\nrow or column of\n2 melons, all 3\nmelons will explode.";
             
             _melonLabel = 3;
             [self updateMelonLabelAndIconType:MelonTypeRegular];
@@ -247,7 +247,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 4:
         {
             [self tutorialPopupVisible: NO];
-            _tutorialText.string = @"Try to explode a row and\ncolumn together with\nnumber 2.";
+            _tutorialText.string = @"Try to get 2 in a\nrow and/or column.";
             
             [_grid clearBoardAndRemoveChildren:YES];
             
@@ -257,7 +257,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
                                   melonLabel:4 type:MelonTypeRegular];
             [self helperShowTutorialStartCol:3 endCol:3 startRow:0 endRow:0
                                   melonLabel:4 type:MelonTypeRegular];
-            [self helperShowTutorialStartCol:4 endCol:4 startRow:0 endRow:1
+            [self helperShowTutorialStartCol:4 endCol:4 startRow:1 endRow:1
                                   melonLabel:4 type:MelonTypeRegular];
             
             _melon = (Melon *)[CCBReader load:@"Melon"];
@@ -269,7 +269,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         {
             [self tutorialPopupVisible: YES];
             _tutorialPopupText.string = @"Nice!\n\nExplosions can be\nvertical and/or\nhorizontal, "
-                "but\nnot diagonal.";
+                "but\nNOT diagonal.";
             
             _backButton.visible = YES;
         }
@@ -278,7 +278,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         {
             [self tutorialPopupVisible:YES];
             _tutorialPopupText.string = @"There are 2 type of\nmelons: green & blue.\n\nEach time "
-                "you get\na random melon.";
+                "you get\na random melon with\na random number.";
             
             [_grid clearBoardAndRemoveChildren:YES];
             
@@ -327,7 +327,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 11:
         {
             [self tutorialPopupVisible:NO];
-            _tutorialText.string = @"Your number of melons\nis limited. Shoot for a\nhigh score!";
+            _tutorialText.string = @"You have a limited\nnumber of 40\nmelons. Place them\nwisely!";
             
             _backButtonAtTop.visible = NO;
             
