@@ -247,7 +247,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 4:
         {
             [self tutorialPopupVisible: NO];
-            _tutorialText.string = @"Try to get 2 in a\nrow or column.";
+            _tutorialText.string = @"Try to get 2 in a row\nor column.";
             
             [_grid clearBoardAndRemoveChildren:YES];
             
