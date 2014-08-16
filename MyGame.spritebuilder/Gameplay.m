@@ -277,7 +277,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 6:
         {
             [self tutorialPopupVisible:YES];
-            _tutorialPopupText.string = @"There are 2 type of\nmelons: green & blue.\n\nEach time "
+            _tutorialPopupText.string = @"\nThere are 2 type of\nmelons: green & blue.\n\nEach time "
                 "you get\na random melon with\na random number.";
             
             [_grid clearBoardAndRemoveChildren:YES];
