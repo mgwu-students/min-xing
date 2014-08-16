@@ -1497,7 +1497,7 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>ccbResources/ccbButtonNormal.png</string>
+							<string>MyGameAssets/Icon-4@4x.png</string>
 						</array>
 					</dict>
 					<dict>
@@ -1823,7 +1823,7 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>ccbResources/ccbButtonNormal.png</string>
+							<string>MyGameAssets/Icon-4@4x.png</string>
 						</array>
 					</dict>
 					<dict>

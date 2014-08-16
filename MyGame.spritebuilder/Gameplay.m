@@ -41,6 +41,10 @@ static const int NUM_MELONS_ON_START = 6;
 // Number of pixels below the label in the y-axis.
 static const int MELON_ICON_Y_OFFSET = 50;
 
+// Adjust melon's position on grid to completely overlap grid cells.
+static const int MELON_X_POS_OFFSET = 5;
+static const int MELON_Y_POS_OFFSET = 5;
+
 // After this number of explosions, stops highlighting cells with possible explosions.
 static const int NUM_EXPLOSIONS_BEFORE_TUTORIAL_HIGHLIGHT_STOPS = 5;
 
@@ -277,8 +281,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 6:
         {
             [self tutorialPopupVisible:YES];
-            _tutorialPopupText.string = @"\nThere are 2 types\nof melons: the green\none you saw "
-                "and this\nblue one.\n\nEach time you get\na random type.";
+            _tutorialPopupText.string = @"There are 2 type of\nmelons: green & blue.\n\nEach time "
+                "you get\na random melon.";
             
             [_grid clearBoardAndRemoveChildren:YES];
             

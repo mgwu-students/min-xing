@@ -199,8 +199,6 @@
 						<string>Grid.ccb</string>
 					</dict>
 				</array>
-				<key>selected</key>
-				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -1439,8 +1437,8 @@
 								<string>Position</string>
 								<key>value</key>
 								<array>
-									<real>0.39688470959663391</real>
-									<real>0.20293426513671875</real>
+									<real>0.40999999642372131</real>
+									<real>0.18000000715255737</real>
 									<integer>0</integer>
 									<integer>2</integer>
 									<integer>2</integer>
@@ -1731,8 +1729,8 @@
 						<string>Position</string>
 						<key>value</key>
 						<array>
-							<real>0.5</real>
-							<real>268</real>
+							<real>0.49687498807907104</real>
+							<real>269</real>
 							<integer>0</integer>
 							<integer>2</integer>
 							<integer>0</integer>
@@ -1826,7 +1824,20 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>ccbResources/ccbButtonNormal.png</string>
+							<string>MyGameAssets/Icon-4@4x.png</string>
+						</array>
+					</dict>
+					<dict>
+						<key>name</key>
+						<string>backgroundColor|Normal</string>
+						<key>type</key>
+						<string>Color3</string>
+						<key>value</key>
+						<array>
+							<real>0.34672239422798157</real>
+							<real>1</real>
+							<real>0.0</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>
@@ -2152,7 +2163,20 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>ccbResources/ccbButtonNormal.png</string>
+							<string>MyGameAssets/Icon-4@4x.png</string>
+						</array>
+					</dict>
+					<dict>
+						<key>name</key>
+						<string>backgroundColor|Normal</string>
+						<key>type</key>
+						<string>Color3</string>
+						<key>value</key>
+						<array>
+							<real>0.34672239422798157</real>
+							<real>1</real>
+							<real>0.0</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>
@@ -2384,7 +2408,7 @@
 						<key>value</key>
 						<array>
 							<real>0.546875</real>
-							<real>0.75</real>
+							<real>0.72000002861022949</real>
 							<integer>0</integer>
 							<integer>2</integer>
 							<integer>2</integer>
@@ -2478,7 +2502,20 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>ccbResources/ccbButtonNormal.png</string>
+							<string>MyGameAssets/Icon-4@4x.png</string>
+						</array>
+					</dict>
+					<dict>
+						<key>name</key>
+						<string>backgroundColor|Normal</string>
+						<key>type</key>
+						<string>Color3</string>
+						<key>value</key>
+						<array>
+							<real>0.95852243900299072</real>
+							<real>0.95852243900299072</real>
+							<real>0.95852243900299072</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>
@@ -2647,7 +2684,7 @@
 							<real>0.0</real>
 							<real>0.0</real>
 							<real>0.0</real>
-							<real>127</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>
@@ -2676,6 +2713,8 @@
 						</array>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -2710,7 +2749,7 @@
 						<key>value</key>
 						<array>
 							<real>0.21687500178813934</real>
-							<real>0.75</real>
+							<real>0.72000002861022949</real>
 							<integer>0</integer>
 							<integer>2</integer>
 							<integer>2</integer>
@@ -2804,7 +2843,20 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>ccbResources/ccbButtonNormal.png</string>
+							<string>MyGameAssets/Icon-4@4x.png</string>
+						</array>
+					</dict>
+					<dict>
+						<key>name</key>
+						<string>backgroundColor|Normal</string>
+						<key>type</key>
+						<string>Color3</string>
+						<key>value</key>
+						<array>
+							<real>0.95852243900299072</real>
+							<real>0.95852243900299072</real>
+							<real>0.95852243900299072</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>
@@ -2933,10 +2985,10 @@
 						<string>Color4</string>
 						<key>value</key>
 						<array>
-							<real>255</real>
-							<real>255</real>
-							<real>255</real>
-							<real>255</real>
+							<real>1</real>
+							<real>1</real>
+							<real>1</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>
@@ -3013,7 +3065,7 @@
 				<key>customClass</key>
 				<string></string>
 				<key>displayName</key>
-				<string>1408159959_arrow_down</string>
+				<string>arrow for next button</string>
 				<key>memberVarAssignmentName</key>
 				<string>_nextArrow</string>
 				<key>memberVarAssignmentType</key>
