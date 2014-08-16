@@ -10,6 +10,4 @@
 
 @interface Tile : CCSprite
 
-- (instancetype)initTile;
-
 @end

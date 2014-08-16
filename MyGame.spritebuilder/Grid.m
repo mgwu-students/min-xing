@@ -59,7 +59,7 @@ static const float MARGIN = 1.0;
             _gridArray[i][j] = [NSNull null];
             
             // Adds a tile picture onto the grid.
-            Tile *tile = [[Tile alloc] initTile];
+            Tile *tile = (Tile *)[CCBReader load:@"tile"];
             tile.anchorPoint = ccp(0, 0);
             tile.position = ccp (x, y);
             

@@ -8,13 +8,6 @@
 
 #import "Tile.h"
 
-static NSString *tileImage = @"MyGameAssets/tile.png";
-
 @implementation Tile
-
-- (instancetype)initTile
-{
-    return [super initWithImageNamed:tileImage];
-}
 
 @end

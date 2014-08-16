@@ -103,7 +103,7 @@
 				<key>value</key>
 				<array>
 					<string></string>
-					<string>MyGameAssets/tile.png</string>
+					<string>MyGameAssets/tile2.png</string>
 				</array>
 			</dict>
 			<dict>
@@ -114,12 +114,14 @@
 				<key>value</key>
 				<array>
 					<real>1</real>
-					<real>1</real>
-					<real>1</real>
+					<real>0.99143755435943604</real>
+					<real>0.48722314834594727</real>
 					<real>1</real>
 				</array>
 			</dict>
 		</array>
+		<key>selected</key>
+		<true/>
 	</dict>
 	<key>notes</key>
 	<array/>
