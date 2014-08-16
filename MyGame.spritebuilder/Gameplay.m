@@ -194,8 +194,8 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 1:
         {
             [self tutorialPopupVisible: YES];
-            _tutorialPopupText.string = @"\n\nThe number 3 on the\nmelon means if you add\n"
-                "a 3rd melon to a\nrow or column of\n2 melons, all 3\nmelons will explode.";
+            _tutorialPopupText.string = @"\n\nThe number 3 on the\nmelon means if you\nadd "
+                "a 3rd melon to\na row or column\nof 2 melons, all 3\nmelons will explode.";
             
             _melonLabel = 3;
             [self updateMelonLabelAndIconType:MelonTypeRegular];
@@ -247,7 +247,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 4:
         {
             [self tutorialPopupVisible: NO];
-            _tutorialText.string = @"Try to get 2 in a\nrow and/or column.";
+            _tutorialText.string = @"Try to get 2 in a\nrow or column.";
             
             [_grid clearBoardAndRemoveChildren:YES];
             
