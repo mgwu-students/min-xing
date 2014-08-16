@@ -13,6 +13,12 @@ static const int GRID_ROWS = 5;
 static const int GRID_COLUMNS = 5;
 static const float MARGIN = 1.0;
 
+// Adjust object's position on grid.
+static const float X_POS_OFFSET = -2.2;
+static const float Y_POS_OFFSET = 0.3;
+// Scaling factor on top of normal grid scaling.
+static const float SCALE_TIMES = 1.08;
+
 @implementation Grid {
     NSMutableArray *_gridArray;
 }
@@ -152,10 +158,11 @@ static const float MARGIN = 1.0;
 // Position an object at the specified position on the board.
 - (void)positionNode:(CCNode *)node atRow:(int)row andCol:(int)col
 {
-    node.position = ccp (col * (self.cellWidth + MARGIN), row * (self.cellHeight + MARGIN));
+    node.position = ccp (col * (self.cellWidth + MARGIN) + X_POS_OFFSET,
+                         row * (self.cellHeight + MARGIN) + Y_POS_OFFSET);
     
     // See Melon class for overriding scale setter.
-    node.scale = self.cellWidth;
+    node.scale = self.cellWidth * SCALE_TIMES;
     
     node.anchorPoint = ccp(0, 0);
 }

@@ -1848,7 +1848,20 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>ccbResources/ccbButtonHighlighted.png</string>
+							<string>MyGameAssets/Icon-4@4x.png</string>
+						</array>
+					</dict>
+					<dict>
+						<key>name</key>
+						<string>backgroundColor|Highlighted</string>
+						<key>type</key>
+						<string>Color3</string>
+						<key>value</key>
+						<array>
+							<real>0.1371997594833374</real>
+							<real>0.39300763607025146</real>
+							<real>0.0022977457847446203</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>
@@ -2187,7 +2200,20 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>ccbResources/ccbButtonHighlighted.png</string>
+							<string>MyGameAssets/Icon-4@4x.png</string>
+						</array>
+					</dict>
+					<dict>
+						<key>name</key>
+						<string>backgroundColor|Highlighted</string>
+						<key>type</key>
+						<string>Color3</string>
+						<key>value</key>
+						<array>
+							<real>0.1371997594833374</real>
+							<real>0.39300763607025146</real>
+							<real>0.0022977457847446203</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>
@@ -2374,6 +2400,8 @@
 						</array>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -2526,7 +2554,20 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>ccbResources/ccbButtonHighlighted.png</string>
+							<string>MyGameAssets/Icon-4@4x.png</string>
+						</array>
+					</dict>
+					<dict>
+						<key>name</key>
+						<string>backgroundColor|Highlighted</string>
+						<key>type</key>
+						<string>Color3</string>
+						<key>value</key>
+						<array>
+							<real>0.45051541924476624</real>
+							<real>0.45051541924476624</real>
+							<real>0.45051541924476624</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>
@@ -2713,8 +2754,6 @@
 						</array>
 					</dict>
 				</array>
-				<key>selected</key>
-				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -2867,7 +2906,20 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>ccbResources/ccbButtonHighlighted.png</string>
+							<string>MyGameAssets/Icon-4@4x.png</string>
+						</array>
+					</dict>
+					<dict>
+						<key>name</key>
+						<string>backgroundColor|Highlighted</string>
+						<key>type</key>
+						<string>Color3</string>
+						<key>value</key>
+						<array>
+							<real>0.45051541924476624</real>
+							<real>0.45051541924476624</real>
+							<real>0.45051541924476624</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>
@@ -2910,7 +2962,20 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>ccbResources/ccbButtonNormal.png</string>
+							<string>MyGameAssets/Icon-4@4x.png</string>
+						</array>
+					</dict>
+					<dict>
+						<key>name</key>
+						<string>backgroundColor|Selected</string>
+						<key>type</key>
+						<string>Color3</string>
+						<key>value</key>
+						<array>
+							<real>0.45051541924476624</real>
+							<real>0.45051541924476624</real>
+							<real>0.45051541924476624</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>

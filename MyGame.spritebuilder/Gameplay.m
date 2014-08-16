@@ -41,10 +41,6 @@ static const int NUM_MELONS_ON_START = 6;
 // Number of pixels below the label in the y-axis.
 static const int MELON_ICON_Y_OFFSET = 50;
 
-// Adjust melon's position on grid to completely overlap grid cells.
-static const int MELON_X_POS_OFFSET = 5;
-static const int MELON_Y_POS_OFFSET = 5;
-
 // After this number of explosions, stops highlighting cells with possible explosions.
 static const int NUM_EXPLOSIONS_BEFORE_TUTORIAL_HIGHLIGHT_STOPS = 5;
 
@@ -292,7 +288,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
         case 7:
         {
             [self tutorialPopupVisible:YES];
-            _tutorialPopupText.string = @"\nA winter melon\ntakes 3 hits to clear.";
+            _tutorialPopupText.string = @"\nA (blue) winter melon\ntakes 3 hits to clear.";
         }
             break;
         case 8:
@@ -388,7 +384,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 {
     _tutorialPopup = (TutorialPopup *)[CCBReader load:@"Tutorial" owner:self];
     _tutorialPopup.positionType = CCPositionTypeNormalized;
-    _tutorialPopup.position = ccp(0.35, 0.6);
+    _tutorialPopup.position = ccp(0.4, 0.6);
     [self addChild:_tutorialPopup];
 }
 

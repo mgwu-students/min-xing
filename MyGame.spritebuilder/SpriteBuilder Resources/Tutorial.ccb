@@ -10,7 +10,7 @@
 		<false/>
 	</dict>
 	<key>UUID</key>
-	<integer>19</integer>
+	<integer>22</integer>
 	<key>centeredOrigin</key>
 	<false/>
 	<key>currentResolution</key>
@@ -41,7 +41,7 @@
 		<array>
 			<dict>
 				<key>UUID</key>
-				<integer>18</integer>
+				<integer>21</integer>
 				<key>baseClass</key>
 				<string>CCSprite</string>
 				<key>children</key>
@@ -49,7 +49,7 @@
 				<key>customClass</key>
 				<string></string>
 				<key>displayName</key>
-				<string>popup</string>
+				<string>popup2</string>
 				<key>memberVarAssignmentName</key>
 				<string></string>
 				<key>memberVarAssignmentType</key>
@@ -71,11 +71,11 @@
 						<string>Position</string>
 						<key>value</key>
 						<array>
-							<real>91</real>
-							<real>153</real>
+							<real>0.5</real>
+							<real>0.5</real>
 							<integer>0</integer>
-							<integer>0</integer>
-							<integer>0</integer>
+							<integer>2</integer>
+							<integer>2</integer>
 						</array>
 					</dict>
 					<dict>
@@ -96,8 +96,8 @@
 						<string>ScaleLock</string>
 						<key>value</key>
 						<array>
-							<real>1.3521331548690796</real>
-							<real>1.7326397895812988</real>
+							<real>1.7963827848434448</real>
+							<real>2.0825870037078857</real>
 							<false/>
 							<integer>0</integer>
 						</array>
@@ -110,7 +110,7 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>MyGameAssets/popup.png</string>
+							<string>MyGameAssets/popup2.png</string>
 						</array>
 					</dict>
 					<dict>
@@ -334,8 +334,6 @@
 						</array>
 					</dict>
 				</array>
-				<key>selected</key>
-				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -369,7 +367,7 @@
 						<string>Position</string>
 						<key>value</key>
 						<array>
-							<real>0.77999997138977051</real>
+							<real>0.75</real>
 							<real>0.14000000059604645</real>
 							<integer>0</integer>
 							<integer>2</integer>
@@ -475,7 +473,20 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>ccbResources/ccbButtonHighlighted.png</string>
+							<string>MyGameAssets/Icon-4@4x.png</string>
+						</array>
+					</dict>
+					<dict>
+						<key>name</key>
+						<string>backgroundColor|Highlighted</string>
+						<key>type</key>
+						<string>Color3</string>
+						<key>value</key>
+						<array>
+							<real>0.45051541924476624</real>
+							<real>0.45051541924476624</real>
+							<real>0.45051541924476624</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>
@@ -662,6 +673,8 @@
 						</array>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -695,7 +708,7 @@
 						<string>Position</string>
 						<key>value</key>
 						<array>
-							<real>0.2199999988079071</real>
+							<real>0.25</real>
 							<real>0.14333333075046539</real>
 							<integer>0</integer>
 							<integer>2</integer>
@@ -801,7 +814,20 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>ccbResources/ccbButtonHighlighted.png</string>
+							<string>MyGameAssets/Icon-4@4x.png</string>
+						</array>
+					</dict>
+					<dict>
+						<key>name</key>
+						<string>backgroundColor|Highlighted</string>
+						<key>type</key>
+						<string>Color3</string>
+						<key>value</key>
+						<array>
+							<real>0.45051541924476624</real>
+							<real>0.45051541924476624</real>
+							<real>0.45051541924476624</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>
@@ -1127,7 +1153,20 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>ccbResources/ccbButtonHighlighted.png</string>
+							<string>MyGameAssets/Icon-4@4x.png</string>
+						</array>
+					</dict>
+					<dict>
+						<key>name</key>
+						<string>backgroundColor|Highlighted</string>
+						<key>type</key>
+						<string>Color3</string>
+						<key>value</key>
+						<array>
+							<real>0.45051541924476624</real>
+							<real>0.45051541924476624</real>
+							<real>0.45051541924476624</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>
@@ -1454,6 +1493,19 @@
 						<array>
 							<string></string>
 							<string>MyGameAssets/Icon-4@4x.png</string>
+						</array>
+					</dict>
+					<dict>
+						<key>name</key>
+						<string>backgroundColor|Highlighted</string>
+						<key>type</key>
+						<string>Color3</string>
+						<key>value</key>
+						<array>
+							<real>0.45051541924476624</real>
+							<real>0.45051541924476624</real>
+							<real>0.45051541924476624</real>
+							<real>1</real>
 						</array>
 					</dict>
 					<dict>
