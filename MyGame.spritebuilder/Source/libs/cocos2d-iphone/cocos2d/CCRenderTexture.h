@@ -31,7 +31,7 @@
 #import "CCSprite.h"
 #import "CCTexture.h"
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 #import <UIKit/UIKit.h>
 #endif // iPHone
 
@@ -58,10 +58,8 @@ typedef NS_ENUM(NSInteger, CCRenderTextureImageFormat)
  */
 @interface CCRenderTexture : CCNode
 
-/** The CCSprite being used.
- The sprite, by default, will use the following blending function: GL_ONE, GL_ONE_MINUS_SRC_ALPHA.
- The blending function can be changed in runtime by calling:
-	- [[renderTexture sprite] setBlendFunc:(ccBlendFunc){GL_ONE, GL_ONE_MINUS_SRC_ALPHA}];
+/** The CCSprite that is used for rendering.
+	A subtle change introduced in v3.1.1 is that this sprite is rendered explicitly and is not a child of the render texture.
 */
 @property (nonatomic,readwrite, strong) CCSprite* sprite;
 
@@ -149,7 +147,7 @@ typedef NS_ENUM(NSInteger, CCRenderTextureImageFormat)
 /** 
  *  Starts rendering to the texture whitout clearing the texture first. 
  */
--(void)begin;
+-(CCRenderer *)begin;
 
 /**
  *  starts rendering to the texture while clearing the texture first.
@@ -160,7 +158,7 @@ typedef NS_ENUM(NSInteger, CCRenderTextureImageFormat)
  *  @param b Blue color.
  *  @param a Alpha.
  */
--(void)beginWithClear:(float)r g:(float)g b:(float)b a:(float)a;
+-(CCRenderer *)beginWithClear:(float)r g:(float)g b:(float)b a:(float)a;
 
 /**
  *  starts rendering to the texture while clearing the texture first.
@@ -172,7 +170,7 @@ typedef NS_ENUM(NSInteger, CCRenderTextureImageFormat)
  *  @param a Alpha.
  *  @param depthValue Depth value.
  */
-- (void)beginWithClear:(float)r g:(float)g b:(float)b a:(float)a depth:(float)depthValue;
+- (CCRenderer *)beginWithClear:(float)r g:(float)g b:(float)b a:(float)a depth:(float)depthValue;
 
 /**
  *  starts rendering to the texture while clearing the texture first.
@@ -185,7 +183,7 @@ typedef NS_ENUM(NSInteger, CCRenderTextureImageFormat)
  *  @param depthValue Depth value.
  *  @param stencilValue Stencil value.
  */
-- (void)beginWithClear:(float)r g:(float)g b:(float)b a:(float)a depth:(float)depthValue stencil:(int)stencilValue;
+- (CCRenderer *)beginWithClear:(float)r g:(float)g b:(float)b a:(float)a depth:(float)depthValue stencil:(int)stencilValue;
 
 /** 
  *  Ends grabbing 
@@ -241,6 +239,7 @@ typedef NS_ENUM(NSInteger, CCRenderTextureImageFormat)
  */
 -(BOOL)saveToFile:(NSString*)name format:(CCRenderTextureImageFormat)format;
 
+#if __CC_PLATFORM_IOS
 /**
  *  Saves the texture into a file using JPEG format.
  *
@@ -259,9 +258,6 @@ typedef NS_ENUM(NSInteger, CCRenderTextureImageFormat)
  *  @return YES if the operation was successful.
  */
 -(BOOL)saveToFilePath:(NSString*)filePath format:(CCRenderTextureImageFormat)format;
-
-
-#ifdef __CC_PLATFORM_IOS
 
 /**
  *  Returns an autoreleased UIImage from the texture 

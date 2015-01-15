@@ -521,7 +521,7 @@ static NSString* const TUTORIAL_KEY = @"tutorialDone";
 #pragma mark - Touch Handling
 
 // Melon gets placed on touch.
-- (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
+- (void)touchBegan:(CCTouch *)touch withEvent:(UIEvent *)event
 {
     if (!_acceptTouch)
     {
